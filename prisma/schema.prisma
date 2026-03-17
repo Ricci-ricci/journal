@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String              @id @default(uuid())
+  email      String              @unique
+  name       String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  accounts   TradingAccount[]
+  trades     Trade[]
+  journals   JournalEntry[]
+  strategies Strategy[]
+  metrics    PerformanceMetric[]
+}
+
+model TradingAccount {
+  id             String              @id @default(uuid())
+  userId         String
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  broker         String?
+  accountType    AccountType         @default(PAPER)
+  initialBalance Decimal             @db.Decimal(15, 2)
+  currency       String              @default("USD")
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  trades         Trade[]
+  metrics        PerformanceMetric[]
+
+  @@index([userId])
+}
+
+model Trade {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String?
+  account   TradingAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  symbol    String
+  assetType AssetType?
+  direction TradeDirection
+  status    TradeStatus    @default(OPEN)
+
+  entryDate  DateTime
+  entryPrice Decimal  @db.Decimal(15, 8)
+  quantity   Decimal  @db.Decimal(15, 8)
+
+  exitDate  DateTime?
+  exitPrice Decimal?  @db.Decimal(15, 8)
+
+  commission        Decimal  @default(0) @db.Decimal(15, 2)
+  fees              Decimal  @default(0) @db.Decimal(15, 2)
+  profitLoss        Decimal? @db.Decimal(15, 2)
+  profitLossPercent Decimal? @db.Decimal(8, 4)
+
+  stopLoss        Decimal? @db.Decimal(15, 8)
+  takeProfit      Decimal? @db.Decimal(15, 8)
+  riskRewardRatio Decimal? @db.Decimal(8, 2)
+
+  strategyId String?
+  strategy   Strategy? @relation(fields: [strategyId], references: [id], onDelete: SetNull)
+  setupType  String?
+  timeFrame  String?
+
+  notes         String?
+  tags          String[] @default([])
+  chartImageUrl String?
+
+  confidenceLevel Int?
+  emotionalState  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([symbol])
+  @@index([entryDate])
+  @@index([status])
+}
+
+model JournalEntry {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entryDate DateTime
+  entryType JournalEntryType @default(DAILY)
+
+  title   String?
+  content String?
+
+  whatWentWell   String?
+  whatWentWrong  String?
+  lessonsLearned String?
+
+  goalsNextPeriod  String?
+  marketConditions String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, entryDate, entryType])
+  @@index([userId])
+  @@index([entryDate])
+}
+
+model Strategy {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name                String
+  description         String?
+  entryRules          String?
+  exitRules           String?
+  riskManagementRules String?
+
+  totalTrades   Int      @default(0)
+  winningTrades Int      @default(0)
+  losingTrades  Int      @default(0)
+  winRate       Decimal? @db.Decimal(5, 2)
+  averageProfit Decimal? @db.Decimal(15, 2)
+  averageLoss   Decimal? @db.Decimal(15, 2)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  trades Trade[]
+
+  @@index([userId])
+}
+
+model PerformanceMetric {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String?
+  account   TradingAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  metricDate DateTime
+
+  totalTrades   Int @default(0)
+  winningTrades Int @default(0)
+  losingTrades  Int @default(0)
+
+  dailyPnl       Decimal  @default(0) @db.Decimal(15, 2)
+  cumulativePnl  Decimal  @default(0) @db.Decimal(15, 2)
+  accountBalance Decimal? @db.Decimal(15, 2)
+
+  winRate      Decimal? @db.Decimal(5, 2)
+  profitFactor Decimal? @db.Decimal(8, 2)
+  sharpeRatio  Decimal? @db.Decimal(8, 4)
+  maxDrawdown  Decimal? @db.Decimal(15, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, accountId, metricDate])
+  @@index([userId])
+  @@index([metricDate])
+}
+
+enum AccountType {
+  LIVE
+  DEMO
+  PAPER
+}
+
+enum TradeDirection {
+  LONG
+  SHORT
+}
+
+enum TradeStatus {
+  OPEN
+  CLOSED
+  PARTIAL
+}
+
+enum JournalEntryType {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum AssetType {
+  STOCK
+  FOREX
+  CRYPTO
+  OPTIONS
+  FUTURES
+  OTHER
+}
