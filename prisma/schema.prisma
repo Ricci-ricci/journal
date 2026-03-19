@@ -1,23 +1,22 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../node_modules/.prisma/client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id         String              @id @default(uuid())
-  email      String              @unique
-  name       String?
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   accounts   TradingAccount[]
   trades     Trade[]
   journals   JournalEntry[]
@@ -26,27 +25,28 @@ model User {
 }
 
 model TradingAccount {
-  id             String              @id @default(uuid())
-  userId         String
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String      @db.ObjectId
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   name           String
   broker         String?
-  accountType    AccountType         @default(PAPER)
-  initialBalance Decimal             @db.Decimal(15, 2)
-  currency       String              @default("USD")
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
-  trades         Trade[]
-  metrics        PerformanceMetric[]
+  accountType    AccountType @default(PAPER)
+  initialBalance Float
+  currency       String      @default("USD")
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  trades  Trade[]
+  metrics PerformanceMetric[]
 
   @@index([userId])
 }
 
 model Trade {
-  id        String          @id @default(uuid())
-  userId    String
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String?  @db.ObjectId
   account   TradingAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
 
   symbol    String
@@ -55,22 +55,22 @@ model Trade {
   status    TradeStatus    @default(OPEN)
 
   entryDate  DateTime
-  entryPrice Decimal  @db.Decimal(15, 8)
-  quantity   Decimal  @db.Decimal(15, 8)
+  entryPrice Float
+  quantity   Float
 
   exitDate  DateTime?
-  exitPrice Decimal?  @db.Decimal(15, 8)
+  exitPrice Float?
 
-  commission        Decimal  @default(0) @db.Decimal(15, 2)
-  fees              Decimal  @default(0) @db.Decimal(15, 2)
-  profitLoss        Decimal? @db.Decimal(15, 2)
-  profitLossPercent Decimal? @db.Decimal(8, 4)
+  commission        Float  @default(0)
+  fees              Float  @default(0)
+  profitLoss        Float?
+  profitLossPercent Float?
 
-  stopLoss        Decimal? @db.Decimal(15, 8)
-  takeProfit      Decimal? @db.Decimal(15, 8)
-  riskRewardRatio Decimal? @db.Decimal(8, 2)
+  stopLoss        Float?
+  takeProfit      Float?
+  riskRewardRatio Float?
 
-  strategyId String?
+  strategyId String?   @db.ObjectId
   strategy   Strategy? @relation(fields: [strategyId], references: [id], onDelete: SetNull)
   setupType  String?
   timeFrame  String?
@@ -93,9 +93,9 @@ model Trade {
 }
 
 model JournalEntry {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @db.ObjectId
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   entryDate DateTime
   entryType JournalEntryType @default(DAILY)
@@ -119,9 +119,9 @@ model JournalEntry {
 }
 
 model Strategy {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   name                String
   description         String?
@@ -132,9 +132,9 @@ model Strategy {
   totalTrades   Int      @default(0)
   winningTrades Int      @default(0)
   losingTrades  Int      @default(0)
-  winRate       Decimal? @db.Decimal(5, 2)
-  averageProfit Decimal? @db.Decimal(15, 2)
-  averageLoss   Decimal? @db.Decimal(15, 2)
+  winRate       Float?
+  averageProfit Float?
+  averageLoss   Float?
 
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -146,10 +146,10 @@ model Strategy {
 }
 
 model PerformanceMetric {
-  id        String          @id @default(uuid())
-  userId    String
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String          @db.ObjectId
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId String?
+  accountId String?         @db.ObjectId
   account   TradingAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
 
   metricDate DateTime
@@ -158,14 +158,14 @@ model PerformanceMetric {
   winningTrades Int @default(0)
   losingTrades  Int @default(0)
 
-  dailyPnl       Decimal  @default(0) @db.Decimal(15, 2)
-  cumulativePnl  Decimal  @default(0) @db.Decimal(15, 2)
-  accountBalance Decimal? @db.Decimal(15, 2)
+  dailyPnl       Float  @default(0)
+  cumulativePnl  Float  @default(0)
+  accountBalance Float?
 
-  winRate      Decimal? @db.Decimal(5, 2)
-  profitFactor Decimal? @db.Decimal(8, 2)
-  sharpeRatio  Decimal? @db.Decimal(8, 4)
-  maxDrawdown  Decimal? @db.Decimal(15, 2)
+  winRate      Float?
+  profitFactor Float?
+  sharpeRatio  Float?
+  maxDrawdown  Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
