@@ -14,6 +14,7 @@ model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String?
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -43,10 +44,10 @@ model TradingAccount {
 }
 
 model Trade {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId String?  @db.ObjectId
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String          @db.ObjectId
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String?         @db.ObjectId
   account   TradingAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
 
   symbol    String
@@ -93,9 +94,9 @@ model Trade {
 }
 
 model JournalEntry {
-  id        String           @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String           @db.ObjectId
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   entryDate DateTime
   entryType JournalEntryType @default(DAILY)
@@ -119,9 +120,9 @@ model JournalEntry {
 }
 
 model Strategy {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   name                String
   description         String?
@@ -129,9 +130,9 @@ model Strategy {
   exitRules           String?
   riskManagementRules String?
 
-  totalTrades   Int      @default(0)
-  winningTrades Int      @default(0)
-  losingTrades  Int      @default(0)
+  totalTrades   Int    @default(0)
+  winningTrades Int    @default(0)
+  losingTrades  Int    @default(0)
   winRate       Float?
   averageProfit Float?
   averageLoss   Float?
