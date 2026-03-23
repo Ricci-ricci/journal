@@ -1,19 +1,24 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Layout } from '../../components/layout/Layout';
-import { JournalEntryForm } from '../../components/forms/JournalEntryForm';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { Layout } from "../../components/layout/Layout";
+import { JournalEntryForm } from "../../components/forms/JournalEntryForm";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Select } from "../../components/ui/Select";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
 
 interface JournalEntry {
   id: string;
   entryDate: string;
-  entryType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  entryType: "DAILY" | "WEEKLY" | "MONTHLY";
   title: string | null;
   content: string | null;
   whatWentWell: string | null;
@@ -31,15 +36,15 @@ const JournalPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("");
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
 
   const entryTypeOptions = [
-    { value: '', label: 'All Types' },
-    { value: 'DAILY', label: 'Daily' },
-    { value: 'WEEKLY', label: 'Weekly' },
-    { value: 'MONTHLY', label: 'Monthly' },
+    { value: "", label: "All Types" },
+    { value: "DAILY", label: "Daily" },
+    { value: "WEEKLY", label: "Weekly" },
+    { value: "MONTHLY", label: "Monthly" },
   ];
 
   useEffect(() => {
@@ -51,54 +56,15 @@ const JournalPage: React.FC = () => {
       setLoading(true);
 
       // Mock data - replace with actual API call
-      const mockEntries: JournalEntry[] = [
-        {
-          id: '1',
-          entryDate: new Date().toISOString().slice(0, 10),
-          entryType: 'DAILY',
-          title: 'Strong Trading Day - Breakout Success',
-          content: 'Today was an exceptional trading day. Market opened with clear direction and I was able to capture multiple breakout opportunities. Stayed disciplined with my strategy and risk management.',
-          whatWentWell: 'Perfect execution on NVDA breakout trade. Risk management was on point - took profits at planned levels. Emotional control was excellent even during volatile periods.',
-          whatWentWrong: 'Missed the AAPL setup due to hesitation. Need to trust my analysis more when all conditions align.',
-          lessonsLearned: 'Hesitation costs money. When all my criteria are met, I need to execute without second-guessing.',
-          goalsNextPeriod: 'Focus on faster execution tomorrow. Review AAPL setup to understand what caused the hesitation.',
-          marketConditions: 'Strong bullish momentum in tech sector. Low volatility, clear directional moves. Perfect conditions for breakout strategy.',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          entryDate: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
-          entryType: 'DAILY',
-          title: 'Challenging Day - Whipsaw Markets',
-          content: 'Difficult trading session with choppy, indecisive price action. Got caught in several false breakouts.',
-          whatWentWell: 'Good job cutting losses quickly. Didnt let emotions take over when trades went against me.',
-          whatWentWrong: 'Traded too aggressively in choppy conditions. Should have recognized the environment and reduced size.',
-          lessonsLearned: 'Market environment matters more than individual setups. Need to adapt strategy to conditions.',
-          goalsNextPeriod: 'Practice identifying choppy market conditions early. Develop rules for reducing activity in poor environments.',
-          marketConditions: 'Choppy, indecisive price action. Multiple false breakouts. High intraday volatility but no clear direction.',
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: '3',
-          entryDate: new Date(Date.now() - 86400000 * 7).toISOString().slice(0, 10),
-          entryType: 'WEEKLY',
-          title: 'Week 47 Review - Mixed Results',
-          content: 'This week showed mixed results with 3 winning days and 2 losing days. Overall profitable but below average performance.',
-          whatWentWell: 'Risk management was consistent throughout the week. No major drawdowns or emotional trading.',
-          whatWentWrong: 'Missed several high-probability setups due to lack of preparation. Position sizing was too conservative on best setups.',
-          lessonsLearned: 'Preparation is key to consistent performance. Need to spend more time on evening analysis.',
-          goalsNextPeriod: 'Implement 30-minute evening routine for next day preparation. Increase size on highest conviction trades.',
-          marketConditions: 'Mixed week with rotation between sectors. Tech strength early week, followed by value rotation.',
-          createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-        },
-      ];
-
-      setEntries(mockEntries);
+      const response = await fetch("/api/strategies");
+      const result = await response.json();
+      if (result.success) {
+        setEntries(result.data);
+      } else {
+        console.log("Failed to fetch strategies");
+      }
     } catch (error) {
-      console.error('Failed to fetch journal entries:', error);
+      console.error("Failed to fetch journal entries:", error);
     } finally {
       setLoading(false);
     }
@@ -123,12 +89,11 @@ const JournalPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      setEntries(prev => [newEntry, ...prev]);
+      setEntries((prev) => [newEntry, ...prev]);
       setShowForm(false);
-      console.log('Journal entry created successfully');
-
+      console.log("Journal entry created successfully");
     } catch (error) {
-      console.error('Failed to create journal entry:', error);
+      console.error("Failed to create journal entry:", error);
     } finally {
       setSubmitting(false);
     }
@@ -159,38 +124,46 @@ const JournalPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      setEntries(prev =>
-        prev.map(entry => entry.id === editingEntry.id ? updatedEntry : entry)
+      setEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === editingEntry.id ? updatedEntry : entry,
+        ),
       );
 
       setShowForm(false);
       setEditingEntry(null);
-
     } catch (error) {
-      console.error('Failed to update journal entry:', error);
+      console.error("Failed to update journal entry:", error);
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteEntry = async (entryId: string) => {
-    if (!confirm('Are you sure you want to delete this journal entry? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this journal entry? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     try {
-      setEntries(prev => prev.filter(entry => entry.id !== entryId));
-      console.log('Journal entry deleted successfully');
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+      console.log("Journal entry deleted successfully");
     } catch (error) {
-      console.error('Failed to delete journal entry:', error);
+      console.error("Failed to delete journal entry:", error);
     }
   };
 
-  const filteredEntries = entries.filter(entry => {
+  const filteredEntries = entries.filter((entry) => {
     const matchesSearch =
-      (entry.title && entry.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (entry.content && entry.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (entry.lessonsLearned && entry.lessonsLearned.toLowerCase().includes(searchTerm.toLowerCase()));
+      (entry.title &&
+        entry.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (entry.content &&
+        entry.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (entry.lessonsLearned &&
+        entry.lessonsLearned.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesType = !filterType || entry.entryType === filterType;
 
@@ -198,35 +171,40 @@ const JournalPage: React.FC = () => {
   });
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getTypeBadgeVariant = (type: string) => {
     switch (type) {
-      case 'DAILY':
-        return 'info';
-      case 'WEEKLY':
-        return 'warning';
-      case 'MONTHLY':
-        return 'success';
+      case "DAILY":
+        return "info";
+      case "WEEKLY":
+        return "warning";
+      case "MONTHLY":
+        return "success";
       default:
-        return 'default';
+        return "default";
     }
   };
 
-  const truncateText = (text: string | null, maxLength: number = 150): string => {
-    if (!text) return '';
-    return text.length <= maxLength ? text : text.substring(0, maxLength) + '...';
+  const truncateText = (
+    text: string | null,
+    maxLength: number = 150,
+  ): string => {
+    if (!text) return "";
+    return text.length <= maxLength
+      ? text
+      : text.substring(0, maxLength) + "...";
   };
 
   if (showForm) {
     return (
-      <Layout title={editingEntry ? 'Edit Journal Entry' : 'New Journal Entry'}>
+      <Layout title={editingEntry ? "Edit Journal Entry" : "New Journal Entry"}>
         <div className="max-w-4xl">
           <JournalEntryForm
             onSubmit={editingEntry ? handleUpdateEntry : handleCreateEntry}
@@ -234,17 +212,21 @@ const JournalPage: React.FC = () => {
               setShowForm(false);
               setEditingEntry(null);
             }}
-            initialData={editingEntry ? {
-              entryDate: editingEntry.entryDate,
-              entryType: editingEntry.entryType,
-              title: editingEntry.title || '',
-              content: editingEntry.content || '',
-              whatWentWell: editingEntry.whatWentWell || '',
-              whatWentWrong: editingEntry.whatWentWrong || '',
-              lessonsLearned: editingEntry.lessonsLearned || '',
-              goalsNextPeriod: editingEntry.goalsNextPeriod || '',
-              marketConditions: editingEntry.marketConditions || '',
-            } : undefined}
+            initialData={
+              editingEntry
+                ? {
+                    entryDate: editingEntry.entryDate,
+                    entryType: editingEntry.entryType,
+                    title: editingEntry.title || "",
+                    content: editingEntry.content || "",
+                    whatWentWell: editingEntry.whatWentWell || "",
+                    whatWentWrong: editingEntry.whatWentWrong || "",
+                    lessonsLearned: editingEntry.lessonsLearned || "",
+                    goalsNextPeriod: editingEntry.goalsNextPeriod || "",
+                    marketConditions: editingEntry.marketConditions || "",
+                  }
+                : undefined
+            }
             loading={submitting}
           />
         </div>
@@ -258,14 +240,27 @@ const JournalPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">Your Trading Journal</h2>
+            <h2 className="text-lg font-medium text-gray-900">
+              Your Trading Journal
+            </h2>
             <p className="text-sm text-gray-500">
-              Reflect on your trading journey, document insights, and track your progress.
+              Reflect on your trading journey, document insights, and track your
+              progress.
             </p>
           </div>
           <Button onClick={() => setShowForm(true)}>
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             New Entry
           </Button>
@@ -281,8 +276,18 @@ const JournalPage: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   leftIcon={
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
                     </svg>
                   }
                 />
@@ -343,18 +348,30 @@ const JournalPage: React.FC = () => {
                 />
               </svg>
               <h3 className="mt-2 text-sm font-medium text-gray-900">
-                {searchTerm || filterType ? 'No entries match your filters' : 'No journal entries'}
+                {searchTerm || filterType
+                  ? "No entries match your filters"
+                  : "No journal entries"}
               </h3>
               <p className="mt-1 text-sm text-gray-500">
                 {searchTerm || filterType
-                  ? 'Try adjusting your search or filter criteria.'
-                  : 'Start documenting your trading journey by creating your first entry.'}
+                  ? "Try adjusting your search or filter criteria."
+                  : "Start documenting your trading journey by creating your first entry."}
               </p>
               {!searchTerm && !filterType && (
                 <div className="mt-6">
                   <Button onClick={() => setShowForm(true)}>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
                     Write Your First Entry
                   </Button>
@@ -365,13 +382,19 @@ const JournalPage: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {filteredEntries.map((entry) => (
-              <Card key={entry.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={entry.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <Badge variant={getTypeBadgeVariant(entry.entryType)} size="sm">
+                          <Badge
+                            variant={getTypeBadgeVariant(entry.entryType)}
+                            size="sm"
+                          >
                             {entry.entryType}
                           </Badge>
                           <span className="text-sm text-gray-500">
@@ -379,7 +402,7 @@ const JournalPage: React.FC = () => {
                           </span>
                         </div>
                         <CardTitle className="text-lg">
-                          {entry.title || 'Untitled Entry'}
+                          {entry.title || "Untitled Entry"}
                         </CardTitle>
                       </div>
                     </div>
@@ -388,11 +411,13 @@ const JournalPage: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setExpandedEntry(
-                          expandedEntry === entry.id ? null : entry.id
-                        )}
+                        onClick={() =>
+                          setExpandedEntry(
+                            expandedEntry === entry.id ? null : entry.id,
+                          )
+                        }
                       >
-                        {expandedEntry === entry.id ? 'Collapse' : 'Expand'}
+                        {expandedEntry === entry.id ? "Collapse" : "Expand"}
                       </Button>
                       <Button
                         variant="outline"
@@ -512,21 +537,21 @@ const JournalPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {entries.filter(e => e.entryType === 'DAILY').length}
+                  {entries.filter((e) => e.entryType === "DAILY").length}
                 </div>
                 <p className="text-sm text-gray-600">Daily Entries</p>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {entries.filter(e => e.entryType === 'WEEKLY').length}
+                  {entries.filter((e) => e.entryType === "WEEKLY").length}
                 </div>
                 <p className="text-sm text-gray-600">Weekly Reviews</p>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
-                  {entries.filter(e => e.entryType === 'MONTHLY').length}
+                  {entries.filter((e) => e.entryType === "MONTHLY").length}
                 </div>
                 <p className="text-sm text-gray-600">Monthly Analyses</p>
               </div>

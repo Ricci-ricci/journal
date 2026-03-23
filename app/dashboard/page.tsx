@@ -40,53 +40,89 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API calls - replace with actual API calls
+    // Real API calls to fetch dashboard data
     const fetchDashboardData = async () => {
       try {
-        // Mock data for now
-        setStats({
-          totalTrades: 47,
-          openTrades: 3,
-          closedTrades: 44,
-          totalPnL: 2847.5,
-          winRate: 63.6,
-          averageWin: 127.3,
-          averageLoss: -89.2,
-          bestTrade: 542.8,
-          worstTrade: -234.5,
-        });
+        setLoading(true);
 
-        setRecentTrades([
-          {
-            id: "1",
-            symbol: "BTC/USD",
-            direction: "LONG",
-            status: "OPEN",
-            entryPrice: 67500,
-            profitLoss: null,
-            entryDate: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            symbol: "AAPL",
-            direction: "LONG",
-            status: "CLOSED",
-            entryPrice: 182.5,
-            profitLoss: 145.2,
-            entryDate: new Date(Date.now() - 86400000).toISOString(),
-          },
-          {
-            id: "3",
-            symbol: "EUR/USD",
-            direction: "SHORT",
-            status: "CLOSED",
-            entryPrice: 1.0845,
-            profitLoss: -67.8,
-            entryDate: new Date(Date.now() - 172800000).toISOString(),
-          },
+        // Parallel API calls for better performance
+        const [tradesRes, metricsRes] = await Promise.all([
+          fetch("/api/trades?limit=5"),
+          fetch("/api/performance-metrics?limit=1"),
         ]);
+
+        const [trades, metrics] = await Promise.all([
+          tradesRes.json(),
+          metricsRes.json(),
+        ]);
+
+        if (trades.success) {
+          setRecentTrades(trades.data);
+
+          // Calculate stats from real trades data
+          const openTrades = trades.data.filter(
+            (t) => t.status === "OPEN",
+          ).length;
+          const closedTrades = trades.data.filter((t) => t.status === "CLOSED");
+          const totalPnL = closedTrades.reduce(
+            (sum, trade) => sum + (trade.profitLoss || 0),
+            0,
+          );
+          const winningTrades = closedTrades.filter(
+            (t) => (t.profitLoss || 0) > 0,
+          );
+          const losingTrades = closedTrades.filter(
+            (t) => (t.profitLoss || 0) < 0,
+          );
+          const winRate =
+            closedTrades.length > 0
+              ? (winningTrades.length / closedTrades.length) * 100
+              : 0;
+          const averageWin =
+            winningTrades.length > 0
+              ? winningTrades.reduce((sum, t) => sum + t.profitLoss, 0) /
+                winningTrades.length
+              : 0;
+          const averageLoss =
+            losingTrades.length > 0
+              ? losingTrades.reduce((sum, t) => sum + t.profitLoss, 0) /
+                losingTrades.length
+              : 0;
+          const bestTrade = Math.max(
+            ...closedTrades.map((t) => t.profitLoss || 0),
+            0,
+          );
+          const worstTrade = Math.min(
+            ...closedTrades.map((t) => t.profitLoss || 0),
+            0,
+          );
+
+          setStats({
+            totalTrades: trades.data.length,
+            openTrades,
+            closedTrades: closedTrades.length,
+            totalPnL,
+            winRate,
+            averageWin,
+            averageLoss,
+            bestTrade,
+            worstTrade,
+          });
+        }
+
+        // Use latest performance metrics if available
+        if (metrics.success && metrics.data.length > 0) {
+          const latestMetric = metrics.data[0];
+          setStats((prevStats) => ({
+            ...prevStats,
+            totalTrades: latestMetric.totalTrades,
+            winRate: latestMetric.winRate || prevStats?.winRate || 0,
+            totalPnL: latestMetric.cumulativePnl,
+          }));
+        }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+        alert("Failed to fetch dashboard data. Please try again.");
       } finally {
         setLoading(false);
       }

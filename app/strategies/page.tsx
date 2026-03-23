@@ -1,12 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Layout } from '../../components/layout/Layout';
-import { StrategyForm } from '../../components/forms/StrategyForm';
-import { Button } from '../../components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { Input } from '../../components/ui/Input';
+import React, { useState, useEffect } from "react";
+import { Layout } from "../../components/layout/Layout";
+import { StrategyForm } from "../../components/forms/StrategyForm";
+import { Button } from "../../components/ui/Button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
+import { Input } from "../../components/ui/Input";
 
 interface Strategy {
   id: string;
@@ -32,7 +37,7 @@ const StrategiesPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -44,63 +49,15 @@ const StrategiesPage: React.FC = () => {
       setLoading(true);
 
       // Mock data - replace with actual API call
-      const mockStrategies: Strategy[] = [
-        {
-          id: '1',
-          name: 'Breakout Strategy',
-          description: 'High-volume breakout strategy for trending markets',
-          entryRules: '• Price breaks above resistance with volume > 1.5x average\n• RSI above 50\n• MACD bullish crossover',
-          exitRules: '• Take profit at 2:1 risk/reward ratio\n• Stop loss at previous support\n• Exit if volume drops below average',
-          riskManagementRules: '• Risk max 2% per trade\n• No more than 3 concurrent positions\n• Daily loss limit: 6%',
-          totalTrades: 47,
-          winningTrades: 29,
-          losingTrades: 18,
-          winRate: 61.7,
-          averageProfit: 156.80,
-          averageLoss: -89.20,
-          isActive: true,
-          createdAt: new Date(Date.now() - 86400000 * 45).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        },
-        {
-          id: '2',
-          name: 'Mean Reversion',
-          description: 'Counter-trend strategy for oversold/overbought conditions',
-          entryRules: '• RSI below 30 or above 70\n• Price touches Bollinger Band\n• Stochastic oversold/overbought',
-          exitRules: '• Exit when RSI returns to 50\n• Take profit at opposite Bollinger Band\n• Stop loss beyond recent swing high/low',
-          riskManagementRules: '• Risk max 1.5% per trade\n• Maximum 2 positions at once\n• Avoid during strong trends',
-          totalTrades: 23,
-          winningTrades: 16,
-          losingTrades: 7,
-          winRate: 69.6,
-          averageProfit: 92.40,
-          averageLoss: -45.80,
-          isActive: true,
-          createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-        },
-        {
-          id: '3',
-          name: 'Swing Trading v1',
-          description: 'Multi-day swing trading strategy',
-          entryRules: '• Higher highs and higher lows pattern\n• 50 EMA above 200 EMA\n• Volume confirmation on entry',
-          exitRules: '• Hold for 3-7 days\n• Exit on momentum divergence\n• Trailing stop at 20 EMA',
-          riskManagementRules: '• Risk max 3% per trade\n• Maximum 5 positions\n• No trades during earnings week',
-          totalTrades: 12,
-          winningTrades: 5,
-          losingTrades: 7,
-          winRate: 41.7,
-          averageProfit: 234.50,
-          averageLoss: -123.20,
-          isActive: false,
-          createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
-        },
-      ];
-
-      setStrategies(mockStrategies);
+      const response = await fetch("");
+      const result = await response.json();
+      if (result.success) {
+        setStrategies(result.data);
+      } else {
+        console.log("failed to fetch Strategie");
+      }
     } catch (error) {
-      console.error('Failed to fetch strategies:', error);
+      console.error("Failed to fetch strategies:", error);
     } finally {
       setLoading(false);
     }
@@ -129,12 +86,11 @@ const StrategiesPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      setStrategies(prev => [newStrategy, ...prev]);
+      setStrategies((prev) => [newStrategy, ...prev]);
       setShowForm(false);
-      console.log('Strategy created successfully');
-
+      console.log("Strategy created successfully");
     } catch (error) {
-      console.error('Failed to create strategy:', error);
+      console.error("Failed to create strategy:", error);
     } finally {
       setSubmitting(false);
     }
@@ -162,30 +118,37 @@ const StrategiesPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      setStrategies(prev =>
-        prev.map(strategy => strategy.id === editingStrategy.id ? updatedStrategy : strategy)
+      setStrategies((prev) =>
+        prev.map((strategy) =>
+          strategy.id === editingStrategy.id ? updatedStrategy : strategy,
+        ),
       );
 
       setShowForm(false);
       setEditingStrategy(null);
-
     } catch (error) {
-      console.error('Failed to update strategy:', error);
+      console.error("Failed to update strategy:", error);
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteStrategy = async (strategyId: string) => {
-    if (!confirm('Are you sure you want to delete this strategy? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this strategy? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     try {
-      setStrategies(prev => prev.filter(strategy => strategy.id !== strategyId));
-      console.log('Strategy deleted successfully');
+      setStrategies((prev) =>
+        prev.filter((strategy) => strategy.id !== strategyId),
+      );
+      console.log("Strategy deleted successfully");
     } catch (error) {
-      console.error('Failed to delete strategy:', error);
+      console.error("Failed to delete strategy:", error);
     }
   };
 
@@ -197,62 +160,71 @@ const StrategiesPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      setStrategies(prev =>
-        prev.map(s => s.id === strategy.id ? updatedStrategy : s)
+      setStrategies((prev) =>
+        prev.map((s) => (s.id === strategy.id ? updatedStrategy : s)),
       );
-
     } catch (error) {
-      console.error('Failed to toggle strategy status:', error);
+      console.error("Failed to toggle strategy status:", error);
     }
   };
 
-  const filteredStrategies = strategies.filter(strategy => {
-    const matchesSearch = strategy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (strategy.description && strategy.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesFilter = filterActive === null || strategy.isActive === filterActive;
+  const filteredStrategies = strategies.filter((strategy) => {
+    const matchesSearch =
+      strategy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (strategy.description &&
+        strategy.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesFilter =
+      filterActive === null || strategy.isActive === filterActive;
 
     return matchesSearch && matchesFilter;
   });
 
   const formatPercent = (percent: number | null): string => {
-    if (percent === null) return 'N/A';
+    if (percent === null) return "N/A";
     return `${percent.toFixed(1)}%`;
   };
 
   const formatCurrency = (amount: number | null): string => {
-    if (amount === null) return 'N/A';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    if (amount === null) return "N/A";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   if (showForm) {
     return (
-      <Layout title={editingStrategy ? 'Edit Strategy' : 'Create New Strategy'}>
+      <Layout title={editingStrategy ? "Edit Strategy" : "Create New Strategy"}>
         <div className="max-w-4xl">
           <StrategyForm
-            onSubmit={editingStrategy ? handleUpdateStrategy : handleCreateStrategy}
+            onSubmit={
+              editingStrategy ? handleUpdateStrategy : handleCreateStrategy
+            }
             onCancel={() => {
               setShowForm(false);
               setEditingStrategy(null);
             }}
-            initialData={editingStrategy ? {
-              name: editingStrategy.name,
-              description: editingStrategy.description || '',
-              entryRules: editingStrategy.entryRules || '',
-              exitRules: editingStrategy.exitRules || '',
-              riskManagementRules: editingStrategy.riskManagementRules || '',
-              isActive: editingStrategy.isActive,
-            } : undefined}
+            initialData={
+              editingStrategy
+                ? {
+                    name: editingStrategy.name,
+                    description: editingStrategy.description || "",
+                    entryRules: editingStrategy.entryRules || "",
+                    exitRules: editingStrategy.exitRules || "",
+                    riskManagementRules:
+                      editingStrategy.riskManagementRules || "",
+                    isActive: editingStrategy.isActive,
+                  }
+                : undefined
+            }
             loading={submitting}
           />
         </div>
@@ -266,14 +238,27 @@ const StrategiesPage: React.FC = () => {
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">Your Trading Strategies</h2>
+            <h2 className="text-lg font-medium text-gray-900">
+              Your Trading Strategies
+            </h2>
             <p className="text-sm text-gray-500">
-              Create, manage and track the performance of your trading strategies.
+              Create, manage and track the performance of your trading
+              strategies.
             </p>
           </div>
           <Button onClick={() => setShowForm(true)}>
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
             Create Strategy
           </Button>
@@ -289,8 +274,18 @@ const StrategiesPage: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   leftIcon={
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
                     </svg>
                   }
                 />
@@ -298,21 +293,21 @@ const StrategiesPage: React.FC = () => {
 
               <div className="flex space-x-2">
                 <Button
-                  variant={filterActive === null ? 'primary' : 'outline'}
+                  variant={filterActive === null ? "primary" : "outline"}
                   size="sm"
                   onClick={() => setFilterActive(null)}
                 >
                   All
                 </Button>
                 <Button
-                  variant={filterActive === true ? 'primary' : 'outline'}
+                  variant={filterActive === true ? "primary" : "outline"}
                   size="sm"
                   onClick={() => setFilterActive(true)}
                 >
                   Active
                 </Button>
                 <Button
-                  variant={filterActive === false ? 'primary' : 'outline'}
+                  variant={filterActive === false ? "primary" : "outline"}
                   size="sm"
                   onClick={() => setFilterActive(false)}
                 >
@@ -323,7 +318,8 @@ const StrategiesPage: React.FC = () => {
 
             <div className="mt-4">
               <p className="text-sm text-gray-600">
-                Showing {filteredStrategies.length} of {strategies.length} strategies
+                Showing {filteredStrategies.length} of {strategies.length}{" "}
+                strategies
                 {(searchTerm || filterActive !== null) && (
                   <span className="ml-1">(filtered)</span>
                 )}
@@ -367,18 +363,30 @@ const StrategiesPage: React.FC = () => {
                 />
               </svg>
               <h3 className="mt-2 text-sm font-medium text-gray-900">
-                {searchTerm || filterActive !== null ? 'No strategies match your filters' : 'No strategies'}
+                {searchTerm || filterActive !== null
+                  ? "No strategies match your filters"
+                  : "No strategies"}
               </h3>
               <p className="mt-1 text-sm text-gray-500">
                 {searchTerm || filterActive !== null
-                  ? 'Try adjusting your search or filter criteria.'
-                  : 'Get started by creating your first trading strategy.'}
+                  ? "Try adjusting your search or filter criteria."
+                  : "Get started by creating your first trading strategy."}
               </p>
               {!searchTerm && filterActive === null && (
                 <div className="mt-6">
                   <Button onClick={() => setShowForm(true)}>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
                     Create Your First Strategy
                   </Button>
@@ -389,13 +397,18 @@ const StrategiesPage: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {filteredStrategies.map((strategy) => (
-              <Card key={strategy.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={strategy.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <CardTitle>{strategy.name}</CardTitle>
-                      <Badge variant={strategy.isActive ? 'success' : 'secondary'}>
-                        {strategy.isActive ? 'Active' : 'Inactive'}
+                      <Badge
+                        variant={strategy.isActive ? "success" : "secondary"}
+                      >
+                        {strategy.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </div>
 
@@ -405,7 +418,7 @@ const StrategiesPage: React.FC = () => {
                         size="sm"
                         onClick={() => handleToggleActive(strategy)}
                       >
-                        {strategy.isActive ? 'Deactivate' : 'Activate'}
+                        {strategy.isActive ? "Deactivate" : "Activate"}
                       </Button>
                       <Button
                         variant="outline"
@@ -424,7 +437,9 @@ const StrategiesPage: React.FC = () => {
                     </div>
                   </div>
                   {strategy.description && (
-                    <p className="text-sm text-gray-600 mt-2">{strategy.description}</p>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {strategy.description}
+                    </p>
                   )}
                 </CardHeader>
 
@@ -432,26 +447,40 @@ const StrategiesPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Performance Metrics */}
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-gray-900">Performance</h4>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        Performance
+                      </h4>
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Total Trades</span>
-                          <span className="text-sm font-medium">{strategy.totalTrades}</span>
+                          <span className="text-sm text-gray-600">
+                            Total Trades
+                          </span>
+                          <span className="text-sm font-medium">
+                            {strategy.totalTrades}
+                          </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Win Rate</span>
-                          <span className={`text-sm font-medium ${strategy.winRate && strategy.winRate >= 50 ? 'text-green-600' : 'text-red-600'}`}>
+                          <span className="text-sm text-gray-600">
+                            Win Rate
+                          </span>
+                          <span
+                            className={`text-sm font-medium ${strategy.winRate && strategy.winRate >= 50 ? "text-green-600" : "text-red-600"}`}
+                          >
                             {formatPercent(strategy.winRate)}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Avg Profit</span>
+                          <span className="text-sm text-gray-600">
+                            Avg Profit
+                          </span>
                           <span className="text-sm font-medium text-green-600">
                             {formatCurrency(strategy.averageProfit)}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Avg Loss</span>
+                          <span className="text-sm text-gray-600">
+                            Avg Loss
+                          </span>
                           <span className="text-sm font-medium text-red-600">
                             {formatCurrency(strategy.averageLoss)}
                           </span>
@@ -461,37 +490,55 @@ const StrategiesPage: React.FC = () => {
 
                     {/* Entry Rules */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">Entry Rules</h4>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        Entry Rules
+                      </h4>
                       {strategy.entryRules ? (
                         <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">{strategy.entryRules}</pre>
+                          <pre className="whitespace-pre-wrap font-sans">
+                            {strategy.entryRules}
+                          </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">No entry rules defined</p>
+                        <p className="text-xs text-gray-500 italic">
+                          No entry rules defined
+                        </p>
                       )}
                     </div>
 
                     {/* Exit Rules */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">Exit Rules</h4>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        Exit Rules
+                      </h4>
                       {strategy.exitRules ? (
                         <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">{strategy.exitRules}</pre>
+                          <pre className="whitespace-pre-wrap font-sans">
+                            {strategy.exitRules}
+                          </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">No exit rules defined</p>
+                        <p className="text-xs text-gray-500 italic">
+                          No exit rules defined
+                        </p>
                       )}
                     </div>
 
                     {/* Risk Management */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">Risk Management</h4>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        Risk Management
+                      </h4>
                       {strategy.riskManagementRules ? (
                         <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">{strategy.riskManagementRules}</pre>
+                          <pre className="whitespace-pre-wrap font-sans">
+                            {strategy.riskManagementRules}
+                          </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">No risk rules defined</p>
+                        <p className="text-xs text-gray-500 italic">
+                          No risk rules defined
+                        </p>
                       )}
                       <div className="pt-2 text-xs text-gray-500">
                         <p>Created: {formatDate(strategy.createdAt)}</p>

@@ -1,20 +1,25 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Layout } from '../../components/layout/Layout';
-import { TradesTable } from '../../components/tables/TradesTable';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { Layout } from "../../components/layout/Layout";
+import { TradesTable } from "../../components/tables/TradesTable";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Select } from "../../components/ui/Select";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../../components/ui/Card";
 
 interface Trade {
   id: string;
   symbol: string;
   assetType: string | null;
-  direction: 'LONG' | 'SHORT';
-  status: 'OPEN' | 'CLOSED' | 'PARTIAL';
+  direction: "LONG" | "SHORT";
+  status: "OPEN" | "CLOSED" | "PARTIAL";
   entryDate: string;
   entryPrice: number;
   quantity: number;
@@ -48,21 +53,21 @@ const TradesPage: React.FC = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<TradesStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [directionFilter, setDirectionFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [directionFilter, setDirectionFilter] = useState("");
 
   const statusOptions = [
-    { value: '', label: 'All Status' },
-    { value: 'OPEN', label: 'Open' },
-    { value: 'CLOSED', label: 'Closed' },
-    { value: 'PARTIAL', label: 'Partial' },
+    { value: "", label: "All Status" },
+    { value: "OPEN", label: "Open" },
+    { value: "CLOSED", label: "Closed" },
+    { value: "PARTIAL", label: "Partial" },
   ];
 
   const directionOptions = [
-    { value: '', label: 'All Directions' },
-    { value: 'LONG', label: 'Long' },
-    { value: 'SHORT', label: 'Short' },
+    { value: "", label: "All Directions" },
+    { value: "LONG", label: "Long" },
+    { value: "SHORT", label: "Short" },
   ];
 
   useEffect(() => {
@@ -70,135 +75,113 @@ const TradesPage: React.FC = () => {
       try {
         setLoading(true);
 
-        // Mock data - replace with actual API call
-        const mockTrades: Trade[] = [
-          {
-            id: '1',
-            symbol: 'BTC/USD',
-            assetType: 'CRYPTO',
-            direction: 'LONG',
-            status: 'OPEN',
-            entryDate: new Date().toISOString(),
-            entryPrice: 67500,
-            quantity: 0.5,
-            exitDate: null,
-            exitPrice: null,
-            commission: 15,
-            fees: 5,
-            profitLoss: null,
-            profitLossPercent: null,
-            setupType: 'Breakout',
-            timeFrame: '1h',
-            notes: 'Strong bullish momentum',
-            confidenceLevel: 8,
-            emotionalState: 'Confident',
-            createdAt: new Date().toISOString(),
-            account: { name: 'Main Account', currency: 'USD' },
-          },
-          {
-            id: '2',
-            symbol: 'AAPL',
-            assetType: 'STOCK',
-            direction: 'LONG',
-            status: 'CLOSED',
-            entryDate: new Date(Date.now() - 86400000).toISOString(),
-            entryPrice: 182.50,
-            quantity: 100,
-            exitDate: new Date(Date.now() - 43200000).toISOString(),
-            exitPrice: 185.95,
-            commission: 2,
-            fees: 1,
-            profitLoss: 342,
-            profitLossPercent: 1.87,
-            setupType: 'Support Bounce',
-            timeFrame: '4h',
-            notes: 'Clean bounce off support level',
-            confidenceLevel: 7,
-            emotionalState: 'Calm',
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-            account: { name: 'Main Account', currency: 'USD' },
-          },
-          {
-            id: '3',
-            symbol: 'EUR/USD',
-            assetType: 'FOREX',
-            direction: 'SHORT',
-            status: 'CLOSED',
-            entryDate: new Date(Date.now() - 172800000).toISOString(),
-            entryPrice: 1.0845,
-            quantity: 10000,
-            exitDate: new Date(Date.now() - 129600000).toISOString(),
-            exitPrice: 1.0878,
-            commission: 0,
-            fees: 2,
-            profitLoss: -35,
-            profitLossPercent: -0.30,
-            setupType: 'Resistance Rejection',
-            timeFrame: '15m',
-            notes: 'Failed to hold below resistance',
-            confidenceLevel: 5,
-            emotionalState: 'Frustrated',
-            createdAt: new Date(Date.now() - 172800000).toISOString(),
-            account: { name: 'Forex Account', currency: 'USD' },
-          },
-        ];
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (statusFilter) params.append("status", statusFilter);
+        if (directionFilter) params.append("direction", directionFilter);
+        params.append("limit", "50");
 
-        setTrades(mockTrades);
+        // Real API call to fetch trades
+        const response = await fetch(`/api/trades?${params.toString()}`);
+        const result = await response.json();
 
-        // Calculate stats
-        const openTrades = mockTrades.filter(t => t.status === 'OPEN').length;
-        const closedTrades = mockTrades.filter(t => t.status === 'CLOSED');
-        const totalPnL = closedTrades.reduce((sum, trade) => sum + (trade.profitLoss || 0), 0);
-        const winningTrades = closedTrades.filter(t => (t.profitLoss || 0) > 0).length;
-        const winRate = closedTrades.length > 0 ? (winningTrades / closedTrades.length) * 100 : 0;
+        if (result.success) {
+          setTrades(result.data);
 
-        setStats({
-          totalTrades: mockTrades.length,
-          openTrades,
-          closedTrades: closedTrades.length,
-          totalPnL,
-          winRate,
-        });
+          // Calculate stats from real data
+          const openTrades = result.data.filter(
+            (t) => t.status === "OPEN",
+          ).length;
+          const closedTrades = result.data.filter((t) => t.status === "CLOSED");
+          const totalPnL = closedTrades.reduce(
+            (sum, trade) => sum + (trade.profitLoss || 0),
+            0,
+          );
+          const winningTrades = closedTrades.filter(
+            (t) => (t.profitLoss || 0) > 0,
+          ).length;
+          const winRate =
+            closedTrades.length > 0
+              ? (winningTrades / closedTrades.length) * 100
+              : 0;
 
+          setStats({
+            totalTrades: result.data.length,
+            openTrades,
+            closedTrades: closedTrades.length,
+            totalPnL,
+            winRate,
+          });
+        } else {
+          console.error("Failed to fetch trades:", result.error);
+          alert("Failed to fetch trades: " + result.error);
+        }
       } catch (error) {
-        console.error('Failed to fetch trades:', error);
+        console.error("Failed to fetch trades:", error);
+        alert("Failed to fetch trades. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchTrades();
-  }, []);
+  }, [statusFilter, directionFilter]);
 
-  const filteredTrades = trades.filter(trade => {
-    const matchesSearch = trade.symbol.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredTrades = trades.filter((trade) => {
+    const matchesSearch = trade.symbol
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || trade.status === statusFilter;
-    const matchesDirection = !directionFilter || trade.direction === directionFilter;
+    const matchesDirection =
+      !directionFilter || trade.direction === directionFilter;
 
     return matchesSearch && matchesStatus && matchesDirection;
   });
 
   const handleEditTrade = (trade: Trade) => {
     // Navigate to edit page or open modal
-    console.log('Edit trade:', trade.id);
+    console.log("Edit trade:", trade.id);
   };
 
-  const handleDeleteTrade = (tradeId: string) => {
-    // Confirm and delete trade
-    if (confirm('Are you sure you want to delete this trade?')) {
-      setTrades(trades.filter(t => t.id !== tradeId));
+  const handleDeleteTrade = async (tradeId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this trade? This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Real API call to delete trade (Note: DELETE endpoint needs to be created)
+      const response = await fetch(`/api/trades/${tradeId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTrades(trades.filter((t) => t.id !== tradeId));
+        alert("Trade deleted successfully!");
+      } else {
+        console.error("Failed to delete trade:", result.error);
+        alert("Failed to delete trade: " + result.error);
+      }
+    } catch (error) {
+      console.error("Failed to delete trade:", error);
+      alert("Failed to delete trade. Please try again.");
     }
   };
 
   const handleViewTrade = (trade: Trade) => {
     // Navigate to trade details page
-    console.log('View trade:', trade.id);
+    console.log("View trade:", trade.id);
   };
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -216,7 +199,9 @@ const TradesPage: React.FC = () => {
               <CardContent padding="sm">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Total Trades</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalTrades}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.totalTrades}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -225,7 +210,9 @@ const TradesPage: React.FC = () => {
               <CardContent padding="sm">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Open Trades</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.openTrades}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {stats.openTrades}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -234,7 +221,9 @@ const TradesPage: React.FC = () => {
               <CardContent padding="sm">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Closed Trades</p>
-                  <p className="text-2xl font-bold text-gray-600">{stats.closedTrades}</p>
+                  <p className="text-2xl font-bold text-gray-600">
+                    {stats.closedTrades}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -243,7 +232,9 @@ const TradesPage: React.FC = () => {
               <CardContent padding="sm">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Total P&L</p>
-                  <p className={`text-2xl font-bold ${stats.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p
+                    className={`text-2xl font-bold ${stats.totalPnL >= 0 ? "text-green-600" : "text-red-600"}`}
+                  >
                     {formatCurrency(stats.totalPnL)}
                   </p>
                 </div>
@@ -254,7 +245,9 @@ const TradesPage: React.FC = () => {
               <CardContent padding="sm">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Win Rate</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatPercent(stats.winRate)}</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {formatPercent(stats.winRate)}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -268,8 +261,18 @@ const TradesPage: React.FC = () => {
               <CardTitle>Trade History</CardTitle>
               <Link href="/trades/new">
                 <Button variant="primary">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                   New Trade
                 </Button>
@@ -285,8 +288,18 @@ const TradesPage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 leftIcon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 }
               />
@@ -310,9 +323,9 @@ const TradesPage: React.FC = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('');
-                    setDirectionFilter('');
+                    setSearchTerm("");
+                    setStatusFilter("");
+                    setDirectionFilter("");
                   }}
                 >
                   Clear Filters
