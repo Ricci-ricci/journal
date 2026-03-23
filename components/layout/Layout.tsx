@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Navigation } from './Navigation';
-import { Sidebar } from './Sidebar';
+import React, { useState } from "react";
+import { Navigation } from "./Navigation";
+import { Sidebar } from "./Sidebar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,8 +13,14 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({
   children,
   showSidebar = true,
-  title
+  title,
 }) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation - always visible */}
@@ -24,7 +30,10 @@ export const Layout: React.FC<LayoutProps> = ({
         {/* Sidebar - conditionally rendered */}
         {showSidebar && (
           <div className="hidden lg:flex lg:flex-shrink-0">
-            <Sidebar />
+            <Sidebar
+              isCollapsed={isSidebarCollapsed}
+              onToggle={toggleSidebar}
+            />
           </div>
         )}
 
@@ -52,7 +61,9 @@ export const Layout: React.FC<LayoutProps> = ({
 };
 
 // Alternative layout for full-width content (like login pages)
-export const SimpleLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SimpleLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {children}
