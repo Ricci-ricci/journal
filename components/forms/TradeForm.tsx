@@ -1,12 +1,25 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
+import React, { useState } from "react";
+import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import { Select } from "../ui/Select";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+
+interface Account {
+  id: string;
+  name: string;
+  currency: string;
+}
+
+interface Strategy {
+  id: string;
+  name: string;
+}
 
 interface TradeFormData {
+  accountId: string;
+  strategyId: string;
   symbol: string;
   assetType: string;
   direction: string;
@@ -32,37 +45,39 @@ interface TradeFormProps {
   onCancel?: () => void;
   initialData?: Partial<TradeFormData>;
   loading?: boolean;
+  accounts?: Account[];
+  strategies?: Strategy[];
 }
 
 const assetTypeOptions = [
-  { value: 'STOCK', label: 'Stock' },
-  { value: 'FOREX', label: 'Forex' },
-  { value: 'CRYPTO', label: 'Crypto' },
-  { value: 'OPTIONS', label: 'Options' },
-  { value: 'FUTURES', label: 'Futures' },
-  { value: 'OTHER', label: 'Other' },
+  { value: "STOCK", label: "Stock" },
+  { value: "FOREX", label: "Forex" },
+  { value: "CRYPTO", label: "Crypto" },
+  { value: "OPTIONS", label: "Options" },
+  { value: "FUTURES", label: "Futures" },
+  { value: "OTHER", label: "Other" },
 ];
 
 const directionOptions = [
-  { value: 'LONG', label: 'Long' },
-  { value: 'SHORT', label: 'Short' },
+  { value: "LONG", label: "Long" },
+  { value: "SHORT", label: "Short" },
 ];
 
 const statusOptions = [
-  { value: 'OPEN', label: 'Open' },
-  { value: 'CLOSED', label: 'Closed' },
-  { value: 'PARTIAL', label: 'Partial' },
+  { value: "OPEN", label: "Open" },
+  { value: "CLOSED", label: "Closed" },
+  { value: "PARTIAL", label: "Partial" },
 ];
 
 const timeFrameOptions = [
-  { value: '1m', label: '1 Minute' },
-  { value: '5m', label: '5 Minutes' },
-  { value: '15m', label: '15 Minutes' },
-  { value: '30m', label: '30 Minutes' },
-  { value: '1h', label: '1 Hour' },
-  { value: '4h', label: '4 Hours' },
-  { value: '1d', label: '1 Day' },
-  { value: '1w', label: '1 Week' },
+  { value: "1m", label: "1 Minute" },
+  { value: "5m", label: "5 Minutes" },
+  { value: "15m", label: "15 Minutes" },
+  { value: "30m", label: "30 Minutes" },
+  { value: "1h", label: "1 Hour" },
+  { value: "4h", label: "4 Hours" },
+  { value: "1d", label: "1 Day" },
+  { value: "1w", label: "1 Week" },
 ];
 
 export const TradeForm: React.FC<TradeFormProps> = ({
@@ -70,39 +85,45 @@ export const TradeForm: React.FC<TradeFormProps> = ({
   onCancel,
   initialData,
   loading = false,
+  accounts = [],
+  strategies = [],
 }) => {
   const [formData, setFormData] = useState<TradeFormData>({
-    symbol: initialData?.symbol || '',
-    assetType: initialData?.assetType || '',
-    direction: initialData?.direction || '',
-    status: initialData?.status || 'OPEN',
+    accountId: initialData?.accountId || "",
+    strategyId: initialData?.strategyId || "",
+    symbol: initialData?.symbol || "",
+    assetType: initialData?.assetType || "",
+    direction: initialData?.direction || "",
+    status: initialData?.status || "OPEN",
     entryDate: initialData?.entryDate || new Date().toISOString().slice(0, 16),
-    entryPrice: initialData?.entryPrice || '',
-    quantity: initialData?.quantity || '',
-    exitDate: initialData?.exitDate || '',
-    exitPrice: initialData?.exitPrice || '',
-    commission: initialData?.commission || '0',
-    fees: initialData?.fees || '0',
-    stopLoss: initialData?.stopLoss || '',
-    takeProfit: initialData?.takeProfit || '',
-    setupType: initialData?.setupType || '',
-    timeFrame: initialData?.timeFrame || '',
-    notes: initialData?.notes || '',
-    confidenceLevel: initialData?.confidenceLevel || '',
-    emotionalState: initialData?.emotionalState || '',
+    entryPrice: initialData?.entryPrice || "",
+    quantity: initialData?.quantity || "",
+    exitDate: initialData?.exitDate || "",
+    exitPrice: initialData?.exitPrice || "",
+    commission: initialData?.commission || "0",
+    fees: initialData?.fees || "0",
+    stopLoss: initialData?.stopLoss || "",
+    takeProfit: initialData?.takeProfit || "",
+    setupType: initialData?.setupType || "",
+    timeFrame: initialData?.timeFrame || "",
+    notes: initialData?.notes || "",
+    confidenceLevel: initialData?.confidenceLevel || "",
+    emotionalState: initialData?.emotionalState || "",
   });
 
   const [errors, setErrors] = useState<Partial<TradeFormData>>({});
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when user starts typing
     if (errors[name as keyof TradeFormData]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
@@ -110,25 +131,25 @@ export const TradeForm: React.FC<TradeFormProps> = ({
     const newErrors: Partial<TradeFormData> = {};
 
     if (!formData.symbol.trim()) {
-      newErrors.symbol = 'Symbol is required';
+      newErrors.symbol = "Symbol is required";
     }
     if (!formData.direction) {
-      newErrors.direction = 'Direction is required';
+      newErrors.direction = "Direction is required";
     }
     if (!formData.entryPrice || isNaN(Number(formData.entryPrice))) {
-      newErrors.entryPrice = 'Valid entry price is required';
+      newErrors.entryPrice = "Valid entry price is required";
     }
     if (!formData.quantity || isNaN(Number(formData.quantity))) {
-      newErrors.quantity = 'Valid quantity is required';
+      newErrors.quantity = "Valid quantity is required";
     }
     if (formData.exitPrice && isNaN(Number(formData.exitPrice))) {
-      newErrors.exitPrice = 'Exit price must be a valid number';
+      newErrors.exitPrice = "Exit price must be a valid number";
     }
     if (formData.commission && isNaN(Number(formData.commission))) {
-      newErrors.commission = 'Commission must be a valid number';
+      newErrors.commission = "Commission must be a valid number";
     }
     if (formData.fees && isNaN(Number(formData.fees))) {
-      newErrors.fees = 'Fees must be a valid number';
+      newErrors.fees = "Fees must be a valid number";
     }
 
     setErrors(newErrors);
@@ -148,12 +169,43 @@ export const TradeForm: React.FC<TradeFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {initialData ? 'Edit Trade' : 'Add New Trade'}
-        </CardTitle>
+        <CardTitle>{initialData ? "Edit Trade" : "Add New Trade"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Account and Strategy Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Trading Account"
+              name="accountId"
+              value={formData.accountId}
+              onChange={handleInputChange}
+              options={[
+                { value: "", label: "Select account (optional)" },
+                ...accounts.map((acc) => ({
+                  value: acc.id,
+                  label: `${acc.name} (${acc.currency})`,
+                })),
+              ]}
+              placeholder="Select account"
+            />
+
+            <Select
+              label="Strategy"
+              name="strategyId"
+              value={formData.strategyId}
+              onChange={handleInputChange}
+              options={[
+                { value: "", label: "Select strategy (optional)" },
+                ...strategies.map((strategy) => ({
+                  value: strategy.id,
+                  label: strategy.name,
+                })),
+              ]}
+              placeholder="Select strategy"
+            />
+          </div>
+
           {/* Basic Trade Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
@@ -203,7 +255,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               onChange={handleInputChange}
               error={errors.entryDate}
             />
-
             <Input
               label="Entry Price *"
               name="entryPrice"
@@ -214,7 +265,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               error={errors.entryPrice}
               placeholder="0.00"
             />
-
             <Input
               label="Quantity *"
               name="quantity"
@@ -225,7 +275,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               error={errors.quantity}
               placeholder="0"
             />
-
             <Input
               label="Exit Date"
               name="exitDate"
@@ -233,7 +282,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               value={formData.exitDate}
               onChange={handleInputChange}
             />
-
             <Input
               label="Exit Price"
               name="exitPrice"
@@ -244,7 +292,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               error={errors.exitPrice}
               placeholder="0.00"
             />
-
             <div></div> {/* Empty cell for grid alignment */}
           </div>
 
@@ -365,12 +412,8 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                 Cancel
               </Button>
             )}
-            <Button
-              type="submit"
-              loading={loading}
-              disabled={loading}
-            >
-              {initialData ? 'Update Trade' : 'Save Trade'}
+            <Button type="submit" loading={loading} disabled={loading}>
+              {initialData ? "Update Trade" : "Save Trade"}
             </Button>
           </div>
         </form>
