@@ -56,7 +56,7 @@ const JournalPage: React.FC = () => {
       setLoading(true);
 
       // Mock data - replace with actual API call
-      const response = await fetch("/api/strategies");
+      const response = await fetch("/api/journal-entries");
       const result = await response.json();
       if (result.success) {
         setEntries(result.data);

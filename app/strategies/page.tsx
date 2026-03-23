@@ -49,7 +49,7 @@ const StrategiesPage: React.FC = () => {
       setLoading(true);
 
       // Mock data - replace with actual API call
-      const response = await fetch("");
+      const response = await fetch("/api/strategies");
       const result = await response.json();
       if (result.success) {
         setStrategies(result.data);
