@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Layout } from "../../components/layout/Layout";
-import { AccountForm } from "../../components/forms/AccountForm";
+import {
+  AccountForm,
+  AccountFormData,
+} from "../../components/forms/AccountForm";
 import {
   Card,
   CardHeader,
@@ -60,7 +63,7 @@ const AccountsPage: React.FC = () => {
     }
   };
 
-  const handleCreateAccount = async (formData: any) => {
+  const handleCreateAccount = async (formData: AccountFormData) => {
     try {
       setSubmitting(true);
 
@@ -75,7 +78,7 @@ const AccountsPage: React.FC = () => {
           name: formData.name,
           broker: formData.broker || null,
           accountType: formData.accountType,
-          initialBalance: parseFloat(formData.initialBalance),
+          initialBalance: formData.initialBalance,
           currency: formData.currency,
         }),
       });
@@ -103,7 +106,7 @@ const AccountsPage: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleUpdateAccount = async (formData: any) => {
+  const handleUpdateAccount = async (formData: AccountFormData) => {
     if (!editingAccount) return;
 
     try {
@@ -119,7 +122,7 @@ const AccountsPage: React.FC = () => {
           name: formData.name,
           broker: formData.broker || null,
           accountType: formData.accountType,
-          initialBalance: parseFloat(formData.initialBalance),
+          initialBalance: formData.initialBalance,
           currency: formData.currency,
         }),
       });
