@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div
       className={cn(
-        "relative flex flex-col bg-white border-r border-border transition-all duration-300 ease-in-out",
+        "relative flex flex-col bg-white border-r border-border transition-all duration-300 ease-in-out h-full",
         isCollapsed ? "w-16" : "w-64",
         className,
       )}
@@ -244,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
         <div className="space-y-1">
           {sidebarItems.map((item) => {
             const isActive = isActivePath(item.href);
