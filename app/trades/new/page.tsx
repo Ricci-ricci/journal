@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Layout } from "../../../components/layout/Layout";
 import { TradeForm } from "../../../components/forms/TradeForm";
 
+// Demo user ID from seeded data
+const DEMO_USER_ID = "69c1194ba84c42e638b96e03";
+
 interface Account {
   id: string;
   name: string;
@@ -21,47 +24,69 @@ const NewTradePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [fetchingData, setFetchingData] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Fetch accounts and strategies from real API on mount
   useEffect(() => {
-    // Fetch accounts and strategies for form dropdowns
-    // This would normally be API calls
-    setAccounts([
-      { id: "1", name: "Main Trading Account", currency: "USD" },
-      { id: "2", name: "Demo Account", currency: "USD" },
-      { id: "3", name: "Paper Trading", currency: "USD" },
-    ]);
+    const fetchFormData = async () => {
+      try {
+        setFetchingData(true);
 
-    setStrategies([
-      { id: "1", name: "Breakout Strategy" },
-      { id: "2", name: "Mean Reversion" },
-      { id: "3", name: "Swing Trading v1" },
-    ]);
+        const [accountsRes, strategiesRes] = await Promise.all([
+          fetch(`/api/accounts?userId=${DEMO_USER_ID}`),
+          fetch("/api/strategies"),
+        ]);
+
+        const [accountsData, strategiesData] = await Promise.all([
+          accountsRes.json(),
+          strategiesRes.json(),
+        ]);
+
+        if (accountsData.success) {
+          setAccounts(accountsData.data);
+        } else {
+          console.error("Failed to fetch accounts:", accountsData.error);
+        }
+
+        if (strategiesData.success) {
+          setStrategies(strategiesData.data);
+        } else {
+          console.error("Failed to fetch strategies:", strategiesData.error);
+        }
+      } catch (error) {
+        console.error("Failed to fetch form data:", error);
+        setErrorMsg("Failed to load accounts and strategies.");
+      } finally {
+        setFetchingData(false);
+      }
+    };
+
+    fetchFormData();
   }, []);
 
   const handleSubmit = async (formData: any) => {
     try {
       setLoading(true);
+      setErrorMsg(null);
+      setSuccessMsg(null);
 
-      // Mock API call to create trade
-      console.log("Creating trade with data:", formData);
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // For now, we'll just log the data and redirect
-      // In a real app, you'd make an API call to POST /api/trades
-      const tradeData = {
-        userId: "demo-user-id", // This would come from auth context
+      // Build the payload matching the /api/trades POST endpoint
+      const payload = {
+        userId: DEMO_USER_ID,
         accountId: formData.accountId || null,
         strategyId: formData.strategyId || null,
         symbol: formData.symbol,
         assetType: formData.assetType || null,
         direction: formData.direction,
         status: formData.status || "OPEN",
-        entryDate: formData.entryDate,
+        entryDate: new Date(formData.entryDate).toISOString(),
         entryPrice: parseFloat(formData.entryPrice),
         quantity: parseFloat(formData.quantity),
-        exitDate: formData.exitDate || null,
+        exitDate: formData.exitDate
+          ? new Date(formData.exitDate).toISOString()
+          : null,
         exitPrice: formData.exitPrice ? parseFloat(formData.exitPrice) : null,
         commission: parseFloat(formData.commission || "0"),
         fees: parseFloat(formData.fees || "0"),
@@ -89,14 +114,32 @@ const NewTradePage: React.FC = () => {
         emotionalState: formData.emotionalState || null,
       };
 
-      console.log("Trade created successfully:", tradeData);
+      const response = await fetch("/api/trades", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      // Redirect to trades page
-      router.push("/trades");
+      const result = await response.json();
+
+      if (result.success) {
+        setSuccessMsg(
+          `Trade for ${result.data.symbol} created successfully! Redirecting...`,
+        );
+        setTimeout(() => {
+          router.push("/trades");
+        }, 1500);
+      } else {
+        setErrorMsg(
+          `Failed to create trade: ${result.error || result.details}`,
+        );
+        console.error("API error:", result);
+      }
     } catch (error) {
       console.error("Failed to create trade:", error);
-      // Here you would show an error message to the user
-      alert("Failed to create trade. Please try again.");
+      setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -122,7 +165,7 @@ const NewTradePage: React.FC = () => {
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
                 Trades
               </a>
@@ -138,7 +181,7 @@ const NewTradePage: React.FC = () => {
                     fillRule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                     clipRule="evenodd"
-                  ></path>
+                  />
                 </svg>
                 <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
                   New Trade
@@ -148,7 +191,43 @@ const NewTradePage: React.FC = () => {
           </ol>
         </nav>
 
-        {/* Instructions */}
+        {/* Success Message */}
+        {successMsg && (
+          <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6 flex items-center space-x-3">
+            <svg
+              className="h-5 w-5 text-green-500 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="text-sm font-medium text-green-800">{successMsg}</p>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {errorMsg && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6 flex items-center space-x-3">
+            <svg
+              className="h-5 w-5 text-red-500 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="text-sm font-medium text-red-800">{errorMsg}</p>
+          </div>
+        )}
+
+        {/* Tips */}
         <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -161,7 +240,7 @@ const NewTradePage: React.FC = () => {
                   fillRule="evenodd"
                   d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                   clipRule="evenodd"
-                ></path>
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -173,7 +252,9 @@ const NewTradePage: React.FC = () => {
                   <li>
                     Fill in as much detail as possible for better analysis later
                   </li>
-                  <li>Entry price and quantity are required fields</li>
+                  <li>
+                    Symbol, direction, entry price and quantity are required
+                  </li>
                   <li>
                     Add your emotional state and confidence level for
                     psychological insights
@@ -181,21 +262,32 @@ const NewTradePage: React.FC = () => {
                   <li>
                     Link to a strategy if this trade follows a specific plan
                   </li>
-                  <li>Use notes to record market conditions and reasoning</li>
+                  <li>
+                    Use notes to record market conditions and your reasoning
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Trade Form */}
-        <TradeForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          loading={loading}
-          accounts={accounts}
-          strategies={strategies}
-        />
+        {/* Loading accounts/strategies */}
+        {fetchingData ? (
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+            <p className="text-sm text-gray-500">
+              Loading accounts and strategies...
+            </p>
+          </div>
+        ) : (
+          <TradeForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            loading={loading}
+            accounts={accounts}
+            strategies={strategies}
+          />
+        )}
       </div>
     </Layout>
   );

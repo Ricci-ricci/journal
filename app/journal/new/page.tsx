@@ -1,48 +1,59 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Layout } from '../../../components/layout/Layout';
-import { JournalEntryForm } from '../../../components/forms/JournalEntryForm';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Layout } from "../../../components/layout/Layout";
+import { JournalEntryForm } from "../../../components/forms/JournalEntryForm";
+
+// Demo user ID from seeded data - replace with auth session in production
+const DEMO_USER_ID = "69c1194ba84c42e638b96e03";
 
 const NewJournalEntryPage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (formData: any) => {
     try {
       setLoading(true);
+      setErrorMessage(null);
 
-      // Mock API call to create journal entry
-      console.log('Creating journal entry with data:', formData);
-
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // For now, we'll just log the data and redirect
-      // In a real app, you'd make an API call to POST /api/journal-entries
-      const entryData = {
-        userId: 'demo-user-id', // This would come from auth context
-        entryDate: formData.entryDate,
-        entryType: formData.entryType,
-        title: formData.title || null,
-        content: formData.content || null,
-        whatWentWell: formData.whatWentWell || null,
-        whatWentWrong: formData.whatWentWrong || null,
-        lessonsLearned: formData.lessonsLearned || null,
-        goalsNextPeriod: formData.goalsNextPeriod || null,
-        marketConditions: formData.marketConditions || null,
+      // Build the payload matching the /api/journal-entries POST schema
+      const payload = {
+        userId: DEMO_USER_ID,
+        entryDate: new Date(formData.entryDate).toISOString(),
+        entryType: formData.entryType || "DAILY",
+        title: formData.title?.trim() || null,
+        content: formData.content?.trim() || null,
+        whatWentWell: formData.whatWentWell?.trim() || null,
+        whatWentWrong: formData.whatWentWrong?.trim() || null,
+        lessonsLearned: formData.lessonsLearned?.trim() || null,
+        goalsNextPeriod: formData.goalsNextPeriod?.trim() || null,
+        marketConditions: formData.marketConditions?.trim() || null,
       };
 
-      console.log('Journal entry created successfully:', entryData);
+      const response = await fetch("/api/journal-entries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      // Redirect to journal page
-      router.push('/journal');
+      const result = await response.json();
 
+      if (result.success) {
+        // Successfully created — redirect to journal list
+        router.push("/journal");
+      } else {
+        // API returned an error (e.g. duplicate entry, validation)
+        const message = result.error || "Failed to create journal entry.";
+        setErrorMessage(message);
+        console.error("API error:", result);
+      }
     } catch (error) {
-      console.error('Failed to create journal entry:', error);
-      // Here you would show an error message to the user
-      alert('Failed to create journal entry. Please try again.');
+      console.error("Failed to create journal entry:", error);
+      setErrorMessage("A network error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -90,7 +101,7 @@ const NewJournalEntryPage: React.FC = () => {
                     fillRule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                     clipRule="evenodd"
-                  ></path>
+                  />
                 </svg>
                 <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
                   New Entry
@@ -100,7 +111,30 @@ const NewJournalEntryPage: React.FC = () => {
           </ol>
         </nav>
 
-        {/* Instructions */}
+        {/* Error Banner */}
+        {errorMessage && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4 flex items-start space-x-3">
+            <svg
+              className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <div>
+              <h3 className="text-sm font-medium text-red-800">
+                Error creating entry
+              </h3>
+              <p className="mt-1 text-sm text-red-700">{errorMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Tips Banner */}
         <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -113,7 +147,7 @@ const NewJournalEntryPage: React.FC = () => {
                   fillRule="evenodd"
                   d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                   clipRule="evenodd"
-                ></path>
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -122,21 +156,11 @@ const NewJournalEntryPage: React.FC = () => {
               </h3>
               <div className="mt-2 text-sm text-green-700">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>
-                    Track patterns in your trading behavior and emotions
-                  </li>
-                  <li>
-                    Document lessons learned to avoid repeating mistakes
-                  </li>
-                  <li>
-                    Set and review goals to maintain focus and direction
-                  </li>
-                  <li>
-                    Analyze market conditions impact on your performance
-                  </li>
-                  <li>
-                    Build self-awareness and emotional intelligence
-                  </li>
+                  <li>Track patterns in your trading behavior and emotions</li>
+                  <li>Document lessons learned to avoid repeating mistakes</li>
+                  <li>Set and review goals to maintain focus and direction</li>
+                  <li>Analyze market conditions impact on your performance</li>
+                  <li>Build self-awareness and emotional intelligence</li>
                 </ul>
               </div>
             </div>
