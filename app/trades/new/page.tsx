@@ -273,9 +273,9 @@ const NewTradePage: React.FC = () => {
 
         {/* Loading accounts/strategies */}
         {fetchingData ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-            <p className="text-sm text-gray-500">
+          <div className="bg-card rounded-lg border border-border p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+            <p className="text-sm text-muted-foreground">
               Loading accounts and strategies...
             </p>
           </div>

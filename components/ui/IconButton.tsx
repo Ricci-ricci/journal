@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-type IconButtonVariant = 'default' | 'edit' | 'delete' | 'add' | 'success' | 'warning';
-type IconButtonSize = 'sm' | 'md' | 'lg';
+type IconButtonVariant =
+  | "default"
+  | "edit"
+  | "delete"
+  | "add"
+  | "success"
+  | "warning";
+type IconButtonSize = "sm" | "md" | "lg";
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
@@ -11,58 +17,58 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   variant?: IconButtonVariant;
   size?: IconButtonSize;
   loading?: boolean;
-  tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
+  tooltipPosition?: "top" | "bottom" | "left" | "right";
 }
 
 const variantClasses: Record<IconButtonVariant, string> = {
   default:
-    'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300',
-  edit:
-    'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300',
+    "bg-card text-muted-foreground border border-border hover:bg-accent hover:text-foreground",
+  edit: "bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20 hover:text-blue-300 hover:border-blue-500/50",
   delete:
-    'bg-white text-red-500 border border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300',
-  add:
-    'bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 hover:border-blue-700',
+    "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/50",
+  add: "bg-blue-600 text-white border border-blue-600 hover:bg-blue-500 hover:border-blue-500",
   success:
-    'bg-white text-green-600 border border-green-200 hover:bg-green-50 hover:text-green-700 hover:border-green-300',
+    "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/50",
   warning:
-    'bg-white text-yellow-600 border border-yellow-200 hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-300',
+    "bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20 hover:text-yellow-300 hover:border-yellow-500/50",
 };
 
 const sizeClasses: Record<IconButtonSize, string> = {
-  sm: 'w-7 h-7',
-  md: 'w-9 h-9',
-  lg: 'w-11 h-11',
+  sm: "w-7 h-7",
+  md: "w-9 h-9",
+  lg: "w-11 h-11",
 };
 
 const iconSizeClasses: Record<IconButtonSize, string> = {
-  sm: 'w-3.5 h-3.5',
-  md: 'w-4 h-4',
-  lg: 'w-5 h-5',
+  sm: "w-3.5 h-3.5",
+  md: "w-4 h-4",
+  lg: "w-5 h-5",
 };
 
 const tooltipPositionClasses: Record<string, string> = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
+  bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
+  left: "right-full top-1/2 -translate-y-1/2 mr-2",
+  right: "left-full top-1/2 -translate-y-1/2 ml-2",
 };
 
 const tooltipArrowClasses: Record<string, string> = {
-  top: 'top-full left-1/2 -translate-x-1/2 border-t-gray-800 border-l-transparent border-r-transparent border-b-transparent border-4',
-  bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-gray-800 border-l-transparent border-r-transparent border-t-transparent border-4',
-  left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-800 border-t-transparent border-b-transparent border-r-transparent border-4',
-  right: 'right-full top-1/2 -translate-y-1/2 border-r-gray-800 border-t-transparent border-b-transparent border-l-transparent border-4',
+  top: "top-full left-1/2 -translate-x-1/2 border-t-gray-800 border-l-transparent border-r-transparent border-b-transparent border-4",
+  bottom:
+    "bottom-full left-1/2 -translate-x-1/2 border-b-gray-800 border-l-transparent border-r-transparent border-t-transparent border-4",
+  left: "left-full top-1/2 -translate-y-1/2 border-l-gray-800 border-t-transparent border-b-transparent border-r-transparent border-4",
+  right:
+    "right-full top-1/2 -translate-y-1/2 border-r-gray-800 border-t-transparent border-b-transparent border-l-transparent border-4",
 };
 
 export const IconButton: React.FC<IconButtonProps> = ({
   icon,
   tooltip,
-  variant = 'default',
-  size = 'md',
+  variant = "default",
+  size = "md",
   loading = false,
-  tooltipPosition = 'top',
-  className = '',
+  tooltipPosition = "top",
+  className = "",
   disabled,
   ...props
 }) => {
@@ -78,13 +84,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
         onFocus={() => setShowTooltip(true)}
         onBlur={() => setShowTooltip(false)}
         className={[
-          'relative inline-flex items-center justify-center rounded-lg transition-all duration-150',
-          'focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400',
-          'disabled:opacity-40 disabled:cursor-not-allowed',
+          "relative inline-flex items-center justify-center rounded-lg transition-all duration-150",
+          "focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-background focus:ring-ring",
+          "disabled:opacity-40 disabled:cursor-not-allowed",
           variantClasses[variant],
           sizeClasses[size],
           className,
-        ].join(' ')}
+        ].join(" ")}
         {...props}
       >
         {loading ? (
@@ -116,17 +122,17 @@ export const IconButton: React.FC<IconButtonProps> = ({
       {tooltip && showTooltip && !disabled && (
         <div
           className={[
-            'absolute z-50 pointer-events-none',
+            "absolute z-50 pointer-events-none",
             tooltipPositionClasses[tooltipPosition],
-          ].join(' ')}
+          ].join(" ")}
         >
-          <div className="relative bg-gray-800 text-white text-xs font-medium px-2 py-1 rounded-md whitespace-nowrap shadow-lg">
+          <div className="relative bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded-md whitespace-nowrap shadow-lg border border-white/10">
             {tooltip}
             <span
               className={[
-                'absolute',
+                "absolute",
                 tooltipArrowClasses[tooltipPosition],
-              ].join(' ')}
+              ].join(" ")}
             />
           </div>
         </div>
@@ -137,12 +143,19 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
 // ─── Pre-built icon buttons ───────────────────────────────────────────────────
 
-export const EditIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>> = (props) => (
+export const EditIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant">
+> = (props) => (
   <IconButton
     variant="edit"
     tooltip="Edit"
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -156,12 +169,19 @@ export const EditIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>>
   />
 );
 
-export const DeleteIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>> = (props) => (
+export const DeleteIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant">
+> = (props) => (
   <IconButton
     variant="delete"
     tooltip="Delete"
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -175,12 +195,19 @@ export const DeleteIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'
   />
 );
 
-export const AddIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>> = (props) => (
+export const AddIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant">
+> = (props) => (
   <IconButton
     variant="add"
     tooltip="Add"
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -193,12 +220,19 @@ export const AddIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>> 
   />
 );
 
-export const ViewIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>> = (props) => (
+export const ViewIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant">
+> = (props) => (
   <IconButton
     variant="default"
     tooltip="View"
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -220,15 +254,19 @@ export const ViewIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'>>
   />
 );
 
-export const ActivateIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'> & { isActive: boolean }> = ({
-  isActive,
-  ...props
-}) => (
+export const ActivateIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant"> & { isActive: boolean }
+> = ({ isActive, ...props }) => (
   <IconButton
-    variant={isActive ? 'warning' : 'success'}
-    tooltip={isActive ? 'Deactivate' : 'Activate'}
+    variant={isActive ? "warning" : "success"}
+    tooltip={isActive ? "Deactivate" : "Activate"}
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -241,20 +279,24 @@ export const ActivateIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'varian
   />
 );
 
-export const ExpandIconButton: React.FC<Omit<IconButtonProps, 'icon' | 'variant'> & { isExpanded: boolean }> = ({
-  isExpanded,
-  ...props
-}) => (
+export const ExpandIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant"> & { isExpanded: boolean }
+> = ({ isExpanded, ...props }) => (
   <IconButton
     variant="default"
-    tooltip={isExpanded ? 'Collapse' : 'Expand'}
+    tooltip={isExpanded ? "Collapse" : "Expand"}
     icon={
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d={isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}
+          d={isExpanded ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
         />
       </svg>
     }

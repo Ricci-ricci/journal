@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
+import React, { useState } from "react";
+import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import { Select } from "../ui/Select";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
 
-interface AccountFormData {
+export interface AccountFormData {
   name: string;
   broker: string;
   accountType: string;
@@ -22,18 +22,18 @@ interface AccountFormProps {
 }
 
 const accountTypeOptions = [
-  { value: 'PAPER', label: 'Paper Trading' },
-  { value: 'DEMO', label: 'Demo Account' },
-  { value: 'LIVE', label: 'Live Account' },
+  { value: "PAPER", label: "Paper Trading" },
+  { value: "DEMO", label: "Demo Account" },
+  { value: "LIVE", label: "Live Account" },
 ];
 
 const currencyOptions = [
-  { value: 'USD', label: 'US Dollar (USD)' },
-  { value: 'EUR', label: 'Euro (EUR)' },
-  { value: 'GBP', label: 'British Pound (GBP)' },
-  { value: 'CAD', label: 'Canadian Dollar (CAD)' },
-  { value: 'AUD', label: 'Australian Dollar (AUD)' },
-  { value: 'JPY', label: 'Japanese Yen (JPY)' },
+  { value: "USD", label: "US Dollar (USD)" },
+  { value: "EUR", label: "Euro (EUR)" },
+  { value: "GBP", label: "British Pound (GBP)" },
+  { value: "CAD", label: "Canadian Dollar (CAD)" },
+  { value: "AUD", label: "Australian Dollar (AUD)" },
+  { value: "JPY", label: "Japanese Yen (JPY)" },
 ];
 
 export const AccountForm: React.FC<AccountFormProps> = ({
@@ -43,24 +43,24 @@ export const AccountForm: React.FC<AccountFormProps> = ({
   loading = false,
 }) => {
   const [formData, setFormData] = useState<AccountFormData>({
-    name: initialData?.name || '',
-    broker: initialData?.broker || '',
-    accountType: initialData?.accountType || 'PAPER',
-    initialBalance: initialData?.initialBalance || '',
-    currency: initialData?.currency || 'USD',
+    name: initialData?.name || "",
+    broker: initialData?.broker || "",
+    accountType: initialData?.accountType || "PAPER",
+    initialBalance: initialData?.initialBalance || "",
+    currency: initialData?.currency || "USD",
   });
 
   const [errors, setErrors] = useState<Partial<AccountFormData>>({});
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when user starts typing
     if (errors[name as keyof AccountFormData]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
@@ -68,19 +68,23 @@ export const AccountForm: React.FC<AccountFormProps> = ({
     const newErrors: Partial<AccountFormData> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Account name is required';
+      newErrors.name = "Account name is required";
     }
 
-    if (!formData.initialBalance || isNaN(Number(formData.initialBalance)) || Number(formData.initialBalance) < 0) {
-      newErrors.initialBalance = 'Valid initial balance is required';
+    if (
+      !formData.initialBalance ||
+      isNaN(Number(formData.initialBalance)) ||
+      Number(formData.initialBalance) < 0
+    ) {
+      newErrors.initialBalance = "Valid initial balance is required";
     }
 
     if (!formData.accountType) {
-      newErrors.accountType = 'Account type is required';
+      newErrors.accountType = "Account type is required";
     }
 
     if (!formData.currency) {
-      newErrors.currency = 'Currency is required';
+      newErrors.currency = "Currency is required";
     }
 
     setErrors(newErrors);
@@ -101,7 +105,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
     <Card>
       <CardHeader>
         <CardTitle>
-          {initialData ? 'Edit Trading Account' : 'Add New Trading Account'}
+          {initialData ? "Edit Trading Account" : "Add New Trading Account"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -160,11 +164,20 @@ export const AccountForm: React.FC<AccountFormProps> = ({
 
             <div className="flex items-end">
               <div className="text-sm text-gray-500 space-y-2">
-                <p><strong>Account Type Info:</strong></p>
+                <p>
+                  <strong>Account Type Info:</strong>
+                </p>
                 <ul className="text-xs space-y-1">
-                  <li><strong>Paper:</strong> Simulated trading with fake money</li>
-                  <li><strong>Demo:</strong> Broker demo account with virtual funds</li>
-                  <li><strong>Live:</strong> Real money trading account</li>
+                  <li>
+                    <strong>Paper:</strong> Simulated trading with fake money
+                  </li>
+                  <li>
+                    <strong>Demo:</strong> Broker demo account with virtual
+                    funds
+                  </li>
+                  <li>
+                    <strong>Live:</strong> Real money trading account
+                  </li>
                 </ul>
               </div>
             </div>
@@ -182,12 +195,8 @@ export const AccountForm: React.FC<AccountFormProps> = ({
                 Cancel
               </Button>
             )}
-            <Button
-              type="submit"
-              loading={loading}
-              disabled={loading}
-            >
-              {initialData ? 'Update Account' : 'Create Account'}
+            <Button type="submit" loading={loading} disabled={loading}>
+              {initialData ? "Update Account" : "Create Account"}
             </Button>
           </div>
         </form>

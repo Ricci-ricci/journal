@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div
       className={cn(
-        "relative flex flex-col bg-white border-r border-border transition-all duration-300 ease-in-out h-full",
+        "relative flex flex-col bg-sidebar border-r border-border transition-all duration-300 ease-in-out h-full",
         isCollapsed ? "w-16" : "w-64",
         className,
       )}
@@ -225,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {isCollapsed && (
         <button
           onClick={onToggle}
-          className="absolute -right-3 top-20 bg-white border border-border rounded-full p-1.5 shadow-md hover:shadow-lg transition-shadow z-10"
+          className="absolute -right-3 top-20 bg-card border border-border rounded-full p-1.5 shadow-md hover:shadow-lg transition-shadow z-10"
         >
           <svg
             className="w-3 h-3 text-muted-foreground"

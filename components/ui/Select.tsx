@@ -1,11 +1,14 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef } from "react";
 
 interface SelectOption {
   value: string;
   label: string;
 }
 
-interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
+interface SelectProps extends Omit<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  "children"
+> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -14,54 +17,59 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({
-    label,
-    error,
-    helperText,
-    options,
-    placeholder,
-    className = '',
-    ...props
-  }, ref) => {
-    const selectClasses = `
-      block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset
-      ${error
-        ? 'ring-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500'
-        : 'ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600'
-      }
-      sm:text-sm sm:leading-6
-      disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-      ${className}
-    `.trim().replace(/\s+/g, ' ');
+  (
+    {
+      label,
+      error,
+      helperText,
+      options,
+      placeholder,
+      className = "",
+      ...props
+    },
+    ref,
+  ) => {
+    const selectClasses = [
+      "block w-full rounded-md border py-1.5 pl-3 pr-10",
+      "bg-background text-foreground",
+      "shadow-sm sm:text-sm sm:leading-6",
+      "transition-colors",
+      error
+        ? "border-destructive focus:ring-2 focus:ring-inset focus:ring-destructive"
+        : "border-border focus:ring-2 focus:ring-inset focus:ring-ring",
+      "disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed",
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+          <label className="block text-sm font-medium leading-6 text-foreground mb-2">
             {label}
           </label>
         )}
 
         <div className="relative">
-          <select
-            ref={ref}
-            className={selectClasses}
-            {...props}
-          >
+          <select ref={ref} className={selectClasses} {...props}>
             {placeholder && (
               <option value="" disabled>
                 {placeholder}
               </option>
             )}
             {options.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option
+                key={option.value}
+                value={option.value}
+                className="bg-background text-foreground"
+              >
                 {option.label}
               </option>
             ))}
           </select>
 
-          {/* Dropdown arrow icon */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -73,19 +81,17 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         </div>
 
         {error && (
-          <p className="mt-2 text-sm text-red-600" role="alert">
+          <p className="mt-2 text-sm text-destructive" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p className="mt-2 text-sm text-gray-500">
-            {helperText}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{helperText}</p>
         )}
       </div>
     );
-  }
+  },
 );
 
-Select.displayName = 'Select';
+Select.displayName = "Select";

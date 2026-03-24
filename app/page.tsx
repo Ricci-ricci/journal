@@ -7,14 +7,14 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/dashboard");
+    router.replace("/accueil");
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto" />
+        <p className="mt-4 text-muted-foreground text-sm">Loading…</p>
       </div>
     </div>
   );
