@@ -61,18 +61,20 @@ const DashboardPage: React.FC = () => {
 
           // Calculate stats from real trades data
           const openTrades = trades.data.filter(
-            (t) => t.status === "OPEN",
+            (t: RecentTrade) => t.status === "OPEN",
           ).length;
-          const closedTrades = trades.data.filter((t) => t.status === "CLOSED");
+          const closedTrades = trades.data.filter(
+            (t: RecentTrade) => t.status === "CLOSED",
+          );
           const totalPnL = closedTrades.reduce(
-            (sum, trade) => sum + (trade.profitLoss || 0),
+            (sum: string, trade: RecentTrade) => sum + (trade.profitLoss || 0),
             0,
           );
           const winningTrades = closedTrades.filter(
-            (t) => (t.profitLoss || 0) > 0,
+            (t: RecentTrade) => (t.profitLoss || 0) > 0,
           );
           const losingTrades = closedTrades.filter(
-            (t) => (t.profitLoss || 0) < 0,
+            (t: RecentTrade) => (t.profitLoss || 0) < 0,
           );
           const winRate =
             closedTrades.length > 0
@@ -80,20 +82,24 @@ const DashboardPage: React.FC = () => {
               : 0;
           const averageWin =
             winningTrades.length > 0
-              ? winningTrades.reduce((sum, t) => sum + t.profitLoss, 0) /
-                winningTrades.length
+              ? winningTrades.reduce(
+                  (sum: string, t: RecentTrade) => sum + t.profitLoss,
+                  0,
+                ) / winningTrades.length
               : 0;
           const averageLoss =
             losingTrades.length > 0
-              ? losingTrades.reduce((sum, t) => sum + t.profitLoss, 0) /
-                losingTrades.length
+              ? losingTrades.reduce(
+                  (sum: string, t: RecentTrade) => sum + t.profitLoss,
+                  0,
+                ) / losingTrades.length
               : 0;
           const bestTrade = Math.max(
-            ...closedTrades.map((t) => t.profitLoss || 0),
+            ...closedTrades.map((t: RecentTrade) => t.profitLoss || 0),
             0,
           );
           const worstTrade = Math.min(
-            ...closedTrades.map((t) => t.profitLoss || 0),
+            ...closedTrades.map((t: RecentTrade) => t.profitLoss || 0),
             0,
           );
 
@@ -113,12 +119,15 @@ const DashboardPage: React.FC = () => {
         // Use latest performance metrics if available
         if (metrics.success && metrics.data.length > 0) {
           const latestMetric = metrics.data[0];
-          setStats((prevStats) => ({
-            ...prevStats,
-            totalTrades: latestMetric.totalTrades,
-            winRate: latestMetric.winRate || prevStats?.winRate || 0,
-            totalPnL: latestMetric.cumulativePnl,
-          }));
+          setStats((prevStats) => {
+            if (!prevStats) return prevStats;
+            return {
+              ...prevStats,
+              totalTrades: latestMetric.totalTrades,
+              winRate: latestMetric.winRate || prevStats.winRate || 0,
+              totalPnL: latestMetric.cumulativePnl,
+            };
+          });
         }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
@@ -200,7 +209,7 @@ const DashboardPage: React.FC = () => {
         <div className="bg-linear-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
           <h2 className="text-2xl font-bold mb-2">Welcome back, Trader!</h2>
           <p className="text-blue-100">
-            Here's how your portfolio is performing today.
+            Here`s how your portfolio is performing today.
           </p>
         </div>
 
