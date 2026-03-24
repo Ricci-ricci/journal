@@ -91,15 +91,17 @@ const TradesPage: React.FC = () => {
 
           // Calculate stats from real data
           const openTrades = result.data.filter(
-            (t) => t.status === "OPEN",
+            (t: Trade) => t.status === "OPEN",
           ).length;
-          const closedTrades = result.data.filter((t) => t.status === "CLOSED");
+          const closedTrades = result.data.filter(
+            (t: Trade) => t.status === "CLOSED",
+          );
           const totalPnL = closedTrades.reduce(
-            (sum, trade) => sum + (trade.profitLoss || 0),
+            (sum: string, trade: Trade) => sum + (trade.profitLoss || 0),
             0,
           );
           const winningTrades = closedTrades.filter(
-            (t) => (t.profitLoss || 0) > 0,
+            (t: Trade) => (t.profitLoss || 0) > 0,
           ).length;
           const winRate =
             closedTrades.length > 0
