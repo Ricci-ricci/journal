@@ -1,15 +1,20 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import React from "react";
+import { Badge } from "../ui/Badge";
+
+import {
+  EditIconButton,
+  DeleteIconButton,
+  ViewIconButton,
+} from "../ui/IconButton";
 
 interface Trade {
   id: string;
   symbol: string;
   assetType: string | null;
-  direction: 'LONG' | 'SHORT';
-  status: 'OPEN' | 'CLOSED' | 'PARTIAL';
+  direction: "LONG" | "SHORT";
+  status: "OPEN" | "CLOSED" | "PARTIAL";
   entryDate: string;
   entryPrice: number;
   quantity: number;
@@ -40,47 +45,47 @@ interface TradesTableProps {
 }
 
 const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
-const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
+const formatCurrency = (amount: number, currency: string = "USD"): string => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency,
     minimumFractionDigits: 2,
   }).format(amount);
 };
 
 const formatPercent = (percent: number): string => {
-  return `${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%`;
+  return `${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`;
 };
 
 const getStatusBadgeVariant = (status: string) => {
   switch (status) {
-    case 'OPEN':
-      return 'info';
-    case 'CLOSED':
-      return 'default';
-    case 'PARTIAL':
-      return 'warning';
+    case "OPEN":
+      return "info";
+    case "CLOSED":
+      return "default";
+    case "PARTIAL":
+      return "warning";
     default:
-      return 'default';
+      return "default";
   }
 };
 
 const getDirectionBadgeVariant = (direction: string) => {
-  return direction === 'LONG' ? 'success' : 'danger';
+  return direction === "LONG" ? "success" : "danger";
 };
 
 const getProfitLossColor = (profitLoss: number | null): string => {
-  if (profitLoss === null) return 'text-gray-500';
-  return profitLoss >= 0 ? 'text-green-600' : 'text-red-600';
+  if (profitLoss === null) return "text-gray-500";
+  return profitLoss >= 0 ? "text-green-600" : "text-red-600";
 };
 
 export const TradesTable: React.FC<TradesTableProps> = ({
@@ -134,7 +139,9 @@ export const TradesTable: React.FC<TradesTableProps> = ({
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No trades</h3>
-          <p className="mt-1 text-sm text-gray-500">Get started by creating your first trade.</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Get started by creating your first trade.
+          </p>
         </div>
       </div>
     );
@@ -188,10 +195,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
               >
                 P&L
               </th>
-              <th
-                scope="col"
-                className="relative px-6 py-3"
-              >
+              <th scope="col" className="relative px-6 py-3">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -229,7 +233,10 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="text-sm text-gray-900">
-                      {formatCurrency(trade.entryPrice, trade.account?.currency)}
+                      {formatCurrency(
+                        trade.entryPrice,
+                        trade.account?.currency,
+                      )}
                     </div>
                     <div className="text-xs text-gray-500">
                       {formatDate(trade.entryDate)}
@@ -241,7 +248,10 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     {trade.exitPrice ? (
                       <>
                         <div className="text-sm text-gray-900">
-                          {formatCurrency(trade.exitPrice, trade.account?.currency)}
+                          {formatCurrency(
+                            trade.exitPrice,
+                            trade.account?.currency,
+                          )}
                         </div>
                         {trade.exitDate && (
                           <div className="text-xs text-gray-500">
@@ -261,11 +271,18 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                   <div className="flex flex-col">
                     {trade.profitLoss !== null ? (
                       <>
-                        <div className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}>
-                          {formatCurrency(trade.profitLoss, trade.account?.currency)}
+                        <div
+                          className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}
+                        >
+                          {formatCurrency(
+                            trade.profitLoss,
+                            trade.account?.currency,
+                          )}
                         </div>
                         {trade.profitLossPercent !== null && (
-                          <div className={`text-xs ${getProfitLossColor(trade.profitLoss)}`}>
+                          <div
+                            className={`text-xs ${getProfitLossColor(trade.profitLoss)}`}
+                          >
                             {formatPercent(trade.profitLossPercent)}
                           </div>
                         )}
@@ -276,33 +293,24 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
+                  <div className="flex justify-end items-center space-x-1">
                     {onViewTrade && (
-                      <Button
-                        variant="outline"
+                      <ViewIconButton
                         size="sm"
                         onClick={() => onViewTrade(trade)}
-                      >
-                        View
-                      </Button>
+                      />
                     )}
                     {onEditTrade && (
-                      <Button
-                        variant="outline"
+                      <EditIconButton
                         size="sm"
                         onClick={() => onEditTrade(trade)}
-                      >
-                        Edit
-                      </Button>
+                      />
                     )}
                     {onDeleteTrade && (
-                      <Button
-                        variant="danger"
+                      <DeleteIconButton
                         size="sm"
                         onClick={() => onDeleteTrade(trade.id)}
-                      >
-                        Delete
-                      </Button>
+                      />
                     )}
                   </div>
                 </td>

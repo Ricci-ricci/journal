@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Layout } from "../../components/layout/Layout";
 import { TradesTable } from "../../components/tables/TradesTable";
 import { Button } from "../../components/ui/Button";
+import { AddIconButton } from "../../components/ui/IconButton";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import {
@@ -260,22 +261,7 @@ const TradesPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <CardTitle>Trade History</CardTitle>
               <Link href="/trades/new">
-                <Button variant="primary">
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  New Trade
-                </Button>
+                <AddIconButton tooltip="New Trade" size="md" />
               </Link>
             </div>
           </CardHeader>

@@ -5,6 +5,12 @@ import { Layout } from "../../components/layout/Layout";
 import { StrategyForm } from "../../components/forms/StrategyForm";
 import { Button } from "../../components/ui/Button";
 import {
+  AddIconButton,
+  EditIconButton,
+  DeleteIconButton,
+  ActivateIconButton,
+} from "../../components/ui/IconButton";
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -246,22 +252,11 @@ const StrategiesPage: React.FC = () => {
               strategies.
             </p>
           </div>
-          <Button onClick={() => setShowForm(true)}>
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Create Strategy
-          </Button>
+          <AddIconButton
+            tooltip="Create Strategy"
+            size="lg"
+            onClick={() => setShowForm(true)}
+          />
         </div>
 
         {/* Filters */}
@@ -373,23 +368,12 @@ const StrategiesPage: React.FC = () => {
                   : "Get started by creating your first trading strategy."}
               </p>
               {!searchTerm && filterActive === null && (
-                <div className="mt-6">
-                  <Button onClick={() => setShowForm(true)}>
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Create Your First Strategy
-                  </Button>
+                <div className="mt-6 flex justify-center">
+                  <AddIconButton
+                    tooltip="Create Your First Strategy"
+                    size="lg"
+                    onClick={() => setShowForm(true)}
+                  />
                 </div>
               )}
             </CardContent>
@@ -413,27 +397,19 @@ const StrategiesPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
+                      <ActivateIconButton
+                        isActive={strategy.isActive}
                         size="sm"
                         onClick={() => handleToggleActive(strategy)}
-                      >
-                        {strategy.isActive ? "Deactivate" : "Activate"}
-                      </Button>
-                      <Button
-                        variant="outline"
+                      />
+                      <EditIconButton
                         size="sm"
                         onClick={() => handleEditStrategy(strategy)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
+                      />
+                      <DeleteIconButton
                         size="sm"
                         onClick={() => handleDeleteStrategy(strategy.id)}
-                      >
-                        Delete
-                      </Button>
+                      />
                     </div>
                   </div>
                   {strategy.description && (

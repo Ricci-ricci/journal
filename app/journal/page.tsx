@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+
 import { Layout } from "../../components/layout/Layout";
 import { JournalEntryForm } from "../../components/forms/JournalEntryForm";
-import { Button } from "../../components/ui/Button";
+
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import {
@@ -14,6 +14,12 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import {
+  AddIconButton,
+  EditIconButton,
+  DeleteIconButton,
+  ExpandIconButton,
+} from "../../components/ui/IconButton";
 
 interface JournalEntry {
   id: string;
@@ -248,22 +254,11 @@ const JournalPage: React.FC = () => {
               progress.
             </p>
           </div>
-          <Button onClick={() => setShowForm(true)}>
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            New Entry
-          </Button>
+          <AddIconButton
+            tooltip="New Entry"
+            size="lg"
+            onClick={() => setShowForm(true)}
+          />
         </div>
 
         {/* Search and Filters */}
@@ -359,22 +354,11 @@ const JournalPage: React.FC = () => {
               </p>
               {!searchTerm && !filterType && (
                 <div className="mt-6">
-                  <Button onClick={() => setShowForm(true)}>
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Write Your First Entry
-                  </Button>
+                  <AddIconButton
+                    tooltip="Write Your First Entry"
+                    size="lg"
+                    onClick={() => setShowForm(true)}
+                  />
                 </div>
               )}
             </CardContent>
@@ -408,31 +392,23 @@ const JournalPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
+                      <ExpandIconButton
+                        isExpanded={expandedEntry === entry.id}
                         size="sm"
                         onClick={() =>
                           setExpandedEntry(
                             expandedEntry === entry.id ? null : entry.id,
                           )
                         }
-                      >
-                        {expandedEntry === entry.id ? "Collapse" : "Expand"}
-                      </Button>
-                      <Button
-                        variant="outline"
+                      />
+                      <EditIconButton
                         size="sm"
                         onClick={() => handleEditEntry(entry)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
+                      />
+                      <DeleteIconButton
                         size="sm"
                         onClick={() => handleDeleteEntry(entry.id)}
-                      >
-                        Delete
-                      </Button>
+                      />
                     </div>
                   </div>
                 </CardHeader>

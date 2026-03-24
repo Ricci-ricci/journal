@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { Layout } from "../../components/layout/Layout";
 import { AccountForm } from "../../components/forms/AccountForm";
-import { Button } from "../../components/ui/Button";
 import {
   Card,
   CardHeader,
@@ -12,6 +10,11 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import {
+  AddIconButton,
+  EditIconButton,
+  DeleteIconButton,
+} from "../../components/ui/IconButton";
 
 interface Account {
   id: string;
@@ -244,22 +247,11 @@ const AccountsPage: React.FC = () => {
               account types.
             </p>
           </div>
-          <Button onClick={() => setShowForm(true)}>
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Add Account
-          </Button>
+          <AddIconButton
+            tooltip="Add Account"
+            size="md"
+            onClick={() => setShowForm(true)}
+          />
         </div>
 
         {/* Accounts Grid */}
@@ -299,22 +291,11 @@ const AccountsPage: React.FC = () => {
                 Get started by creating your first trading account.
               </p>
               <div className="mt-6">
-                <Button onClick={() => setShowForm(true)}>
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Add Your First Account
-                </Button>
+                <AddIconButton
+                  tooltip="Add Your First Account"
+                  size="lg"
+                  onClick={() => setShowForm(true)}
+                />
               </div>
             </CardContent>
           </Card>
@@ -368,23 +349,15 @@ const AccountsPage: React.FC = () => {
                     </div>
 
                     <div className="pt-3 border-t border-gray-200">
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
+                      <div className="flex justify-end space-x-2">
+                        <EditIconButton
                           size="sm"
                           onClick={() => handleEditAccount(account)}
-                          className="flex-1"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
+                        />
+                        <DeleteIconButton
                           size="sm"
                           onClick={() => handleDeleteAccount(account.id)}
-                          className="flex-1"
-                        >
-                          Delete
-                        </Button>
+                        />
                       </div>
                     </div>
                   </div>
