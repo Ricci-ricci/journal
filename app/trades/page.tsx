@@ -200,7 +200,7 @@ const TradesPage: React.FC = () => {
     exitPrice: number;
     exitDate: string;
     profitLoss: number;
-    profitLossPercent: number;
+    profitLossPercent: number | null;
   }) => {
     if (!tradeToClose) return;
     setCloseLoading(true);

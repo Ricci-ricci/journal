@@ -8,9 +8,6 @@ interface Trade {
   symbol: string;
   direction: "LONG" | "SHORT";
   entryPrice: number;
-  quantity: number;
-  commission: number;
-  fees: number;
   account?: { name: string; currency: string } | null;
 }
 
@@ -20,31 +17,13 @@ interface CloseTradeModalProps {
     exitPrice: number;
     exitDate: string;
     profitLoss: number;
-    profitLossPercent: number;
+    profitLossPercent: number | null;
   }) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
 
-function computePnL(
-  direction: "LONG" | "SHORT",
-  entryPrice: number,
-  exitPrice: number,
-  quantity: number,
-  commission: number,
-  fees: number,
-): { pl: number; plPct: number } {
-  const raw =
-    direction === "SHORT"
-      ? (entryPrice - exitPrice) * quantity
-      : (exitPrice - entryPrice) * quantity;
-  const pl = raw - commission - fees;
-  const cost = entryPrice * quantity;
-  const plPct = cost !== 0 ? (pl / cost) * 100 : 0;
-  return { pl, plPct };
-}
-
-// ─── Inner form — mounted fresh for every trade thanks to key={trade.id} ─────
+// ─── Inner form — remounts via key={trade.id} so state always resets ─────────
 
 interface CloseTradeFormProps {
   trade: Trade;
@@ -63,61 +42,90 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
   const [exitDate, setExitDate] = useState(
     new Date().toISOString().slice(0, 16),
   );
-  const [exitPriceError, setExitPriceError] = useState<string | null>(null);
+  const [profitLoss, setProfitLoss] = useState("");
+  const [profitLossPercent, setProfitLossPercent] = useState("");
 
-  const exitPriceNum = parseFloat(exitPrice);
-  const hasValidExit = !isNaN(exitPriceNum) && exitPriceNum > 0;
-
-  const pnl = hasValidExit
-    ? computePnL(
-        trade.direction,
-        trade.entryPrice,
-        exitPriceNum,
-        trade.quantity,
-        trade.commission,
-        trade.fees,
-      )
-    : null;
-
-  const isProfit = pnl !== null && pnl.pl > 0;
-  const isLoss = pnl !== null && pnl.pl < 0;
+  const [errors, setErrors] = useState<{
+    exitPrice?: string;
+    profitLoss?: string;
+  }>({});
 
   const currency = trade.account?.currency ?? "USD";
   const formatCurrency = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency }).format(n);
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(n);
+
+  // Derived display values
+  const plNum = parseFloat(profitLoss);
+  const plPctNum = parseFloat(profitLossPercent);
+  const hasValidPl = profitLoss.trim() !== "" && !isNaN(plNum);
+  const hasValidPct = profitLossPercent.trim() !== "" && !isNaN(plPctNum);
+
+  const isProfit = hasValidPl && plNum > 0;
+  const isLoss = hasValidPl && plNum < 0;
+
+  const plColor = isProfit
+    ? "text-emerald-400"
+    : isLoss
+      ? "text-red-400"
+      : "text-muted-foreground";
+
+  const previewBorder = !hasValidPl
+    ? "border-border bg-muted/30"
+    : isProfit
+      ? "border-emerald-500/30 bg-emerald-500/5"
+      : isLoss
+        ? "border-red-500/30 bg-red-500/5"
+        : "border-border bg-muted/20";
 
   const handleConfirm = async () => {
-    if (!exitPrice.trim()) {
-      setExitPriceError("Exit price is required");
-      return;
-    }
-    if (isNaN(exitPriceNum) || exitPriceNum <= 0) {
-      setExitPriceError("Enter a valid exit price greater than 0");
-      return;
-    }
-    setExitPriceError(null);
+    const newErrors: typeof errors = {};
 
-    const { pl, plPct } = computePnL(
-      trade.direction,
-      trade.entryPrice,
-      exitPriceNum,
-      trade.quantity,
-      trade.commission,
-      trade.fees,
-    );
+    const exitPriceNum = parseFloat(exitPrice);
+    if (exitPrice.trim() === "" || isNaN(exitPriceNum) || exitPriceNum <= 0) {
+      newErrors.exitPrice = "Enter a valid exit price greater than 0";
+    }
+
+    const plValue = parseFloat(profitLoss);
+    if (profitLoss.trim() === "" || isNaN(plValue)) {
+      newErrors.profitLoss = "Enter the profit or loss for this trade";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
 
     await onConfirm({
       exitPrice: exitPriceNum,
       exitDate: new Date(exitDate).toISOString(),
-      profitLoss: pl,
-      profitLossPercent: plPct,
+      profitLoss: plValue,
+      profitLossPercent: hasValidPct ? plPctNum : null,
     });
   };
 
+  const inputClass = (hasError?: boolean) =>
+    [
+      "block w-full rounded-md border-0 py-2 px-3 text-sm shadow-sm",
+      "ring-1 ring-inset transition-colors",
+      "bg-background text-foreground placeholder:text-muted-foreground",
+      "focus:outline-none focus:ring-2 focus:ring-inset",
+      hasError
+        ? "ring-red-500 focus:ring-red-500"
+        : "ring-border focus:ring-ring",
+      loading ? "opacity-50 cursor-not-allowed" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
   return (
-    /* Panel */
     <div className="relative z-10 w-full max-w-md rounded-xl bg-card border border-border shadow-2xl overflow-hidden">
-      {/* Header */}
+      {/* ── Header ── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30">
@@ -153,8 +161,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
               >
                 {trade.direction}
               </span>
-              &nbsp;·&nbsp;Entry {formatCurrency(trade.entryPrice)}
-              &nbsp;×&nbsp;{trade.quantity.toLocaleString()}
+              &nbsp;·&nbsp;Entry&nbsp;{formatCurrency(trade.entryPrice)}
             </p>
           </div>
         </div>
@@ -180,112 +187,138 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
         </button>
       </div>
 
-      {/* Body */}
-      <div className="px-6 py-5 space-y-5">
-        {/* Exit Price */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">
-            Exit Price <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="number"
-            step="any"
-            value={exitPrice}
-            onChange={(e) => {
-              setExitPrice(e.target.value);
-              if (exitPriceError) setExitPriceError(null);
-            }}
-            placeholder="0.00"
-            autoFocus
-            disabled={loading}
-            className={[
-              "block w-full rounded-md border-0 py-2 px-3 text-sm shadow-sm ring-1 ring-inset transition-colors",
-              "bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset",
-              exitPriceError
-                ? "ring-red-500 focus:ring-red-500"
-                : "ring-border focus:ring-ring",
-              loading ? "opacity-50 cursor-not-allowed" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          />
-          {exitPriceError && (
-            <p className="mt-1 text-xs text-red-400">{exitPriceError}</p>
-          )}
+      {/* ── Body ── */}
+      <div className="px-6 py-5 space-y-4">
+        {/* Row: Exit Price + Exit Date */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Exit Price <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="number"
+              step="any"
+              value={exitPrice}
+              onChange={(e) => {
+                setExitPrice(e.target.value);
+                if (errors.exitPrice)
+                  setErrors((prev) => ({ ...prev, exitPrice: undefined }));
+              }}
+              placeholder="0.00"
+              autoFocus
+              disabled={loading}
+              className={inputClass(!!errors.exitPrice)}
+            />
+            {errors.exitPrice && (
+              <p className="mt-1 text-xs text-red-400">{errors.exitPrice}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Exit Date &amp; Time
+            </label>
+            <input
+              type="datetime-local"
+              value={exitDate}
+              onChange={(e) => setExitDate(e.target.value)}
+              disabled={loading}
+              className={inputClass()}
+            />
+          </div>
         </div>
 
-        {/* Exit Date */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">
-            Exit Date &amp; Time
-          </label>
-          <input
-            type="datetime-local"
-            value={exitDate}
-            onChange={(e) => setExitDate(e.target.value)}
-            disabled={loading}
-            className={[
-              "block w-full rounded-md border-0 py-2 px-3 text-sm shadow-sm ring-1 ring-inset ring-border transition-colors",
-              "bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-ring",
-              loading ? "opacity-50 cursor-not-allowed" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          />
-        </div>
+        {/* Row: P&L amount + P&L % */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Profit / Loss <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="number"
+              step="any"
+              value={profitLoss}
+              onChange={(e) => {
+                setProfitLoss(e.target.value);
+                if (errors.profitLoss)
+                  setErrors((prev) => ({ ...prev, profitLoss: undefined }));
+              }}
+              placeholder="-50.00"
+              disabled={loading}
+              className={inputClass(!!errors.profitLoss)}
+            />
+            {errors.profitLoss && (
+              <p className="mt-1 text-xs text-red-400">{errors.profitLoss}</p>
+            )}
+          </div>
 
-        {/* Live P&L preview */}
-        <div
-          className={[
-            "rounded-lg border px-4 py-3 transition-colors",
-            pnl === null
-              ? "border-border bg-muted/30"
-              : isProfit
-                ? "border-emerald-500/30 bg-emerald-500/5"
-                : isLoss
-                  ? "border-red-500/30 bg-red-500/5"
-                  : "border-border bg-muted/30",
-          ].join(" ")}
-        >
-          <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
-            Estimated P&amp;L
-          </p>
-          {pnl === null ? (
-            <p className="text-sm text-muted-foreground">
-              Enter an exit price to preview your P&amp;L
-            </p>
-          ) : (
-            <div className="flex items-baseline justify-between">
-              <span
-                className={`text-2xl font-bold tabular-nums ${
-                  isProfit
-                    ? "text-emerald-400"
-                    : isLoss
-                      ? "text-red-400"
-                      : "text-foreground"
-                }`}
-              >
-                {isProfit ? "+" : ""}
-                {formatCurrency(pnl.pl)}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              P&amp;L&nbsp;%&nbsp;
+              <span className="text-muted-foreground font-normal">
+                (optional)
               </span>
-              <span
-                className={`text-sm font-semibold tabular-nums ${
-                  isProfit
-                    ? "text-emerald-400"
-                    : isLoss
-                      ? "text-red-400"
-                      : "text-muted-foreground"
-                }`}
-              >
-                {pnl.plPct >= 0 ? "+" : ""}
-                {pnl.plPct.toFixed(2)}%
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="any"
+                value={profitLossPercent}
+                onChange={(e) => setProfitLossPercent(e.target.value)}
+                placeholder="0.00"
+                disabled={loading}
+                className={[inputClass(), "pr-7"].join(" ")}
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+                %
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* ── Live P&L preview ── */}
+        <div
+          className={`rounded-lg border px-4 py-4 transition-colors ${previewBorder}`}
+        >
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+            Result
+          </p>
+
+          {!hasValidPl ? (
+            <p className="text-sm text-muted-foreground">
+              Enter the profit or loss to see a preview
+            </p>
+          ) : (
+            <div className="flex items-baseline justify-between gap-4">
+              {/* Big amount */}
+              <span className={`text-3xl font-bold tabular-nums ${plColor}`}>
+                {isProfit ? "+" : ""}
+                {formatCurrency(plNum)}
+              </span>
+
+              {/* Percentage pill */}
+              {hasValidPct && (
+                <span
+                  className={[
+                    "text-sm font-semibold tabular-nums px-2.5 py-1 rounded-full border",
+                    isProfit
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                      : isLoss
+                        ? "bg-red-500/10 text-red-400 border-red-500/30"
+                        : "bg-muted text-muted-foreground border-border",
+                  ].join(" ")}
+                >
+                  {plPctNum >= 0 ? "+" : ""}
+                  {plPctNum.toFixed(2)}%
+                </span>
+              )}
+            </div>
           )}
-          {pnl !== null && (
-            <p className="mt-1.5 text-xs text-muted-foreground">
-              Includes commission &amp; fees&nbsp;(
-              {formatCurrency(trade.commission + trade.fees)})
+
+          {/* Label below */}
+          {hasValidPl && (
+            <p className={`mt-1.5 text-xs font-medium ${plColor}`}>
+              {isProfit ? "▲ Profit" : isLoss ? "▼ Loss" : "— Break-even"}
             </p>
           )}
         </div>
@@ -303,13 +336,13 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          The trade status will be set to&nbsp;
-          <span className="font-medium text-foreground">Closed</span> and the
-          account balance will be updated immediately.
+          Status will be set to&nbsp;
+          <span className="font-medium text-foreground">Closed</span>
+          &nbsp;and the account balance will be updated immediately.
         </p>
       </div>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
         <Button
           type="button"
@@ -325,7 +358,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           size="sm"
           onClick={handleConfirm}
           loading={loading}
-          disabled={loading || !hasValidExit}
+          disabled={loading}
         >
           Confirm Close
         </Button>
@@ -334,7 +367,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
   );
 };
 
-// ─── Public modal wrapper ─────────────────────────────────────────────────────
+// ─── Public wrapper ───────────────────────────────────────────────────────────
 
 export const CloseTradeModal: React.FC<CloseTradeModalProps> = ({
   trade,
@@ -351,13 +384,12 @@ export const CloseTradeModal: React.FC<CloseTradeModalProps> = ({
       aria-modal="true"
       aria-labelledby="close-trade-title"
     >
-      {/* Dimmed overlay — click outside to cancel */}
+      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={!loading ? onCancel : undefined}
       />
-      {/* key={trade.id} makes React fully remount CloseTradeForm
-          whenever a different trade is selected, resetting all form state. */}
+      {/* key resets all form state when a different trade is selected */}
       <CloseTradeForm
         key={trade.id}
         trade={trade}
