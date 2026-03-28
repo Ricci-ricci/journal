@@ -48,20 +48,43 @@ export async function GET(request: Request) {
     const status = url.searchParams.get("status");
     const symbol = url.searchParams.get("symbol");
     const limitParam = url.searchParams.get("limit");
+    const period = url.searchParams.get("period"); // 'week' | 'month' | 'year' | 'all'
 
-    const limit = Math.min(Math.max(Number(limitParam || 50), 1), 200);
+    // Build optional date filter from period
+    let entryDateFilter: { gte: Date } | undefined;
+    if (period && period !== "all") {
+      const now = new Date();
+      if (period === "week") {
+        const start = new Date(now);
+        start.setDate(start.getDate() - 7);
+        entryDateFilter = { gte: start };
+      } else if (period === "month") {
+        const start = new Date(now);
+        start.setMonth(start.getMonth() - 1);
+        entryDateFilter = { gte: start };
+      } else if (period === "year") {
+        const start = new Date(now);
+        start.setFullYear(start.getFullYear() - 1);
+        entryDateFilter = { gte: start };
+      }
+    }
+
+    // When a period is requested fetch all matching trades; otherwise apply limit
+    const usePeriod = !!period;
+    const limit = usePeriod
+      ? undefined
+      : Math.min(Math.max(Number(limitParam || 50), 1), 200);
 
     const trades = await prisma.trade.findMany({
       where: {
         ...(userId ? { userId } : {}),
         ...(accountId ? { accountId } : {}),
         ...(symbol ? { symbol } : {}),
-        ...(status && isValidEnumValue(TradeStatus, status)
-          ? { status }
-          : {}),
+        ...(status && isValidEnumValue(TradeStatus, status) ? { status } : {}),
+        ...(entryDateFilter ? { entryDate: entryDateFilter } : {}),
       },
       orderBy: { createdAt: "desc" },
-      take: limit,
+      ...(limit !== undefined ? { take: limit } : {}),
       include: {
         account: {
           select: {

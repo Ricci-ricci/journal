@@ -1,16 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Layout } from "../../components/layout/Layout";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
 } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
-import { Button } from "../../components/ui/Button";
-import Link from "next/link";
+
+type Period = "week" | "month" | "year" | "all";
+
+const PERIODS: { label: string; value: Period }[] = [
+  { label: "7D", value: "week" },
+  { label: "1M", value: "month" },
+  { label: "1Y", value: "year" },
+  { label: "All", value: "all" },
+];
 
 interface DashboardStats {
   totalTrades: number;
@@ -24,7 +33,7 @@ interface DashboardStats {
   worstTrade: number;
 }
 
-interface RecentTrade {
+interface Trade {
   id: string;
   symbol: string;
   direction: "LONG" | "SHORT";
@@ -35,76 +44,66 @@ interface RecentTrade {
 }
 
 const DashboardPage: React.FC = () => {
+  const [period, setPeriod] = useState<Period>("month");
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
+  const [recentTrades, setRecentTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Real API calls to fetch dashboard data
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
 
-        // Parallel API calls for better performance
-        const [tradesRes, metricsRes] = await Promise.all([
-          fetch("/api/trades?limit=5"),
-          fetch("/api/performance-metrics?limit=1"),
-        ]);
+        const res = await fetch(`/api/trades?period=${period}`);
+        const result = await res.json();
 
-        const [trades, metrics] = await Promise.all([
-          tradesRes.json(),
-          metricsRes.json(),
-        ]);
+        if (result.success) {
+          const allTrades: Trade[] = result.data;
 
-        if (trades.success) {
-          setRecentTrades(trades.data);
+          // Show the 5 most recent trades in the list
+          setRecentTrades(allTrades.slice(0, 5));
 
-          // Calculate stats from real trades data
-          const openTrades = trades.data.filter(
-            (t: RecentTrade) => t.status === "OPEN",
+          // Compute stats from ALL trades in the period
+          const openTrades = allTrades.filter(
+            (t) => t.status === "OPEN",
           ).length;
-          const closedTrades = trades.data.filter(
-            (t: RecentTrade) => t.status === "CLOSED",
-          );
+          const closedTrades = allTrades.filter((t) => t.status === "CLOSED");
+
           const totalPnL = closedTrades.reduce(
-            (sum: string, trade: RecentTrade) => sum + (trade.profitLoss || 0),
+            (sum, t) => sum + (t.profitLoss ?? 0),
             0,
           );
+
           const winningTrades = closedTrades.filter(
-            (t: RecentTrade) => (t.profitLoss || 0) > 0,
+            (t) => (t.profitLoss ?? 0) > 0,
           );
           const losingTrades = closedTrades.filter(
-            (t: RecentTrade) => (t.profitLoss || 0) < 0,
+            (t) => (t.profitLoss ?? 0) < 0,
           );
+
           const winRate =
             closedTrades.length > 0
               ? (winningTrades.length / closedTrades.length) * 100
               : 0;
+
           const averageWin =
             winningTrades.length > 0
-              ? winningTrades.reduce(
-                  (sum: string, t: RecentTrade) => sum + t.profitLoss,
-                  0,
-                ) / winningTrades.length
+              ? winningTrades.reduce((sum, t) => sum + (t.profitLoss ?? 0), 0) /
+                winningTrades.length
               : 0;
+
           const averageLoss =
             losingTrades.length > 0
-              ? losingTrades.reduce(
-                  (sum: string, t: RecentTrade) => sum + t.profitLoss,
-                  0,
-                ) / losingTrades.length
+              ? losingTrades.reduce((sum, t) => sum + (t.profitLoss ?? 0), 0) /
+                losingTrades.length
               : 0;
-          const bestTrade = Math.max(
-            ...closedTrades.map((t: RecentTrade) => t.profitLoss || 0),
-            0,
-          );
-          const worstTrade = Math.min(
-            ...closedTrades.map((t: RecentTrade) => t.profitLoss || 0),
-            0,
-          );
+
+          const pnlValues = closedTrades.map((t) => t.profitLoss ?? 0);
+          const bestTrade = pnlValues.length > 0 ? Math.max(...pnlValues) : 0;
+          const worstTrade = pnlValues.length > 0 ? Math.min(...pnlValues) : 0;
 
           setStats({
-            totalTrades: trades.data.length,
+            totalTrades: allTrades.length,
             openTrades,
             closedTrades: closedTrades.length,
             totalPnL,
@@ -115,54 +114,34 @@ const DashboardPage: React.FC = () => {
             worstTrade,
           });
         }
-
-        // Use latest performance metrics if available
-        if (metrics.success && metrics.data.length > 0) {
-          const latestMetric = metrics.data[0];
-          setStats((prevStats) => {
-            if (!prevStats) return prevStats;
-            return {
-              ...prevStats,
-              totalTrades: latestMetric.totalTrades,
-              winRate: latestMetric.winRate || prevStats.winRate || 0,
-              totalPnL: latestMetric.cumulativePnl,
-            };
-          });
-        }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
-        alert("Failed to fetch dashboard data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [period]);
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(amount);
-  };
 
-  const formatPercent = (percent: number): string => {
-    return `${percent.toFixed(1)}%`;
-  };
+  const formatPercent = (percent: number): string => `${percent.toFixed(1)}%`;
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string): string =>
+    new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
-  const getDirectionBadgeVariant = (direction: string) => {
-    return direction === "LONG" ? "success" : "danger";
-  };
+  const getDirectionBadgeVariant = (direction: string) =>
+    direction === "LONG" ? "success" : "danger";
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -182,17 +161,28 @@ const DashboardPage: React.FC = () => {
     return profitLoss >= 0 ? "text-emerald-400" : "text-red-400";
   };
 
+  const profitFactor =
+    stats && stats.averageLoss !== 0
+      ? Math.abs(stats.averageWin / stats.averageLoss).toFixed(2)
+      : "—";
+
+  const periodLabel = {
+    week: "last 7 days",
+    month: "last 30 days",
+    year: "last 12 months",
+    all: "all time",
+  }[period];
+
   if (loading) {
     return (
       <Layout title="Dashboard">
         <div className="space-y-6">
-          {/* Loading skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <Card key={i}>
                 <CardContent className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-muted rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                  <div className="h-8 bg-muted rounded w-1/2" />
                 </CardContent>
               </Card>
             ))}
@@ -205,17 +195,46 @@ const DashboardPage: React.FC = () => {
   return (
     <Layout title="Dashboard">
       <div className="space-y-6">
-        {/* Welcome Section */}
-        <div className="bg-linear-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
-          <h2 className="text-2xl font-bold mb-2">Welcome back, Trader!</h2>
-          <p className="text-blue-100">
-            Here`s how your portfolio is performing today.
-          </p>
+        {/* Header row: welcome + period toggle */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-foreground">
+              Welcome back, Trader!
+            </h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Showing stats for{" "}
+              <span className="text-foreground font-medium">{periodLabel}</span>
+              {stats && (
+                <span className="ml-1">
+                  · {stats.totalTrades} trade
+                  {stats.totalTrades !== 1 ? "s" : ""}
+                </span>
+              )}
+            </p>
+          </div>
+
+          {/* Period toggle */}
+          <div className="inline-flex rounded-lg border border-border overflow-hidden flex-shrink-0">
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  period === p.value
+                    ? "bg-blue-600 text-white"
+                    : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Key Performance Metrics */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Total P&L */}
             <Card>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -229,7 +248,7 @@ const DashboardPage: React.FC = () => {
                       {formatCurrency(stats.totalPnL)}
                     </p>
                   </div>
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-emerald-500/10 rounded-full flex items-center justify-center">
                     <svg
                       className="w-4 h-4 text-emerald-400"
                       fill="currentColor"
@@ -246,6 +265,7 @@ const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Win Rate */}
             <Card>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -256,10 +276,13 @@ const DashboardPage: React.FC = () => {
                     <p className="text-2xl font-bold text-foreground">
                       {formatPercent(stats.winRate)}
                     </p>
+                    <p className="text-xs text-muted-foreground">
+                      {stats.closedTrades} closed trades
+                    </p>
                   </div>
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-blue-500/10 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-blue-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -274,6 +297,7 @@ const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Total Trades */}
             <Card>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -285,12 +309,12 @@ const DashboardPage: React.FC = () => {
                       {stats.totalTrades}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {stats.openTrades} open, {stats.closedTrades} closed
+                      {stats.openTrades} open · {stats.closedTrades} closed
                     </p>
                   </div>
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-purple-500/10 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-4 h-4 text-purple-600"
+                      className="w-4 h-4 text-purple-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -301,6 +325,7 @@ const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Best Trade */}
             <Card>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -315,9 +340,9 @@ const DashboardPage: React.FC = () => {
                       Worst: {formatCurrency(stats.worstTrade)}
                     </p>
                   </div>
-                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-yellow-500/10 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-4 h-4 text-yellow-600"
+                      className="w-4 h-4 text-yellow-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -330,13 +355,52 @@ const DashboardPage: React.FC = () => {
           </div>
         )}
 
+        {/* No trades state */}
+        {!loading && stats && stats.totalTrades === 0 && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <svg
+                className="mx-auto h-12 w-12 text-muted-foreground mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                />
+              </svg>
+              <h3 className="text-sm font-medium text-foreground">
+                No trades for this period
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Try a different time range or add a new trade.
+              </p>
+              <div className="mt-4">
+                <Link href="/trades/new">
+                  <Button variant="primary" size="sm">
+                    Add Trade
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Trades */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Recent Trades</CardTitle>
+                  <div>
+                    <CardTitle>Recent Trades</CardTitle>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Last 5 of {periodLabel}
+                    </p>
+                  </div>
                   <Link href="/trades">
                     <Button variant="outline" size="sm">
                       View All
@@ -345,27 +409,27 @@ const DashboardPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {recentTrades.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">
-                      No recent trades
+                    <p className="text-muted-foreground text-center py-8 text-sm">
+                      No trades for this period
                     </p>
                   ) : (
                     recentTrades.map((trade) => (
                       <div
                         key={trade.id}
-                        className="flex items-center justify-between p-3 border border-border rounded-lg"
+                        className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors"
                       >
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-3">
                           <div className="flex flex-col">
-                            <span className="font-medium text-foreground">
+                            <span className="font-medium text-foreground text-sm">
                               {trade.symbol}
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-xs text-muted-foreground">
                               {formatDate(trade.entryDate)}
                             </span>
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex gap-1.5">
                             <Badge
                               variant={getDirectionBadgeVariant(
                                 trade.direction,
@@ -382,19 +446,18 @@ const DashboardPage: React.FC = () => {
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="text-right">
-                            <div className="text-sm font-medium text-foreground">
-                              {formatCurrency(trade.entryPrice)}
-                            </div>
-                            {trade.profitLoss !== null && (
-                              <div
-                                className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}
-                              >
-                                {formatCurrency(trade.profitLoss)}
-                              </div>
-                            )}
+                        <div className="text-right">
+                          <div className="text-sm text-foreground">
+                            {formatCurrency(trade.entryPrice)}
                           </div>
+                          {trade.profitLoss !== null && (
+                            <div
+                              className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}
+                            >
+                              {trade.profitLoss >= 0 ? "+" : ""}
+                              {formatCurrency(trade.profitLoss)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))
@@ -404,7 +467,7 @@ const DashboardPage: React.FC = () => {
             </Card>
           </div>
 
-          {/* Quick Actions & Performance Summary */}
+          {/* Right column */}
           <div className="space-y-6">
             {/* Quick Actions */}
             <Card>
@@ -412,7 +475,7 @@ const DashboardPage: React.FC = () => {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   <Link href="/trades/new">
                     <Button className="w-full justify-start" variant="primary">
                       <svg
@@ -475,7 +538,7 @@ const DashboardPage: React.FC = () => {
             </Card>
 
             {/* Performance Summary */}
-            {stats && (
+            {stats && stats.closedTrades > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Performance Summary</CardTitle>
@@ -503,9 +566,7 @@ const DashboardPage: React.FC = () => {
                         Profit Factor
                       </span>
                       <span className="text-sm font-medium text-foreground">
-                        {Math.abs(stats.averageWin / stats.averageLoss).toFixed(
-                          2,
-                        )}
+                        {profitFactor}
                       </span>
                     </div>
                   </div>

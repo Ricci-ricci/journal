@@ -50,58 +50,65 @@ interface TradesStats {
   winRate: number;
 }
 
+type Period = "week" | "month" | "year" | "all";
+
+const PERIODS: { label: string; value: Period }[] = [
+  { label: "7D", value: "week" },
+  { label: "1M", value: "month" },
+  { label: "1Y", value: "year" },
+  { label: "All", value: "all" },
+];
+
+const statusOptions = [
+  { value: "", label: "All Status" },
+  { value: "OPEN", label: "Open" },
+  { value: "CLOSED", label: "Closed" },
+  { value: "PARTIAL", label: "Partial" },
+];
+
+const directionOptions = [
+  { value: "", label: "All Directions" },
+  { value: "LONG", label: "Long" },
+  { value: "SHORT", label: "Short" },
+];
+
 const TradesPage: React.FC = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<TradesStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<Period>("month");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [directionFilter, setDirectionFilter] = useState("");
-
-  const statusOptions = [
-    { value: "", label: "All Status" },
-    { value: "OPEN", label: "Open" },
-    { value: "CLOSED", label: "Closed" },
-    { value: "PARTIAL", label: "Partial" },
-  ];
-
-  const directionOptions = [
-    { value: "", label: "All Directions" },
-    { value: "LONG", label: "Long" },
-    { value: "SHORT", label: "Short" },
-  ];
 
   useEffect(() => {
     const fetchTrades = async () => {
       try {
         setLoading(true);
 
-        // Build query parameters
         const params = new URLSearchParams();
+        params.append("period", period);
         if (statusFilter) params.append("status", statusFilter);
         if (directionFilter) params.append("direction", directionFilter);
-        params.append("limit", "50");
 
-        // Real API call to fetch trades
         const response = await fetch(`/api/trades?${params.toString()}`);
         const result = await response.json();
 
         if (result.success) {
           setTrades(result.data);
 
-          // Calculate stats from real data
-          const openTrades = result.data.filter(
-            (t: Trade) => t.status === "OPEN",
+          // Compute stats from all returned trades
+          const allTrades: Trade[] = result.data;
+          const openTrades = allTrades.filter(
+            (t) => t.status === "OPEN",
           ).length;
-          const closedTrades = result.data.filter(
-            (t: Trade) => t.status === "CLOSED",
-          );
+          const closedTrades = allTrades.filter((t) => t.status === "CLOSED");
           const totalPnL = closedTrades.reduce(
-            (sum: string, trade: Trade) => sum + (trade.profitLoss || 0),
+            (sum, t) => sum + (t.profitLoss || 0),
             0,
           );
           const winningTrades = closedTrades.filter(
-            (t: Trade) => (t.profitLoss || 0) > 0,
+            (t) => (t.profitLoss || 0) > 0,
           ).length;
           const winRate =
             closedTrades.length > 0
@@ -109,7 +116,7 @@ const TradesPage: React.FC = () => {
               : 0;
 
           setStats({
-            totalTrades: result.data.length,
+            totalTrades: allTrades.length,
             openTrades,
             closedTrades: closedTrades.length,
             totalPnL,
@@ -117,34 +124,23 @@ const TradesPage: React.FC = () => {
           });
         } else {
           console.error("Failed to fetch trades:", result.error);
-          alert("Failed to fetch trades: " + result.error);
         }
       } catch (error) {
         console.error("Failed to fetch trades:", error);
-        alert("Failed to fetch trades. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchTrades();
-  }, [statusFilter, directionFilter]);
+  }, [period, statusFilter, directionFilter]);
 
   const filteredTrades = trades.filter((trade) => {
     const matchesSearch = trade.symbol
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesStatus = !statusFilter || trade.status === statusFilter;
-    const matchesDirection =
-      !directionFilter || trade.direction === directionFilter;
-
-    return matchesSearch && matchesStatus && matchesDirection;
+    return matchesSearch;
   });
-
-  const handleEditTrade = (trade: Trade) => {
-    // Navigate to edit page or open modal
-    console.log("Edit trade:", trade.id);
-  };
 
   const handleDeleteTrade = async (tradeId: string) => {
     if (
@@ -156,52 +152,92 @@ const TradesPage: React.FC = () => {
     }
 
     try {
-      // Real API call to delete trade (Note: DELETE endpoint needs to be created)
       const response = await fetch(`/api/trades/${tradeId}`, {
         method: "DELETE",
       });
-
       const result = await response.json();
 
       if (result.success) {
-        setTrades(trades.filter((t) => t.id !== tradeId));
-        alert("Trade deleted successfully!");
+        setTrades((prev) => prev.filter((t) => t.id !== tradeId));
+        setStats((prev) => {
+          if (!prev) return prev;
+          const remaining = trades.filter((t) => t.id !== tradeId);
+          const closed = remaining.filter((t) => t.status === "CLOSED");
+          const winning = closed.filter((t) => (t.profitLoss || 0) > 0).length;
+          return {
+            totalTrades: remaining.length,
+            openTrades: remaining.filter((t) => t.status === "OPEN").length,
+            closedTrades: closed.length,
+            totalPnL: closed.reduce((s, t) => s + (t.profitLoss || 0), 0),
+            winRate: closed.length > 0 ? (winning / closed.length) * 100 : 0,
+          };
+        });
       } else {
-        console.error("Failed to delete trade:", result.error);
         alert("Failed to delete trade: " + result.error);
       }
     } catch (error) {
       console.error("Failed to delete trade:", error);
-      alert("Failed to delete trade. Please try again.");
     }
   };
 
+  const handleEditTrade = (trade: Trade) => {
+    console.log("Edit trade:", trade.id);
+  };
+
   const handleViewTrade = (trade: Trade) => {
-    // Navigate to trade details page
     console.log("View trade:", trade.id);
   };
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(amount);
-  };
 
-  const formatPercent = (percent: number): string => {
-    return `${percent.toFixed(1)}%`;
-  };
+  const formatPercent = (percent: number): string => `${percent.toFixed(1)}%`;
 
   return (
-    <Layout title="Trading History">
+    <Layout title="My Trades">
       <div className="space-y-6">
+        {/* Period toggle + header row */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Showing stats for the selected period
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Period toggle */}
+            <div className="inline-flex rounded-lg border border-border overflow-hidden">
+              {PERIODS.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setPeriod(p.value)}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    period === p.value
+                      ? "bg-blue-600 text-white"
+                      : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <Link href="/trades/new">
+              <AddIconButton tooltip="New Trade" size="md" />
+            </Link>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Total Trades</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Total Trades
+                  </p>
                   <p className="text-2xl font-bold text-foreground">
                     {stats.totalTrades}
                   </p>
@@ -212,8 +248,8 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Open Trades</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-xs text-muted-foreground mb-1">Open</p>
+                  <p className="text-2xl font-bold text-blue-400">
                     {stats.openTrades}
                   </p>
                 </div>
@@ -223,8 +259,8 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Closed Trades</p>
-                  <p className="text-2xl font-bold text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mb-1">Closed</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {stats.closedTrades}
                   </p>
                 </div>
@@ -234,9 +270,13 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Total P&L</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Total P&L
+                  </p>
                   <p
-                    className={`text-2xl font-bold ${stats.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                    className={`text-2xl font-bold ${
+                      stats.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"
+                    }`}
                   >
                     {formatCurrency(stats.totalPnL)}
                   </p>
@@ -247,8 +287,12 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Win Rate</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-xs text-muted-foreground mb-1">Win Rate</p>
+                  <p
+                    className={`text-2xl font-bold ${
+                      stats.winRate >= 50 ? "text-emerald-400" : "text-red-400"
+                    }`}
+                  >
                     {formatPercent(stats.winRate)}
                   </p>
                 </div>
@@ -257,19 +301,13 @@ const TradesPage: React.FC = () => {
           </div>
         )}
 
-        {/* Filters and Actions */}
+        {/* Filters + Table */}
         <Card>
           <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-              <CardTitle>Trade History</CardTitle>
-              <Link href="/trades/new">
-                <AddIconButton tooltip="New Trade" size="md" />
-              </Link>
-            </div>
+            <CardTitle>Trade History</CardTitle>
           </CardHeader>
-
           <CardContent>
-            {/* Search and Filter Controls */}
+            {/* Filters */}
             <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 placeholder="Search by symbol..."
@@ -296,42 +334,40 @@ const TradesPage: React.FC = () => {
                 options={statusOptions}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                placeholder="Filter by status"
               />
 
               <Select
                 options={directionOptions}
                 value={directionFilter}
                 onChange={(e) => setDirectionFilter(e.target.value)}
-                placeholder="Filter by direction"
               />
 
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("");
-                    setDirectionFilter("");
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("");
+                  setDirectionFilter("");
+                }}
+              >
+                Clear Filters
+              </Button>
             </div>
 
-            {/* Results Summary */}
+            {/* Results count */}
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Showing {filteredTrades.length} of {trades.length} trades
-                {(searchTerm || statusFilter || directionFilter) && (
-                  <span className="ml-1">(filtered)</span>
-                )}
+                {loading
+                  ? "Loading…"
+                  : `${filteredTrades.length} trade${filteredTrades.length !== 1 ? "s" : ""}${
+                      filteredTrades.length !== trades.length
+                        ? ` (filtered from ${trades.length})`
+                        : ""
+                    }`}
               </p>
             </div>
 
-            {/* Trades Table */}
             <TradesTable
               trades={filteredTrades}
               loading={loading}
