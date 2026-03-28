@@ -14,6 +14,7 @@ import {
   CardTitle,
   CardContent,
 } from "../../components/ui/Card";
+import { useAccounts } from "../../contexts/AccountsContext";
 
 interface Trade {
   id: string;
@@ -73,6 +74,7 @@ const directionOptions = [
 ];
 
 const TradesPage: React.FC = () => {
+  const { activeAccount, activeAccountId } = useAccounts();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<TradesStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,6 +90,7 @@ const TradesPage: React.FC = () => {
 
         const params = new URLSearchParams();
         params.append("period", period);
+        if (activeAccountId) params.append("accountId", activeAccountId);
         if (statusFilter) params.append("status", statusFilter);
         if (directionFilter) params.append("direction", directionFilter);
 
@@ -133,7 +136,7 @@ const TradesPage: React.FC = () => {
     };
 
     fetchTrades();
-  }, [period, statusFilter, directionFilter]);
+  }, [period, activeAccountId, statusFilter, directionFilter]);
 
   const filteredTrades = trades.filter((trade) => {
     const matchesSearch = trade.symbol
@@ -203,7 +206,37 @@ const TradesPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-sm text-muted-foreground">
-              Showing stats for the selected period
+              {activeAccount ? (
+                <>
+                  Account:{" "}
+                  <span className="font-medium text-foreground">
+                    {activeAccount.name}
+                  </span>
+                  <span className="ml-2 text-xs">
+                    Balance:{" "}
+                    <span className="font-medium text-foreground">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: activeAccount.currency,
+                      }).format(activeAccount.currentBalance)}
+                    </span>
+                    {activeAccount.totalPnL !== 0 && (
+                      <span
+                        className={`ml-1 ${activeAccount.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                      >
+                        ({activeAccount.totalPnL >= 0 ? "+" : ""}
+                        {new Intl.NumberFormat("en-US", {
+                          style: "currency",
+                          currency: activeAccount.currency,
+                        }).format(activeAccount.totalPnL)}
+                        )
+                      </span>
+                    )}
+                  </span>
+                </>
+              ) : (
+                "Showing all accounts"
+              )}
             </p>
           </div>
           <div className="flex items-center gap-3">

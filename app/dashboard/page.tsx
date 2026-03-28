@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardContent,
 } from "../../components/ui/Card";
+import { useAccounts } from "../../contexts/AccountsContext";
 
 type Period = "week" | "month" | "year" | "all";
 
@@ -38,12 +39,31 @@ interface Trade {
   symbol: string;
   direction: "LONG" | "SHORT";
   status: "OPEN" | "CLOSED" | "PARTIAL";
+  entryDate: string;
   entryPrice: number;
   profitLoss: number | null;
-  entryDate: string;
 }
 
-const DashboardPage: React.FC = () => {
+const ACCOUNT_TYPE_BADGE: Record<string, "danger" | "warning" | "secondary"> = {
+  LIVE: "danger",
+  DEMO: "warning",
+  PAPER: "secondary",
+};
+
+const ACCOUNT_TYPE_BG: Record<string, string> = {
+  LIVE: "bg-red-500/10",
+  DEMO: "bg-yellow-500/10",
+  PAPER: "bg-muted",
+};
+
+const ACCOUNT_TYPE_ICON_COLOR: Record<string, string> = {
+  LIVE: "text-red-400",
+  DEMO: "text-yellow-400",
+  PAPER: "text-muted-foreground",
+};
+
+export default function DashboardPage() {
+  const { activeAccount, activeAccountId } = useAccounts();
   const [period, setPeriod] = useState<Period>("month");
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentTrades, setRecentTrades] = useState<Trade[]>([]);
@@ -54,16 +74,18 @@ const DashboardPage: React.FC = () => {
       try {
         setLoading(true);
 
-        const res = await fetch(`/api/trades?period=${period}`);
+        const params = new URLSearchParams();
+        params.set("period", period);
+        if (activeAccountId) params.set("accountId", activeAccountId);
+
+        const res = await fetch(`/api/trades?${params.toString()}`);
         const result = await res.json();
 
         if (result.success) {
           const allTrades: Trade[] = result.data;
 
-          // Show the 5 most recent trades in the list
           setRecentTrades(allTrades.slice(0, 5));
 
-          // Compute stats from ALL trades in the period
           const openTrades = allTrades.filter(
             (t) => t.status === "OPEN",
           ).length;
@@ -122,12 +144,13 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchDashboardData();
-  }, [period]);
+  }, [period, activeAccountId]);
 
-  const formatCurrency = (amount: number): string =>
+  const formatCurrency = (amount: number, currency = "USD"): string =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency,
+      minimumFractionDigits: 2,
     }).format(amount);
 
   const formatPercent = (percent: number): string => `${percent.toFixed(1)}%`;
@@ -195,7 +218,7 @@ const DashboardPage: React.FC = () => {
   return (
     <Layout title="Dashboard">
       <div className="space-y-6">
-        {/* Header row: welcome + period toggle */}
+        {/* ── Header row: title + period toggle ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-foreground">
@@ -213,7 +236,6 @@ const DashboardPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Period toggle */}
           <div className="inline-flex rounded-lg border border-border overflow-hidden flex-shrink-0">
             {PERIODS.map((p) => (
               <button
@@ -231,7 +253,123 @@ const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Key Performance Metrics */}
+        {/* ── Active account balance card ── */}
+        {activeAccount && (
+          <Card>
+            <CardContent>
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-sm font-medium text-foreground truncate">
+                      {activeAccount.name}
+                    </span>
+                    {activeAccount.broker && (
+                      <span className="text-xs text-muted-foreground">
+                        · {activeAccount.broker}
+                      </span>
+                    )}
+                    <Badge
+                      variant={
+                        ACCOUNT_TYPE_BADGE[activeAccount.accountType] ??
+                        "default"
+                      }
+                      size="sm"
+                    >
+                      {activeAccount.accountType}
+                    </Badge>
+                  </div>
+
+                  <p className="text-3xl font-bold text-foreground">
+                    {formatCurrency(
+                      activeAccount.currentBalance,
+                      activeAccount.currency,
+                    )}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-4 mt-1.5">
+                    <span className="text-xs text-muted-foreground">
+                      Initial:{" "}
+                      {formatCurrency(
+                        activeAccount.initialBalance,
+                        activeAccount.currency,
+                      )}
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${
+                        activeAccount.totalPnL >= 0
+                          ? "text-emerald-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {activeAccount.totalPnL >= 0 ? "+" : ""}
+                      {formatCurrency(
+                        activeAccount.totalPnL,
+                        activeAccount.currency,
+                      )}{" "}
+                      all-time P&L
+                    </span>
+                    {activeAccount.initialBalance !== 0 && (
+                      <span
+                        className={`text-xs font-medium ${
+                          activeAccount.totalPnL >= 0
+                            ? "text-emerald-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        (
+                        {(
+                          (activeAccount.totalPnL /
+                            activeAccount.initialBalance) *
+                          100
+                        ).toFixed(1)}
+                        %)
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  className={`w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center ${
+                    ACCOUNT_TYPE_BG[activeAccount.accountType] ?? "bg-muted"
+                  }`}
+                >
+                  <svg
+                    className={`w-6 h-6 ${
+                      ACCOUNT_TYPE_ICON_COLOR[activeAccount.accountType] ??
+                      "text-muted-foreground"
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ── No account selected hint ── */}
+        {!activeAccount && (
+          <div className="rounded-lg border border-dashed border-border p-4 flex items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              No account selected — showing stats across all accounts.
+            </p>
+            <Link href="/accounts">
+              <Button variant="outline" size="sm">
+                Manage Accounts
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {/* ── KPI Stats ── */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Total P&L */}
@@ -245,10 +383,13 @@ const DashboardPage: React.FC = () => {
                     <p
                       className={`text-2xl font-bold ${getProfitLossColor(stats.totalPnL)}`}
                     >
-                      {formatCurrency(stats.totalPnL)}
+                      {formatCurrency(stats.totalPnL, activeAccount?.currency)}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {periodLabel}
                     </p>
                   </div>
-                  <div className="w-9 h-9 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-emerald-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <svg
                       className="w-4 h-4 text-emerald-400"
                       fill="currentColor"
@@ -276,11 +417,11 @@ const DashboardPage: React.FC = () => {
                     <p className="text-2xl font-bold text-foreground">
                       {formatPercent(stats.winRate)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {stats.closedTrades} closed trades
                     </p>
                   </div>
-                  <div className="w-9 h-9 bg-blue-500/10 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-blue-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <svg
                       className="w-4 h-4 text-blue-400"
                       fill="currentColor"
@@ -308,11 +449,11 @@ const DashboardPage: React.FC = () => {
                     <p className="text-2xl font-bold text-foreground">
                       {stats.totalTrades}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {stats.openTrades} open · {stats.closedTrades} closed
                     </p>
                   </div>
-                  <div className="w-9 h-9 bg-purple-500/10 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-purple-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <svg
                       className="w-4 h-4 text-purple-400"
                       fill="currentColor"
@@ -334,13 +475,17 @@ const DashboardPage: React.FC = () => {
                       Best Trade
                     </p>
                     <p className="text-2xl font-bold text-emerald-400">
-                      {formatCurrency(stats.bestTrade)}
+                      {formatCurrency(stats.bestTrade, activeAccount?.currency)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Worst: {formatCurrency(stats.worstTrade)}
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Worst:{" "}
+                      {formatCurrency(
+                        stats.worstTrade,
+                        activeAccount?.currency,
+                      )}
                     </p>
                   </div>
-                  <div className="w-9 h-9 bg-yellow-500/10 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-yellow-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <svg
                       className="w-4 h-4 text-yellow-400"
                       fill="currentColor"
@@ -355,7 +500,7 @@ const DashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* No trades state */}
+        {/* ── No trades empty state ── */}
         {!loading && stats && stats.totalTrades === 0 && (
           <Card>
             <CardContent className="text-center py-12">
@@ -390,7 +535,7 @@ const DashboardPage: React.FC = () => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Trades */}
+          {/* ── Recent Trades ── */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
@@ -399,6 +544,7 @@ const DashboardPage: React.FC = () => {
                     <CardTitle>Recent Trades</CardTitle>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Last 5 of {periodLabel}
+                      {activeAccount ? ` · ${activeAccount.name}` : ""}
                     </p>
                   </div>
                   <Link href="/trades">
@@ -448,14 +594,20 @@ const DashboardPage: React.FC = () => {
                         </div>
                         <div className="text-right">
                           <div className="text-sm text-foreground">
-                            {formatCurrency(trade.entryPrice)}
+                            {formatCurrency(
+                              trade.entryPrice,
+                              activeAccount?.currency,
+                            )}
                           </div>
                           {trade.profitLoss !== null && (
                             <div
                               className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}
                             >
                               {trade.profitLoss >= 0 ? "+" : ""}
-                              {formatCurrency(trade.profitLoss)}
+                              {formatCurrency(
+                                trade.profitLoss,
+                                activeAccount?.currency,
+                              )}
                             </div>
                           )}
                         </div>
@@ -467,7 +619,7 @@ const DashboardPage: React.FC = () => {
             </Card>
           </div>
 
-          {/* Right column */}
+          {/* ── Right column ── */}
           <div className="space-y-6">
             {/* Quick Actions */}
             <Card>
@@ -533,6 +685,24 @@ const DashboardPage: React.FC = () => {
                       View Strategies
                     </Button>
                   </Link>
+                  <Link href="/accounts">
+                    <Button className="w-full justify-start" variant="outline">
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                        />
+                      </svg>
+                      Manage Accounts
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -550,7 +720,10 @@ const DashboardPage: React.FC = () => {
                         Average Win
                       </span>
                       <span className="text-sm font-medium text-emerald-400">
-                        {formatCurrency(stats.averageWin)}
+                        {formatCurrency(
+                          stats.averageWin,
+                          activeAccount?.currency,
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -558,7 +731,10 @@ const DashboardPage: React.FC = () => {
                         Average Loss
                       </span>
                       <span className="text-sm font-medium text-red-400">
-                        {formatCurrency(stats.averageLoss)}
+                        {formatCurrency(
+                          stats.averageLoss,
+                          activeAccount?.currency,
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t border-border">
@@ -578,6 +754,4 @@ const DashboardPage: React.FC = () => {
       </div>
     </Layout>
   );
-};
-
-export default DashboardPage;
+}

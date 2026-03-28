@@ -26,7 +26,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (typeof body.initialBalance !== "number" || Number.isNaN(body.initialBalance)) {
+    if (
+      typeof body.initialBalance !== "number" ||
+      Number.isNaN(body.initialBalance)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -103,17 +106,42 @@ export async function GET(request: Request) {
     const accounts = await prisma.tradingAccount.findMany({
       where: userId ? { userId } : undefined,
       orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: { id: true, email: true, name: true },
-        },
+    });
+
+    // Compute current balance from closed trades P&L
+    const accountIds = accounts.map((a) => a.id);
+
+    const closedTrades = await prisma.trade.findMany({
+      where: {
+        accountId: { in: accountIds },
+        status: "CLOSED",
       },
+      select: { accountId: true, profitLoss: true },
+    });
+
+    const pnlByAccount = new Map<string, number>();
+    for (const trade of closedTrades) {
+      if (trade.accountId) {
+        pnlByAccount.set(
+          trade.accountId,
+          (pnlByAccount.get(trade.accountId) ?? 0) + (trade.profitLoss ?? 0),
+        );
+      }
+    }
+
+    const data = accounts.map((a) => {
+      const totalPnL = pnlByAccount.get(a.id) ?? 0;
+      return {
+        ...a,
+        totalPnL,
+        currentBalance: a.initialBalance + totalPnL,
+      };
     });
 
     return NextResponse.json({
       success: true,
-      count: accounts.length,
-      data: accounts,
+      count: data.length,
+      data,
     });
   } catch (error: any) {
     return NextResponse.json(

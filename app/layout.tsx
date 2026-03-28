@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { AccountsProvider } from "@/contexts/AccountsContext";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark font-sans", geist.variable)}>
       <body className="antialiased bg-background text-foreground">
-        {children}
+        <AccountsProvider>{children}</AccountsProvider>
       </body>
     </html>
   );

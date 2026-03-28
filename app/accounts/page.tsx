@@ -25,6 +25,8 @@ interface Account {
   broker: string | null;
   accountType: "LIVE" | "DEMO" | "PAPER";
   initialBalance: number;
+  currentBalance: number;
+  totalPnL: number;
   currency: string;
   createdAt: string;
   updatedAt: string;
@@ -329,11 +331,42 @@ const AccountsPage: React.FC = () => {
 
                 <CardContent>
                   <div className="space-y-3">
+                    {/* Current Balance */}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">
-                        Initial Balance
+                        Current Balance
                       </span>
                       <span className="text-lg font-semibold text-foreground">
+                        {formatCurrency(
+                          account.currentBalance,
+                          account.currency,
+                        )}
+                      </span>
+                    </div>
+
+                    {/* P&L */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        All-time P&L
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          account.totalPnL >= 0
+                            ? "text-emerald-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {account.totalPnL >= 0 ? "+" : ""}
+                        {formatCurrency(account.totalPnL, account.currency)}
+                      </span>
+                    </div>
+
+                    {/* Initial Balance */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Initial Balance
+                      </span>
+                      <span className="text-muted-foreground">
                         {formatCurrency(
                           account.initialBalance,
                           account.currency,

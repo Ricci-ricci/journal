@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAccounts } from "@/contexts/AccountsContext";
 
 interface SidebarItem {
   href: string;
@@ -151,6 +152,18 @@ const quickActions: SidebarItem[] = [
   },
 ];
 
+const accountTypeDot: Record<string, string> = {
+  LIVE: "bg-red-400",
+  DEMO: "bg-yellow-400",
+  PAPER: "bg-muted-foreground/60",
+};
+
+const accountTypeBadgeColor: Record<string, string> = {
+  LIVE: "text-red-400",
+  DEMO: "text-yellow-400",
+  PAPER: "text-muted-foreground",
+};
+
 interface SidebarProps {
   className?: string;
   isCollapsed: boolean;
@@ -163,6 +176,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
 }) => {
   const pathname = usePathname();
+  const { accounts, activeAccount, activeAccountId, setActiveAccountId } =
+    useAccounts();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const isActivePath = (href: string): boolean => {
     if (href === "/dashboard") {
@@ -170,6 +186,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
     return pathname.startsWith(href);
   };
+
+  const formatCurrency = (amount: number, currency = "USD") =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(amount);
 
   return (
     <div
@@ -179,11 +202,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         className,
       )}
     >
-      {/* Toggle Button */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-border">
+      {/* ── Logo header ── */}
+      <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
         {!isCollapsed && (
           <Link href="/dashboard" className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">TJ</span>
             </div>
             <span className="ml-3 text-lg font-semibold text-foreground">
@@ -193,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {isCollapsed && (
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto">
             <span className="text-white font-bold text-sm">TJ</span>
           </div>
         )}
@@ -221,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Collapse Button for Collapsed State */}
+      {/* Floating expand button (collapsed state) */}
       {isCollapsed && (
         <button
           onClick={onToggle}
@@ -243,12 +266,188 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       )}
 
-      {/* Navigation */}
+      {/* ── Account Switcher ── */}
+      {!isCollapsed ? (
+        <div className="flex-shrink-0 px-2 pt-3 pb-2 border-b border-border relative">
+          <button
+            onClick={() => setDropdownOpen((v) => !v)}
+            className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <span
+                className={cn(
+                  "w-2 h-2 rounded-full flex-shrink-0",
+                  activeAccount
+                    ? accountTypeDot[activeAccount.accountType]
+                    : "bg-muted-foreground/40",
+                )}
+              />
+              <div className="min-w-0 text-left">
+                <p className="text-xs font-medium text-foreground truncate leading-tight">
+                  {activeAccount ? activeAccount.name : "All Accounts"}
+                </p>
+                {activeAccount && (
+                  <p className="text-xs text-muted-foreground leading-tight">
+                    {formatCurrency(
+                      activeAccount.currentBalance,
+                      activeAccount.currency,
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+            <svg
+              className={cn(
+                "w-3.5 h-3.5 text-muted-foreground flex-shrink-0 transition-transform duration-150",
+                dropdownOpen && "rotate-180",
+              )}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {/* Dropdown */}
+          {dropdownOpen && (
+            <div className="absolute left-2 right-2 top-full mt-1 z-50 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
+              {/* All Accounts */}
+              <button
+                onClick={() => {
+                  setActiveAccountId(null);
+                  setDropdownOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-accent transition-colors"
+              >
+                <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                <span
+                  className={cn(
+                    "flex-1 text-left",
+                    !activeAccountId
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  All Accounts
+                </span>
+                {!activeAccountId && (
+                  <svg
+                    className="w-3.5 h-3.5 text-blue-400 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              {accounts.length > 0 && <div className="h-px bg-border" />}
+
+              {accounts.map((acc) => (
+                <button
+                  key={acc.id}
+                  onClick={() => {
+                    setActiveAccountId(acc.id);
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-accent transition-colors"
+                >
+                  <span
+                    className={cn(
+                      "w-2 h-2 rounded-full flex-shrink-0",
+                      accountTypeDot[acc.accountType],
+                    )}
+                  />
+                  <div className="flex-1 min-w-0 text-left">
+                    <p
+                      className={cn(
+                        "truncate leading-tight",
+                        activeAccountId === acc.id
+                          ? "text-foreground font-medium"
+                          : "text-foreground",
+                      )}
+                    >
+                      {acc.name}
+                    </p>
+                    <p className="text-muted-foreground leading-tight flex items-center gap-1">
+                      <span
+                        className={cn(
+                          "text-xs",
+                          accountTypeBadgeColor[acc.accountType],
+                        )}
+                      >
+                        {acc.accountType}
+                      </span>
+                      <span>·</span>
+                      <span>
+                        {formatCurrency(acc.currentBalance, acc.currency)}
+                      </span>
+                      {acc.totalPnL !== 0 && (
+                        <span
+                          className={
+                            acc.totalPnL >= 0
+                              ? "text-emerald-400"
+                              : "text-red-400"
+                          }
+                        >
+                          ({acc.totalPnL >= 0 ? "+" : ""}
+                          {formatCurrency(acc.totalPnL, acc.currency)})
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  {activeAccountId === acc.id && (
+                    <svg
+                      className="w-3.5 h-3.5 text-blue-400 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Collapsed: dot indicator */
+        <div className="flex justify-center pt-2 pb-2.5 border-b border-border flex-shrink-0">
+          <span
+            title={activeAccount ? activeAccount.name : "All Accounts"}
+            className={cn(
+              "w-2.5 h-2.5 rounded-full",
+              activeAccount
+                ? accountTypeDot[activeAccount.accountType]
+                : "bg-muted-foreground/40",
+            )}
+          />
+        </div>
+      )}
+
+      {/* ── Navigation ── */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
         <div className="space-y-1">
           {sidebarItems.map((item) => {
             const isActive = isActivePath(item.href);
-
             return (
               <Link
                 key={item.href}
@@ -272,18 +471,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   {item.icon}
                 </span>
-
                 {!isCollapsed && (
-                  <>
-                    <span className="ml-3 transition-opacity duration-200">
-                      {item.label}
-                    </span>
-                    {item.badge && (
-                      <span className="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
+                  <span className="ml-3 transition-opacity duration-200">
+                    {item.label}
+                  </span>
                 )}
               </Link>
             );
@@ -302,7 +493,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Quick Actions
             </h3>
           )}
-
           <div className="space-y-1">
             {quickActions.map((item) => (
               <Link
@@ -328,7 +518,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </nav>
 
-      {/* User Profile */}
+      {/* ── User Profile ── */}
       <div
         className={cn(
           "flex-shrink-0 border-t border-border",
@@ -359,25 +549,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   demo@journal.com
                 </p>
               </div>
-
-              <div className="flex-shrink-0">
-                <button className="inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring rounded-full transition-colors">
-                  <span className="sr-only">Open user menu</span>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <button className="inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring rounded-full transition-colors">
+                <span className="sr-only">Open user menu</span>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  />
+                </svg>
+              </button>
             </>
           )}
         </div>
