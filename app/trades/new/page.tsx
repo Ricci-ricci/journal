@@ -158,7 +158,7 @@ const NewTradePage: React.FC = () => {
             <li className="inline-flex items-center">
               <a
                 href="/trades"
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+                className="inline-flex items-center text-sm font-medium text-foreground hover:text-blue-600"
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -173,7 +173,7 @@ const NewTradePage: React.FC = () => {
             <li>
               <div className="flex items-center">
                 <svg
-                  className="w-6 h-6 text-gray-400"
+                  className="w-6 h-6 text-muted-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -183,7 +183,7 @@ const NewTradePage: React.FC = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                <span className="ml-1 text-sm font-medium text-muted-foreground md:ml-2">
                   New Trade
                 </span>
               </div>
@@ -193,9 +193,9 @@ const NewTradePage: React.FC = () => {
 
         {/* Success Message */}
         {successMsg && (
-          <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6 flex items-center space-x-3">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md p-4 mb-6 flex items-center space-x-3">
             <svg
-              className="h-5 w-5 text-green-500 flex-shrink-0"
+              className="h-5 w-5 text-emerald-400 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -205,15 +205,15 @@ const NewTradePage: React.FC = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <p className="text-sm font-medium text-green-800">{successMsg}</p>
+            <p className="text-sm font-medium text-emerald-400">{successMsg}</p>
           </div>
         )}
 
         {/* Error Message */}
         {errorMsg && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6 flex items-center space-x-3">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-md p-4 mb-6 flex items-center space-x-3">
             <svg
-              className="h-5 w-5 text-red-500 flex-shrink-0"
+              className="h-5 w-5 text-red-400 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -223,12 +223,12 @@ const NewTradePage: React.FC = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <p className="text-sm font-medium text-red-800">{errorMsg}</p>
+            <p className="text-sm font-medium text-red-400">{errorMsg}</p>
           </div>
         )}
 
         {/* Tips */}
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-md p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg
@@ -244,10 +244,10 @@ const NewTradePage: React.FC = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
+              <h3 className="text-sm font-medium text-blue-400">
                 Tips for Recording Trades
               </h3>
-              <div className="mt-2 text-sm text-blue-700">
+              <div className="mt-2 text-sm text-blue-400">
                 <ul className="list-disc pl-5 space-y-1">
                   <li>
                     Fill in as much detail as possible for better analysis later

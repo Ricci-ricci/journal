@@ -244,10 +244,10 @@ const StrategiesPage: React.FC = () => {
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-foreground">
               Your Trading Strategies
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Create, manage and track the performance of your trading
               strategies.
             </p>
@@ -312,7 +312,7 @@ const StrategiesPage: React.FC = () => {
             </div>
 
             <div className="mt-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Showing {filteredStrategies.length} of {strategies.length}{" "}
                 strategies
                 {(searchTerm || filterActive !== null) && (
@@ -329,13 +329,13 @@ const StrategiesPage: React.FC = () => {
             {[...Array(3)].map((_, i) => (
               <Card key={i}>
                 <CardContent className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-3/4 mb-4"></div>
                   <div className="grid grid-cols-4 gap-4">
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
+                    <div className="h-8 bg-muted rounded"></div>
+                    <div className="h-8 bg-muted rounded"></div>
+                    <div className="h-8 bg-muted rounded"></div>
+                    <div className="h-8 bg-muted rounded"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -345,7 +345,7 @@ const StrategiesPage: React.FC = () => {
           <Card>
             <CardContent className="text-center py-12">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -357,12 +357,12 @@ const StrategiesPage: React.FC = () => {
                   d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 {searchTerm || filterActive !== null
                   ? "No strategies match your filters"
                   : "No strategies"}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {searchTerm || filterActive !== null
                   ? "Try adjusting your search or filter criteria."
                   : "Get started by creating your first trading strategy."}
@@ -413,7 +413,7 @@ const StrategiesPage: React.FC = () => {
                     </div>
                   </div>
                   {strategy.description && (
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="text-sm text-muted-foreground mt-2">
                       {strategy.description}
                     </p>
                   )}
@@ -423,12 +423,12 @@ const StrategiesPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Performance Metrics */}
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-foreground">
                         Performance
                       </h4>
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             Total Trades
                           </span>
                           <span className="text-sm font-medium">
@@ -436,28 +436,28 @@ const StrategiesPage: React.FC = () => {
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             Win Rate
                           </span>
                           <span
-                            className={`text-sm font-medium ${strategy.winRate && strategy.winRate >= 50 ? "text-green-600" : "text-red-600"}`}
+                            className={`text-sm font-medium ${strategy.winRate && strategy.winRate >= 50 ? "text-emerald-400" : "text-red-400"}`}
                           >
                             {formatPercent(strategy.winRate)}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             Avg Profit
                           </span>
-                          <span className="text-sm font-medium text-green-600">
+                          <span className="text-sm font-medium text-emerald-400">
                             {formatCurrency(strategy.averageProfit)}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             Avg Loss
                           </span>
-                          <span className="text-sm font-medium text-red-600">
+                          <span className="text-sm font-medium text-red-400">
                             {formatCurrency(strategy.averageLoss)}
                           </span>
                         </div>
@@ -466,17 +466,17 @@ const StrategiesPage: React.FC = () => {
 
                     {/* Entry Rules */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-foreground">
                         Entry Rules
                       </h4>
                       {strategy.entryRules ? (
-                        <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
+                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
                           <pre className="whitespace-pre-wrap font-sans">
                             {strategy.entryRules}
                           </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">
+                        <p className="text-xs text-muted-foreground italic">
                           No entry rules defined
                         </p>
                       )}
@@ -484,17 +484,17 @@ const StrategiesPage: React.FC = () => {
 
                     {/* Exit Rules */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-foreground">
                         Exit Rules
                       </h4>
                       {strategy.exitRules ? (
-                        <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
+                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
                           <pre className="whitespace-pre-wrap font-sans">
                             {strategy.exitRules}
                           </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">
+                        <p className="text-xs text-muted-foreground italic">
                           No exit rules defined
                         </p>
                       )}
@@ -502,21 +502,21 @@ const StrategiesPage: React.FC = () => {
 
                     {/* Risk Management */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-foreground">
                         Risk Management
                       </h4>
                       {strategy.riskManagementRules ? (
-                        <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-h-24 overflow-y-auto">
+                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
                           <pre className="whitespace-pre-wrap font-sans">
                             {strategy.riskManagementRules}
                           </pre>
                         </div>
                       ) : (
-                        <p className="text-xs text-gray-500 italic">
+                        <p className="text-xs text-muted-foreground italic">
                           No risk rules defined
                         </p>
                       )}
-                      <div className="pt-2 text-xs text-gray-500">
+                      <div className="pt-2 text-xs text-muted-foreground">
                         <p>Created: {formatDate(strategy.createdAt)}</p>
                         <p>Updated: {formatDate(strategy.updatedAt)}</p>
                       </div>

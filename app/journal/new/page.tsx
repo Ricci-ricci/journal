@@ -72,7 +72,7 @@ const NewJournalEntryPage: React.FC = () => {
             <li className="inline-flex items-center">
               <a
                 href="/journal"
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+                className="inline-flex items-center text-sm font-medium text-foreground hover:text-blue-600"
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -93,7 +93,7 @@ const NewJournalEntryPage: React.FC = () => {
             <li>
               <div className="flex items-center">
                 <svg
-                  className="w-6 h-6 text-gray-400"
+                  className="w-6 h-6 text-muted-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -103,7 +103,7 @@ const NewJournalEntryPage: React.FC = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                <span className="ml-1 text-sm font-medium text-muted-foreground md:ml-2">
                   New Entry
                 </span>
               </div>
@@ -113,7 +113,7 @@ const NewJournalEntryPage: React.FC = () => {
 
         {/* Error Banner */}
         {errorMessage && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4 flex items-start space-x-3">
+          <div className="mb-6 bg-red-500/10 border border-red-500/30 rounded-md p-4 flex items-start space-x-3">
             <svg
               className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5"
               fill="currentColor"
@@ -126,20 +126,20 @@ const NewJournalEntryPage: React.FC = () => {
               />
             </svg>
             <div>
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-red-400">
                 Error creating entry
               </h3>
-              <p className="mt-1 text-sm text-red-700">{errorMessage}</p>
+              <p className="mt-1 text-sm text-red-400">{errorMessage}</p>
             </div>
           </div>
         )}
 
         {/* Tips Banner */}
-        <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg
-                className="h-5 w-5 text-green-400"
+                className="h-5 w-5 text-emerald-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -151,10 +151,10 @@ const NewJournalEntryPage: React.FC = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">
+              <h3 className="text-sm font-medium text-emerald-400">
                 Benefits of Regular Journaling
               </h3>
-              <div className="mt-2 text-sm text-green-700">
+              <div className="mt-2 text-sm text-emerald-400">
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Track patterns in your trading behavior and emotions</li>
                   <li>Document lessons learned to avoid repeating mistakes</li>

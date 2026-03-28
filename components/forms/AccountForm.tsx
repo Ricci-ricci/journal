@@ -163,7 +163,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
             />
 
             <div className="flex items-end">
-              <div className="text-sm text-gray-500 space-y-2">
+              <div className="text-sm text-muted-foreground space-y-2">
                 <p>
                   <strong>Account Type Info:</strong>
                 </p>
@@ -184,7 +184,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
             {onCancel && (
               <Button
                 type="button"

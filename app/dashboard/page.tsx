@@ -178,8 +178,8 @@ const DashboardPage: React.FC = () => {
   };
 
   const getProfitLossColor = (profitLoss: number | null): string => {
-    if (profitLoss === null) return "text-gray-500";
-    return profitLoss >= 0 ? "text-green-600" : "text-red-600";
+    if (profitLoss === null) return "text-muted-foreground";
+    return profitLoss >= 0 ? "text-emerald-400" : "text-red-400";
   };
 
   if (loading) {
@@ -191,8 +191,8 @@ const DashboardPage: React.FC = () => {
             {[...Array(4)].map((_, i) => (
               <Card key={i}>
                 <CardContent className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
                 </CardContent>
               </Card>
             ))}
@@ -220,7 +220,7 @@ const DashboardPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Total P&L
                     </p>
                     <p
@@ -231,7 +231,7 @@ const DashboardPage: React.FC = () => {
                   </div>
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-4 h-4 text-green-600"
+                      className="w-4 h-4 text-emerald-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -250,10 +250,10 @@ const DashboardPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Win Rate
                     </p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {formatPercent(stats.winRate)}
                     </p>
                   </div>
@@ -278,13 +278,13 @@ const DashboardPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Total Trades
                     </p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-foreground">
                       {stats.totalTrades}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {stats.openTrades} open, {stats.closedTrades} closed
                     </p>
                   </div>
@@ -305,13 +305,13 @@ const DashboardPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Best Trade
                     </p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold text-emerald-400">
                       {formatCurrency(stats.bestTrade)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Worst: {formatCurrency(stats.worstTrade)}
                     </p>
                   </div>
@@ -347,21 +347,21 @@ const DashboardPage: React.FC = () => {
               <CardContent>
                 <div className="space-y-4">
                   {recentTrades.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
+                    <p className="text-muted-foreground text-center py-4">
                       No recent trades
                     </p>
                   ) : (
                     recentTrades.map((trade) => (
                       <div
                         key={trade.id}
-                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                        className="flex items-center justify-between p-3 border border-border rounded-lg"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="flex flex-col">
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-foreground">
                               {trade.symbol}
                             </span>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-muted-foreground">
                               {formatDate(trade.entryDate)}
                             </span>
                           </div>
@@ -384,7 +384,7 @@ const DashboardPage: React.FC = () => {
                         </div>
                         <div className="flex items-center space-x-4">
                           <div className="text-right">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-foreground">
                               {formatCurrency(trade.entryPrice)}
                             </div>
                             {trade.profitLoss !== null && (
@@ -483,24 +483,26 @@ const DashboardPage: React.FC = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Average Win</span>
-                      <span className="text-sm font-medium text-green-600">
+                      <span className="text-sm text-muted-foreground">
+                        Average Win
+                      </span>
+                      <span className="text-sm font-medium text-emerald-400">
                         {formatCurrency(stats.averageWin)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-muted-foreground">
                         Average Loss
                       </span>
-                      <span className="text-sm font-medium text-red-600">
+                      <span className="text-sm font-medium text-red-400">
                         {formatCurrency(stats.averageLoss)}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                      <span className="text-sm text-gray-600">
+                    <div className="flex justify-between items-center pt-2 border-t border-border">
+                      <span className="text-sm text-muted-foreground">
                         Profit Factor
                       </span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-foreground">
                         {Math.abs(stats.averageWin / stats.averageLoss).toFixed(
                           2,
                         )}

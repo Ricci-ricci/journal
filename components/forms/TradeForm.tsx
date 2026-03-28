@@ -387,7 +387,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
               Notes
             </label>
             <textarea
@@ -395,13 +395,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               rows={4}
               value={formData.notes}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
               placeholder="Trade analysis, market conditions, lessons learned..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
             {onCancel && (
               <Button
                 type="button"

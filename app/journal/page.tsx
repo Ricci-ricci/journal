@@ -246,10 +246,10 @@ const JournalPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-foreground">
               Your Trading Journal
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Reflect on your trading journey, document insights, and track your
               progress.
             </p>
@@ -299,7 +299,7 @@ const JournalPage: React.FC = () => {
             </div>
 
             <div className="mt-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Showing {filteredEntries.length} of {entries.length} entries
                 {(searchTerm || filterType) && (
                   <span className="ml-1">(filtered)</span>
@@ -315,12 +315,12 @@ const JournalPage: React.FC = () => {
             {[...Array(3)].map((_, i) => (
               <Card key={i}>
                 <CardContent className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-3/4 mb-4"></div>
                   <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                    <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-                    <div className="h-3 bg-gray-200 rounded w-4/6"></div>
+                    <div className="h-3 bg-muted rounded w-full"></div>
+                    <div className="h-3 bg-muted rounded w-5/6"></div>
+                    <div className="h-3 bg-muted rounded w-4/6"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -330,7 +330,7 @@ const JournalPage: React.FC = () => {
           <Card>
             <CardContent className="text-center py-12">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -342,12 +342,12 @@ const JournalPage: React.FC = () => {
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 {searchTerm || filterType
                   ? "No entries match your filters"
                   : "No journal entries"}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {searchTerm || filterType
                   ? "Try adjusting your search or filter criteria."
                   : "Start documenting your trading journey by creating your first entry."}
@@ -381,7 +381,7 @@ const JournalPage: React.FC = () => {
                           >
                             {entry.entryType}
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-muted-foreground">
                             {formatDate(entry.entryDate)}
                           </span>
                         </div>
@@ -418,7 +418,7 @@ const JournalPage: React.FC = () => {
                     {/* Main Content */}
                     {entry.content && (
                       <div>
-                        <p className="text-gray-700 leading-relaxed">
+                        <p className="text-foreground leading-relaxed">
                           {expandedEntry === entry.id
                             ? entry.content
                             : truncateText(entry.content)}
@@ -428,13 +428,13 @@ const JournalPage: React.FC = () => {
 
                     {/* Expanded Content */}
                     {expandedEntry === entry.id && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
                         {entry.whatWentWell && (
                           <div>
-                            <h4 className="text-sm font-medium text-green-800 mb-2">
+                            <h4 className="text-sm font-medium text-emerald-400 mb-2">
                               ✅ What Went Well
                             </h4>
-                            <p className="text-sm text-gray-700 bg-green-50 p-3 rounded">
+                            <p className="text-sm text-foreground bg-emerald-500/10 p-3 rounded">
                               {entry.whatWentWell}
                             </p>
                           </div>
@@ -442,10 +442,10 @@ const JournalPage: React.FC = () => {
 
                         {entry.whatWentWrong && (
                           <div>
-                            <h4 className="text-sm font-medium text-red-800 mb-2">
+                            <h4 className="text-sm font-medium text-red-400 mb-2">
                               ❌ What Went Wrong
                             </h4>
-                            <p className="text-sm text-gray-700 bg-red-50 p-3 rounded">
+                            <p className="text-sm text-foreground bg-red-500/10 p-3 rounded">
                               {entry.whatWentWrong}
                             </p>
                           </div>
@@ -453,10 +453,10 @@ const JournalPage: React.FC = () => {
 
                         {entry.lessonsLearned && (
                           <div>
-                            <h4 className="text-sm font-medium text-blue-800 mb-2">
+                            <h4 className="text-sm font-medium text-blue-400 mb-2">
                               💡 Lessons Learned
                             </h4>
-                            <p className="text-sm text-gray-700 bg-blue-50 p-3 rounded">
+                            <p className="text-sm text-foreground bg-blue-500/10 p-3 rounded">
                               {entry.lessonsLearned}
                             </p>
                           </div>
@@ -464,10 +464,10 @@ const JournalPage: React.FC = () => {
 
                         {entry.goalsNextPeriod && (
                           <div>
-                            <h4 className="text-sm font-medium text-purple-800 mb-2">
+                            <h4 className="text-sm font-medium text-purple-400 mb-2">
                               🎯 Goals Next Period
                             </h4>
-                            <p className="text-sm text-gray-700 bg-purple-50 p-3 rounded">
+                            <p className="text-sm text-foreground bg-purple-500/10 p-3 rounded">
                               {entry.goalsNextPeriod}
                             </p>
                           </div>
@@ -475,10 +475,10 @@ const JournalPage: React.FC = () => {
 
                         {entry.marketConditions && (
                           <div className="md:col-span-2">
-                            <h4 className="text-sm font-medium text-gray-800 mb-2">
+                            <h4 className="text-sm font-medium text-foreground mb-2">
                               📈 Market Conditions
                             </h4>
-                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                            <p className="text-sm text-foreground bg-muted/50 p-3 rounded">
                               {entry.marketConditions}
                             </p>
                           </div>
@@ -489,10 +489,10 @@ const JournalPage: React.FC = () => {
                     {/* Preview of lessons when collapsed */}
                     {expandedEntry !== entry.id && entry.lessonsLearned && (
                       <div className="border-l-4 border-blue-400 pl-4">
-                        <h4 className="text-sm font-medium text-blue-800 mb-1">
+                        <h4 className="text-sm font-medium text-blue-400 mb-1">
                           Key Lesson
                         </h4>
-                        <p className="text-sm text-gray-600 italic">
+                        <p className="text-sm text-muted-foreground italic">
                           {truncateText(entry.lessonsLearned, 100)}
                         </p>
                       </div>
@@ -515,21 +515,21 @@ const JournalPage: React.FC = () => {
                 <div className="text-2xl font-bold text-blue-600">
                   {entries.filter((e) => e.entryType === "DAILY").length}
                 </div>
-                <p className="text-sm text-gray-600">Daily Entries</p>
+                <p className="text-sm text-muted-foreground">Daily Entries</p>
               </div>
 
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-emerald-400">
                   {entries.filter((e) => e.entryType === "WEEKLY").length}
                 </div>
-                <p className="text-sm text-gray-600">Weekly Reviews</p>
+                <p className="text-sm text-muted-foreground">Weekly Reviews</p>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {entries.filter((e) => e.entryType === "MONTHLY").length}
                 </div>
-                <p className="text-sm text-gray-600">Monthly Analyses</p>
+                <p className="text-sm text-muted-foreground">Monthly Analyses</p>
               </div>
             </div>
           </CardContent>

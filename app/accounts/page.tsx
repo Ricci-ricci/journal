@@ -242,10 +242,10 @@ const AccountsPage: React.FC = () => {
         {/* Header Actions */}
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-foreground">
               Manage your trading accounts
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Add and manage your trading accounts across different brokers and
               account types.
             </p>
@@ -263,10 +263,10 @@ const AccountsPage: React.FC = () => {
             {[...Array(6)].map((_, i) => (
               <Card key={i}>
                 <CardContent className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-1/2 mb-4"></div>
+                  <div className="h-8 bg-muted rounded w-full mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-2/3"></div>
                 </CardContent>
               </Card>
             ))}
@@ -275,7 +275,7 @@ const AccountsPage: React.FC = () => {
           <Card>
             <CardContent className="text-center py-12">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -287,10 +287,10 @@ const AccountsPage: React.FC = () => {
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <h3 className="mt-2 text-sm font-medium text-foreground">
                 No accounts
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Get started by creating your first trading account.
               </p>
               <div className="mt-6">
@@ -314,7 +314,7 @@ const AccountsPage: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <CardTitle className="truncate">{account.name}</CardTitle>
                       {account.broker && (
-                        <p className="text-sm text-gray-500 mt-1 truncate">
+                        <p className="text-sm text-muted-foreground mt-1 truncate">
                           {account.broker}
                         </p>
                       )}
@@ -330,10 +330,10 @@ const AccountsPage: React.FC = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-muted-foreground">
                         Initial Balance
                       </span>
-                      <span className="text-lg font-semibold text-gray-900">
+                      <span className="text-lg font-semibold text-foreground">
                         {formatCurrency(
                           account.initialBalance,
                           account.currency,
@@ -342,16 +342,16 @@ const AccountsPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Currency</span>
+                      <span className="text-muted-foreground">Currency</span>
                       <span className="font-medium">{account.currency}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Created</span>
+                      <span className="text-muted-foreground">Created</span>
                       <span>{formatDate(account.createdAt)}</span>
                     </div>
 
-                    <div className="pt-3 border-t border-gray-200">
+                    <div className="pt-3 border-t border-border">
                       <div className="flex justify-end space-x-2">
                         <EditIconButton
                           size="sm"
@@ -382,10 +382,10 @@ const AccountsPage: React.FC = () => {
                   PAPER
                 </Badge>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-sm font-medium text-foreground">
                     Paper Trading
                   </h4>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Virtual trading with simulated money for practice and
                     strategy testing.
                   </p>
@@ -397,10 +397,10 @@ const AccountsPage: React.FC = () => {
                   DEMO
                 </Badge>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-sm font-medium text-foreground">
                     Demo Account
                   </h4>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Broker-provided demo account with virtual funds and real
                     market data.
                   </p>
@@ -412,10 +412,10 @@ const AccountsPage: React.FC = () => {
                   LIVE
                 </Badge>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-sm font-medium text-foreground">
                     Live Account
                   </h4>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Real money trading account with actual market execution.
                   </p>
                 </div>

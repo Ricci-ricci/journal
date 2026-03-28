@@ -201,8 +201,8 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Total Trades</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm text-muted-foreground">Total Trades</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {stats.totalTrades}
                   </p>
                 </div>
@@ -212,7 +212,7 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Open Trades</p>
+                  <p className="text-sm text-muted-foreground">Open Trades</p>
                   <p className="text-2xl font-bold text-blue-600">
                     {stats.openTrades}
                   </p>
@@ -223,8 +223,8 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Closed Trades</p>
-                  <p className="text-2xl font-bold text-gray-600">
+                  <p className="text-sm text-muted-foreground">Closed Trades</p>
+                  <p className="text-2xl font-bold text-muted-foreground">
                     {stats.closedTrades}
                   </p>
                 </div>
@@ -234,9 +234,9 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Total P&L</p>
+                  <p className="text-sm text-muted-foreground">Total P&L</p>
                   <p
-                    className={`text-2xl font-bold ${stats.totalPnL >= 0 ? "text-green-600" : "text-red-600"}`}
+                    className={`text-2xl font-bold ${stats.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"}`}
                   >
                     {formatCurrency(stats.totalPnL)}
                   </p>
@@ -247,7 +247,7 @@ const TradesPage: React.FC = () => {
             <Card>
               <CardContent padding="sm">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">Win Rate</p>
+                  <p className="text-sm text-muted-foreground">Win Rate</p>
                   <p className="text-2xl font-bold text-purple-600">
                     {formatPercent(stats.winRate)}
                   </p>
@@ -323,7 +323,7 @@ const TradesPage: React.FC = () => {
 
             {/* Results Summary */}
             <div className="mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Showing {filteredTrades.length} of {trades.length} trades
                 {(searchTerm || statusFilter || directionFilter) && (
                   <span className="ml-1">(filtered)</span>
