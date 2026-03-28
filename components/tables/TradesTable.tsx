@@ -304,13 +304,13 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                   <div className="flex justify-end items-center space-x-1">
                     {onViewTrade && (
                       <ViewIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => onViewTrade(trade)}
                       />
                     )}
                     {onEditTrade && (
                       <EditIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => onEditTrade(trade)}
                       />
                     )}
@@ -318,13 +318,13 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                       (trade.status === "OPEN" ||
                         trade.status === "PARTIAL") && (
                         <CloseTradeIconButton
-                          size="sm"
+                          size="md"
                           onClick={() => onCloseTrade(trade)}
                         />
                       )}
                     {onDeleteTrade && (
                       <DeleteIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => onDeleteTrade(trade.id)}
                       />
                     )}
