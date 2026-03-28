@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Layout } from "../../components/layout/Layout";
 import { TradesTable } from "../../components/tables/TradesTable";
+import { CloseTradeModal } from "../../components/modals/CloseTradeModal";
 import { Button } from "../../components/ui/Button";
 import { AddIconButton } from "../../components/ui/IconButton";
 import { Input } from "../../components/ui/Input";
@@ -74,7 +75,11 @@ const directionOptions = [
 ];
 
 const TradesPage: React.FC = () => {
-  const { activeAccount, activeAccountId } = useAccounts();
+  const {
+    activeAccount,
+    activeAccountId,
+    refetch: refetchAccounts,
+  } = useAccounts();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<TradesStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,6 +87,10 @@ const TradesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [directionFilter, setDirectionFilter] = useState("");
+
+  // Close trade modal state
+  const [tradeToClose, setTradeToClose] = useState<Trade | null>(null);
+  const [closeLoading, setCloseLoading] = useState(false);
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -183,6 +192,83 @@ const TradesPage: React.FC = () => {
     }
   };
 
+  const handleCloseTrade = (trade: Trade) => {
+    setTradeToClose(trade);
+  };
+
+  const handleCloseTradeConfirm = async (data: {
+    exitPrice: number;
+    exitDate: string;
+    profitLoss: number;
+    profitLossPercent: number;
+  }) => {
+    if (!tradeToClose) return;
+    setCloseLoading(true);
+    try {
+      const response = await fetch(`/api/trades/${tradeToClose.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "CLOSED",
+          exitPrice: data.exitPrice,
+          exitDate: data.exitDate,
+          profitLoss: data.profitLoss,
+          profitLossPercent: data.profitLossPercent,
+        }),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        // Update the trade in local state
+        setTrades((prev) =>
+          prev.map((t) =>
+            t.id === tradeToClose.id
+              ? {
+                  ...t,
+                  status: "CLOSED",
+                  exitPrice: data.exitPrice,
+                  exitDate: data.exitDate,
+                  profitLoss: data.profitLoss,
+                  profitLossPercent: data.profitLossPercent,
+                }
+              : t,
+          ),
+        );
+
+        // Recompute stats inline
+        setStats((prev) => {
+          if (!prev) return prev;
+          const updatedTrades = trades.map((t) =>
+            t.id === tradeToClose.id
+              ? { ...t, status: "CLOSED" as const, profitLoss: data.profitLoss }
+              : t,
+          );
+          const closed = updatedTrades.filter((t) => t.status === "CLOSED");
+          const winning = closed.filter((t) => (t.profitLoss || 0) > 0).length;
+          return {
+            totalTrades: updatedTrades.length,
+            openTrades: updatedTrades.filter((t) => t.status === "OPEN").length,
+            closedTrades: closed.length,
+            totalPnL: closed.reduce((s, t) => s + (t.profitLoss || 0), 0),
+            winRate: closed.length > 0 ? (winning / closed.length) * 100 : 0,
+          };
+        });
+
+        // Refresh account balances in the sidebar
+        await refetchAccounts();
+
+        setTradeToClose(null);
+      } else {
+        alert("Failed to close trade: " + (result.error || result.details));
+      }
+    } catch (err) {
+      console.error("Failed to close trade:", err);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setCloseLoading(false);
+    }
+  };
+
   const handleEditTrade = (trade: Trade) => {
     console.log("Edit trade:", trade.id);
   };
@@ -201,6 +287,13 @@ const TradesPage: React.FC = () => {
 
   return (
     <Layout title="My Trades">
+      {/* Close Trade Modal */}
+      <CloseTradeModal
+        trade={tradeToClose}
+        onConfirm={handleCloseTradeConfirm}
+        onCancel={() => setTradeToClose(null)}
+        loading={closeLoading}
+      />
       <div className="space-y-6">
         {/* Period toggle + header row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -407,6 +500,7 @@ const TradesPage: React.FC = () => {
               onEditTrade={handleEditTrade}
               onDeleteTrade={handleDeleteTrade}
               onViewTrade={handleViewTrade}
+              onCloseTrade={handleCloseTrade}
             />
           </CardContent>
         </Card>

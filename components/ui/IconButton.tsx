@@ -8,7 +8,8 @@ type IconButtonVariant =
   | "delete"
   | "add"
   | "success"
-  | "warning";
+  | "warning"
+  | "close";
 type IconButtonSize = "sm" | "md" | "lg";
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -31,6 +32,8 @@ const variantClasses: Record<IconButtonVariant, string> = {
     "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/50",
   warning:
     "bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20 hover:text-yellow-300 hover:border-yellow-500/50",
+  close:
+    "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/50",
 };
 
 const sizeClasses: Record<IconButtonSize, string> = {
@@ -247,6 +250,31 @@ export const ViewIconButton: React.FC<
              c4.478 0 8.268 2.943 9.542 7
              -1.274 4.057-5.064 7-9.542 7
              -4.477 0-8.268-2.943-9.542-7z"
+        />
+      </svg>
+    }
+    {...props}
+  />
+);
+
+export const CloseTradeIconButton: React.FC<
+  Omit<IconButtonProps, "icon" | "variant">
+> = (props) => (
+  <IconButton
+    variant="close"
+    tooltip="Close Trade"
+    icon={
+      <svg
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        className="w-full h-full"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
     }

@@ -7,6 +7,7 @@ import {
   EditIconButton,
   DeleteIconButton,
   ViewIconButton,
+  CloseTradeIconButton,
 } from "../ui/IconButton";
 
 interface Trade {
@@ -42,6 +43,7 @@ interface TradesTableProps {
   onEditTrade?: (trade: Trade) => void;
   onDeleteTrade?: (tradeId: string) => void;
   onViewTrade?: (trade: Trade) => void;
+  onCloseTrade?: (trade: Trade) => void;
 }
 
 const formatDate = (dateString: string): string => {
@@ -94,6 +96,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
   onEditTrade,
   onDeleteTrade,
   onViewTrade,
+  onCloseTrade,
 }) => {
   if (loading) {
     return (
@@ -311,6 +314,14 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                         onClick={() => onEditTrade(trade)}
                       />
                     )}
+                    {onCloseTrade &&
+                      (trade.status === "OPEN" ||
+                        trade.status === "PARTIAL") && (
+                        <CloseTradeIconButton
+                          size="sm"
+                          onClick={() => onCloseTrade(trade)}
+                        />
+                      )}
                     {onDeleteTrade && (
                       <DeleteIconButton
                         size="sm"

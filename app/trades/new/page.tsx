@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Layout } from "../../../components/layout/Layout";
 import { TradeForm } from "../../../components/forms/TradeForm";
+import { useAccounts } from "../../../contexts/AccountsContext";
 
 // Demo user ID from seeded data
 const DEMO_USER_ID = "69c1194ba84c42e638b96e03";
@@ -21,6 +22,7 @@ interface Strategy {
 
 const NewTradePage: React.FC = () => {
   const router = useRouter();
+  const { refetch: refetchAccounts } = useAccounts();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
@@ -128,6 +130,10 @@ const NewTradePage: React.FC = () => {
         setSuccessMsg(
           `Trade for ${result.data.symbol} created successfully! Redirecting...`,
         );
+        // If the trade was created as CLOSED, refresh account balances immediately
+        if (result.data.status === "CLOSED") {
+          await refetchAccounts();
+        }
         setTimeout(() => {
           router.push("/trades");
         }, 1500);
