@@ -160,47 +160,47 @@ export const TradesTable: React.FC<TradesTableProps> = ({
             <tr>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Symbol
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Direction
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Entry
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Exit
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Quantity
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 P&L
               </th>
-              <th scope="col" className="relative px-6 py-3">
+              <th scope="col" className="relative px-3 py-3">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -211,7 +211,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                 key={trade.id}
                 className="hover:bg-muted/30 transition-colors"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="text-sm font-medium text-foreground">
                       {trade.symbol}
@@ -228,17 +228,17 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <Badge variant={getDirectionBadgeVariant(trade.direction)}>
                     {trade.direction}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <Badge variant={getStatusBadgeVariant(trade.status)}>
                     {trade.status}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="text-sm text-foreground">
                       {formatCurrency(
@@ -251,7 +251,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.exitPrice ? (
                       <>
@@ -272,10 +272,10 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                <td className="px-3 py-3 whitespace-nowrap text-sm text-foreground">
                   {trade.quantity.toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.profitLoss !== null ? (
                       <>
@@ -300,7 +300,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-3 py-3 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end items-center space-x-1">
                     {onViewTrade && (
                       <ViewIconButton
