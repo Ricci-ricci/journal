@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAccounts } from "@/contexts/AccountsContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarItem {
   href: string;
@@ -178,6 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const pathname = usePathname();
   const { accounts, activeAccount, activeAccountId, setActiveAccountId } =
     useAccounts();
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const isActivePath = (href: string): boolean => {
@@ -543,14 +545,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  Demo User
+                  {user?.name ?? user?.email ?? "My Account"}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  demo@journal.com
+                  {user?.email ?? ""}
                 </p>
               </div>
-              <button className="inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring rounded-full transition-colors">
-                <span className="sr-only">Open user menu</span>
+              <button
+                onClick={logout}
+                className="inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring rounded-full transition-colors"
+              >
+                <span className="sr-only">Sign out</span>
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -561,7 +566,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
               </button>

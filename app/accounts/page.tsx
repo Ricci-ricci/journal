@@ -18,6 +18,7 @@ import {
   EditIconButton,
   DeleteIconButton,
 } from "../../components/ui/IconButton";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Account {
   id: string;
@@ -38,6 +39,7 @@ const AccountsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchAccounts();
@@ -48,7 +50,7 @@ const AccountsPage: React.FC = () => {
       setLoading(true);
 
       // Real API call to fetch accounts
-      const response = await fetch("/api/accounts");
+      const response = await fetch(`/api/accounts?userId=${user?.id}`);
       const result = await response.json();
 
       if (result.success) {
@@ -66,6 +68,11 @@ const AccountsPage: React.FC = () => {
   };
 
   const handleCreateAccount = async (formData: AccountFormData) => {
+    if (!user) {
+      alert("You must be logged in to create an account.");
+      return;
+    }
+
     try {
       setSubmitting(true);
 
@@ -76,7 +83,7 @@ const AccountsPage: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "69c1194ba84c42e638b96e03", // Demo user ID from seeded data
+          userId: user?.id ?? "",
           name: formData.name,
           broker: formData.broker || null,
           accountType: formData.accountType,

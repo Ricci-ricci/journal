@@ -9,13 +9,29 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    // TODO: replace with real auth
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    router.push("/dashboard");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        router.push("/dashboard");
+      } else {
+        setError(data.error ?? "Login failed. Please try again.");
+      }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,6 +83,22 @@ export default function LoginPage() {
 
           {/* Card */}
           <div className="bg-card border border-border rounded-2xl p-7 shadow-xl shadow-black/30">
+            {error && (
+              <div className="mb-5 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 flex items-center gap-2">
+                <svg
+                  className="h-4 w-4 text-red-400 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
             <form onSubmit={handleLogin} className="space-y-5">
               {/* Email */}
               <div>
@@ -146,8 +178,33 @@ export default function LoginPage() {
 
             {/* Demo login */}
             <button
-              onClick={() => router.push("/dashboard")}
-              className="w-full border border-border hover:bg-muted active:bg-accent text-foreground rounded-lg py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              type="button"
+              onClick={async () => {
+                setError(null);
+                setLoading(true);
+                try {
+                  const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: "demo@journal.com",
+                      password: "demo1234",
+                    }),
+                  });
+                  const data = await res.json();
+                  if (data.success) {
+                    router.push("/dashboard");
+                  } else {
+                    setError("Demo account not available. Please register.");
+                  }
+                } catch {
+                  setError("An unexpected error occurred.");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full border border-border hover:bg-muted active:bg-accent disabled:opacity-50 disabled:cursor-not-allowed text-foreground rounded-lg py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               <svg
                 className="w-4 h-4 text-muted-foreground"
@@ -175,12 +232,12 @@ export default function LoginPage() {
           {/* Sign up link */}
           <p className="text-center text-sm text-muted-foreground mt-6">
             Don&apos;t have an account?{" "}
-            <a
-              href="#"
+            <Link
+              href="/register"
               className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
             >
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -8,6 +8,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
+import { useAuth } from "./AuthContext";
 
 const STORAGE_KEY = "tj_active_account_id";
 
@@ -49,9 +50,16 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
   );
   const [loading, setLoading] = useState(true);
 
+  const { user } = useAuth();
+
   const fetchAccounts = useCallback(async () => {
+    if (!user) {
+      setAccounts([]);
+      setLoading(false);
+      return;
+    }
     try {
-      const res = await fetch("/api/accounts");
+      const res = await fetch(`/api/accounts?userId=${user.id}`);
       const result = await res.json();
       if (result.success) {
         const fetched: AccountWithBalance[] = result.data;
@@ -71,7 +79,7 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchAccounts();
@@ -86,8 +94,7 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const activeAccount =
-    accounts.find((a) => a.id === activeAccountId) ?? null;
+  const activeAccount = accounts.find((a) => a.id === activeAccountId) ?? null;
 
   return (
     <AccountsContext.Provider

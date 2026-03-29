@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { Layout } from "../../../components/layout/Layout";
 import { TradeForm } from "../../../components/forms/TradeForm";
 import { useAccounts } from "../../../contexts/AccountsContext";
-
-// Demo user ID from seeded data
-const DEMO_USER_ID = "69c1194ba84c42e638b96e03";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface Account {
   id: string;
@@ -22,6 +20,7 @@ interface Strategy {
 
 const NewTradePage: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const { refetch: refetchAccounts } = useAccounts();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -37,7 +36,7 @@ const NewTradePage: React.FC = () => {
         setFetchingData(true);
 
         const [accountsRes, strategiesRes] = await Promise.all([
-          fetch(`/api/accounts?userId=${DEMO_USER_ID}`),
+          fetch(`/api/accounts?userId=${user?.id}`),
           fetch("/api/strategies"),
         ]);
 
@@ -66,9 +65,40 @@ const NewTradePage: React.FC = () => {
     };
 
     fetchFormData();
-  }, []);
+  }, [user?.id]);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: {
+    accountId: string;
+    strategyId: string;
+    symbol: string;
+    assetType: string;
+    direction: string;
+    status: string;
+    entryDate: string;
+    entryPrice: string;
+    quantity: string;
+    exitDate: string;
+    exitPrice: string;
+    commission: string;
+    fees: string;
+    profitLoss: string;
+    profitLossPercent: string;
+    stopLoss: string;
+    takeProfit: string;
+    riskRewardRatio: string;
+    setupType: string;
+    timeFrame: string;
+    notes: string;
+    confidenceLevel: string;
+    emotionalState: string;
+    tags?: string[];
+    chartImageUrl?: string;
+  }) => {
+    if (!user) {
+      setErrorMsg("You must be logged in to create a trade.");
+      return;
+    }
+
     try {
       setLoading(true);
       setErrorMsg(null);
@@ -76,7 +106,7 @@ const NewTradePage: React.FC = () => {
 
       // Build the payload matching the /api/trades POST endpoint
       const payload = {
-        userId: DEMO_USER_ID,
+        userId: user?.id ?? "",
         accountId: formData.accountId || null,
         strategyId: formData.strategyId || null,
         symbol: formData.symbol,
