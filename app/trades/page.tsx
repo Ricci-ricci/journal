@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Layout } from "../../components/layout/Layout";
 import { TradesTable } from "../../components/tables/TradesTable";
 import { CloseTradeModal } from "../../components/modals/CloseTradeModal";
@@ -76,6 +77,7 @@ const directionOptions = [
 ];
 
 const TradesPage: React.FC = () => {
+  const router = useRouter();
   const { user } = useAuth();
   const {
     activeAccount,
@@ -275,7 +277,7 @@ const TradesPage: React.FC = () => {
   };
 
   const handleEditTrade = (trade: Trade) => {
-    console.log("Edit trade:", trade.id);
+    router.push(`/trades/${trade.id}/edit`);
   };
 
   const handleViewTrade = (trade: Trade) => {
