@@ -95,7 +95,7 @@ const AccountsPage: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        setAccounts((prev) => [result.data, ...prev]);
+        await fetchAccounts();
         setShowForm(false);
         alert("Account created successfully!");
       } else {
@@ -139,9 +139,7 @@ const AccountsPage: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        setAccounts((prev) =>
-          prev.map((acc) => (acc.id === editingAccount.id ? result.data : acc)),
-        );
+        await fetchAccounts();
         setShowForm(false);
         setEditingAccount(null);
         alert("Account updated successfully!");
