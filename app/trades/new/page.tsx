@@ -37,7 +37,7 @@ const NewTradePage: React.FC = () => {
 
         const [accountsRes, strategiesRes] = await Promise.all([
           fetch(`/api/accounts?userId=${user?.id}`),
-          fetch("/api/strategies"),
+          fetch(`/api/strategies?userId=${user?.id}`),
         ]);
 
         const [accountsData, strategiesData] = await Promise.all([

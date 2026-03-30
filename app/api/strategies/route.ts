@@ -13,9 +13,13 @@ type CreateStrategyBody = {
   isActive?: boolean;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId") ?? undefined;
+
     const strategies = await prisma.strategy.findMany({
+      where: userId ? { userId } : undefined,
       orderBy: { createdAt: "desc" },
       include: {
         user: {

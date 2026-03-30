@@ -16,6 +16,7 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { useAccounts } from "../../contexts/AccountsContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Trade {
   id: string;
@@ -75,6 +76,7 @@ const directionOptions = [
 ];
 
 const TradesPage: React.FC = () => {
+  const { user } = useAuth();
   const {
     activeAccount,
     activeAccountId,
@@ -94,10 +96,13 @@ const TradesPage: React.FC = () => {
 
   useEffect(() => {
     const fetchTrades = async () => {
+      if (!user) return;
+
       try {
         setLoading(true);
 
         const params = new URLSearchParams();
+        params.append("userId", user.id);
         params.append("period", period);
         if (activeAccountId) params.append("accountId", activeAccountId);
         if (statusFilter) params.append("status", statusFilter);
@@ -145,7 +150,7 @@ const TradesPage: React.FC = () => {
     };
 
     fetchTrades();
-  }, [period, activeAccountId, statusFilter, directionFilter]);
+  }, [period, activeAccountId, statusFilter, directionFilter, user]);
 
   const filteredTrades = trades.filter((trade) => {
     const matchesSearch = trade.symbol

@@ -12,6 +12,7 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { useAccounts } from "../../contexts/AccountsContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 type Period = "week" | "month" | "year" | "all";
 
@@ -63,6 +64,7 @@ const ACCOUNT_TYPE_ICON_COLOR: Record<string, string> = {
 };
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const { activeAccount, activeAccountId } = useAccounts();
   const [period, setPeriod] = useState<Period>("month");
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -71,10 +73,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!user) return;
+
       try {
         setLoading(true);
 
         const params = new URLSearchParams();
+        params.set("userId", user.id);
         params.set("period", period);
         if (activeAccountId) params.set("accountId", activeAccountId);
 
@@ -144,7 +149,7 @@ export default function DashboardPage() {
     };
 
     fetchDashboardData();
-  }, [period, activeAccountId]);
+  }, [period, activeAccountId, user]);
 
   const formatCurrency = (amount: number, currency = "USD"): string =>
     new Intl.NumberFormat("en-US", {

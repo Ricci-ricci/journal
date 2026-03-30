@@ -1,26 +1,42 @@
 "use client";
 
+interface JournalFormData {
+  entryDate: string;
+  entryType?: string;
+  title?: string;
+  content?: string;
+  whatWentWell?: string;
+  whatWentWrong?: string;
+  lessonsLearned?: string;
+  goalsNextPeriod?: string;
+  marketConditions?: string;
+}
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Layout } from "../../../components/layout/Layout";
 import { JournalEntryForm } from "../../../components/forms/JournalEntryForm";
-
-// Demo user ID from seeded data - replace with auth session in production
-const DEMO_USER_ID = "69c1194ba84c42e638b96e03";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const NewJournalEntryPage: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: JournalFormData) => {
+    if (!user) {
+      setErrorMessage("You must be logged in to create a journal entry.");
+      return;
+    }
+
     try {
       setLoading(true);
       setErrorMessage(null);
 
       // Build the payload matching the /api/journal-entries POST schema
       const payload = {
-        userId: DEMO_USER_ID,
+        userId: user.id,
         entryDate: new Date(formData.entryDate).toISOString(),
         entryType: formData.entryType || "DAILY",
         title: formData.title?.trim() || null,

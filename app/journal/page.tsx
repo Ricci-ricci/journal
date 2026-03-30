@@ -1,9 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+interface JournalFormData {
+  entryDate: string;
+  entryType: string;
+  title?: string;
+  content?: string;
+  whatWentWell?: string;
+  whatWentWrong?: string;
+  lessonsLearned?: string;
+  goalsNextPeriod?: string;
+  marketConditions?: string;
+}
+
+import React, { useState, useEffect, useCallback } from "react";
 
 import { Layout } from "../../components/layout/Layout";
 import { JournalEntryForm } from "../../components/forms/JournalEntryForm";
+import { useAuth } from "../../contexts/AuthContext";
 
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
@@ -37,6 +50,7 @@ interface JournalEntry {
 }
 
 const JournalPage: React.FC = () => {
+  const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -45,6 +59,7 @@ const JournalPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("");
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const entryTypeOptions = [
     { value: "", label: "All Types" },
@@ -53,53 +68,63 @@ const JournalPage: React.FC = () => {
     { value: "MONTHLY", label: "Monthly" },
   ];
 
-  useEffect(() => {
-    fetchEntries();
-  }, []);
-
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async () => {
+    if (!user) return;
     try {
       setLoading(true);
-
-      // Mock data - replace with actual API call
-      const response = await fetch("/api/journal-entries");
+      const response = await fetch(`/api/journal-entries?userId=${user.id}`);
       const result = await response.json();
       if (result.success) {
         setEntries(result.data);
       } else {
-        console.log("Failed to fetch strategies");
+        console.error("Failed to fetch journal entries:", result.error);
       }
     } catch (error) {
       console.error("Failed to fetch journal entries:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const handleCreateEntry = async (formData: any) => {
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
+
+  const handleCreateEntry = async (formData: JournalFormData) => {
+    if (!user) return;
     try {
       setSubmitting(true);
+      setErrorMsg(null);
 
-      const newEntry: JournalEntry = {
-        id: Date.now().toString(),
-        entryDate: formData.entryDate,
-        entryType: formData.entryType,
-        title: formData.title || null,
-        content: formData.content || null,
-        whatWentWell: formData.whatWentWell || null,
-        whatWentWrong: formData.whatWentWrong || null,
-        lessonsLearned: formData.lessonsLearned || null,
-        goalsNextPeriod: formData.goalsNextPeriod || null,
-        marketConditions: formData.marketConditions || null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch("/api/journal-entries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          entryDate: new Date(formData.entryDate).toISOString(),
+          entryType: formData.entryType || "DAILY",
+          title: formData.title?.trim() || null,
+          content: formData.content?.trim() || null,
+          whatWentWell: formData.whatWentWell?.trim() || null,
+          whatWentWrong: formData.whatWentWrong?.trim() || null,
+          lessonsLearned: formData.lessonsLearned?.trim() || null,
+          goalsNextPeriod: formData.goalsNextPeriod?.trim() || null,
+          marketConditions: formData.marketConditions?.trim() || null,
+        }),
+      });
 
-      setEntries((prev) => [newEntry, ...prev]);
-      setShowForm(false);
-      console.log("Journal entry created successfully");
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchEntries();
+        setShowForm(false);
+      } else {
+        setErrorMsg(result.error || "Failed to create journal entry.");
+        console.error("API error:", result);
+      }
     } catch (error) {
       console.error("Failed to create journal entry:", error);
+      setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -110,36 +135,42 @@ const JournalPage: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleUpdateEntry = async (formData: any) => {
+  const handleUpdateEntry = async (formData: JournalFormData) => {
     if (!editingEntry) return;
 
     try {
       setSubmitting(true);
+      setErrorMsg(null);
 
-      const updatedEntry: JournalEntry = {
-        ...editingEntry,
-        entryDate: formData.entryDate,
-        entryType: formData.entryType,
-        title: formData.title || null,
-        content: formData.content || null,
-        whatWentWell: formData.whatWentWell || null,
-        whatWentWrong: formData.whatWentWrong || null,
-        lessonsLearned: formData.lessonsLearned || null,
-        goalsNextPeriod: formData.goalsNextPeriod || null,
-        marketConditions: formData.marketConditions || null,
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch(`/api/journal-entries/${editingEntry.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          entryDate: new Date(formData.entryDate).toISOString(),
+          entryType: formData.entryType || "DAILY",
+          title: formData.title?.trim() || null,
+          content: formData.content?.trim() || null,
+          whatWentWell: formData.whatWentWell?.trim() || null,
+          whatWentWrong: formData.whatWentWrong?.trim() || null,
+          lessonsLearned: formData.lessonsLearned?.trim() || null,
+          goalsNextPeriod: formData.goalsNextPeriod?.trim() || null,
+          marketConditions: formData.marketConditions?.trim() || null,
+        }),
+      });
 
-      setEntries((prev) =>
-        prev.map((entry) =>
-          entry.id === editingEntry.id ? updatedEntry : entry,
-        ),
-      );
+      const result = await response.json();
 
-      setShowForm(false);
-      setEditingEntry(null);
+      if (result.success) {
+        await fetchEntries();
+        setShowForm(false);
+        setEditingEntry(null);
+      } else {
+        setErrorMsg(result.error || "Failed to update journal entry.");
+        console.error("API error:", result);
+      }
     } catch (error) {
       console.error("Failed to update journal entry:", error);
+      setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -155,8 +186,18 @@ const JournalPage: React.FC = () => {
     }
 
     try {
-      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
-      console.log("Journal entry deleted successfully");
+      const response = await fetch(`/api/journal-entries/${entryId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+      } else {
+        console.error("Failed to delete journal entry:", result.error);
+        alert(result.error || "Failed to delete journal entry.");
+      }
     } catch (error) {
       console.error("Failed to delete journal entry:", error);
     }
@@ -212,11 +253,17 @@ const JournalPage: React.FC = () => {
     return (
       <Layout title={editingEntry ? "Edit Journal Entry" : "New Journal Entry"}>
         <div className="max-w-4xl">
+          {errorMsg && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-md p-4 text-sm text-red-400">
+              {errorMsg}
+            </div>
+          )}
           <JournalEntryForm
             onSubmit={editingEntry ? handleUpdateEntry : handleCreateEntry}
             onCancel={() => {
               setShowForm(false);
               setEditingEntry(null);
+              setErrorMsg(null);
             }}
             initialData={
               editingEntry
@@ -529,7 +576,9 @@ const JournalPage: React.FC = () => {
                 <div className="text-2xl font-bold text-purple-600">
                   {entries.filter((e) => e.entryType === "MONTHLY").length}
                 </div>
-                <p className="text-sm text-muted-foreground">Monthly Analyses</p>
+                <p className="text-sm text-muted-foreground">
+                  Monthly Analyses
+                </p>
               </div>
             </div>
           </CardContent>

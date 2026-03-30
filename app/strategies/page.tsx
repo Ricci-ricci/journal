@@ -1,6 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+interface StrategyFormData {
+  name: string;
+  description?: string;
+  entryRules?: string;
+  exitRules?: string;
+  riskManagementRules?: string;
+  isActive: boolean;
+}
+
+import React, { useState, useEffect, useCallback } from "react";
 import { Layout } from "../../components/layout/Layout";
 import { StrategyForm } from "../../components/forms/StrategyForm";
 import { Button } from "../../components/ui/Button";
@@ -18,6 +27,7 @@ import {
 } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Input } from "../../components/ui/Input";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Strategy {
   id: string;
@@ -38,6 +48,7 @@ interface Strategy {
 }
 
 const StrategiesPage: React.FC = () => {
+  const { user } = useAuth();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -45,58 +56,62 @@ const StrategiesPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchStrategies();
-  }, []);
-
-  const fetchStrategies = async () => {
+  const fetchStrategies = useCallback(async () => {
+    if (!user) return;
     try {
       setLoading(true);
-
-      // Mock data - replace with actual API call
-      const response = await fetch("/api/strategies");
+      const response = await fetch(`/api/strategies?userId=${user.id}`);
       const result = await response.json();
       if (result.success) {
         setStrategies(result.data);
       } else {
-        console.log("failed to fetch Strategie");
+        console.error("Failed to fetch strategies:", result.error);
       }
     } catch (error) {
       console.error("Failed to fetch strategies:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const handleCreateStrategy = async (formData: any) => {
+  useEffect(() => {
+    fetchStrategies();
+  }, [fetchStrategies]);
+
+  const handleCreateStrategy = async (formData: StrategyFormData) => {
+    if (!user) return;
     try {
       setSubmitting(true);
+      setErrorMsg(null);
 
-      // Mock API call
-      const newStrategy: Strategy = {
-        id: Date.now().toString(),
-        name: formData.name,
-        description: formData.description || null,
-        entryRules: formData.entryRules || null,
-        exitRules: formData.exitRules || null,
-        riskManagementRules: formData.riskManagementRules || null,
-        totalTrades: 0,
-        winningTrades: 0,
-        losingTrades: 0,
-        winRate: null,
-        averageProfit: null,
-        averageLoss: null,
-        isActive: formData.isActive,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch("/api/strategies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          name: formData.name,
+          description: formData.description || null,
+          entryRules: formData.entryRules || null,
+          exitRules: formData.exitRules || null,
+          riskManagementRules: formData.riskManagementRules || null,
+          isActive: formData.isActive ?? true,
+        }),
+      });
 
-      setStrategies((prev) => [newStrategy, ...prev]);
-      setShowForm(false);
-      console.log("Strategy created successfully");
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchStrategies();
+        setShowForm(false);
+      } else {
+        setErrorMsg(result.error || "Failed to create strategy.");
+        console.error("API error:", result);
+      }
     } catch (error) {
       console.error("Failed to create strategy:", error);
+      setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -107,33 +122,39 @@ const StrategiesPage: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleUpdateStrategy = async (formData: any) => {
+  const handleUpdateStrategy = async (formData: StrategyFormData) => {
     if (!editingStrategy) return;
 
     try {
       setSubmitting(true);
+      setErrorMsg(null);
 
-      const updatedStrategy: Strategy = {
-        ...editingStrategy,
-        name: formData.name,
-        description: formData.description || null,
-        entryRules: formData.entryRules || null,
-        exitRules: formData.exitRules || null,
-        riskManagementRules: formData.riskManagementRules || null,
-        isActive: formData.isActive,
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch(`/api/strategies/${editingStrategy.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description || null,
+          entryRules: formData.entryRules || null,
+          exitRules: formData.exitRules || null,
+          riskManagementRules: formData.riskManagementRules || null,
+          isActive: formData.isActive,
+        }),
+      });
 
-      setStrategies((prev) =>
-        prev.map((strategy) =>
-          strategy.id === editingStrategy.id ? updatedStrategy : strategy,
-        ),
-      );
+      const result = await response.json();
 
-      setShowForm(false);
-      setEditingStrategy(null);
+      if (result.success) {
+        await fetchStrategies();
+        setShowForm(false);
+        setEditingStrategy(null);
+      } else {
+        setErrorMsg(result.error || "Failed to update strategy.");
+        console.error("API error:", result);
+      }
     } catch (error) {
       console.error("Failed to update strategy:", error);
+      setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -149,10 +170,18 @@ const StrategiesPage: React.FC = () => {
     }
 
     try {
-      setStrategies((prev) =>
-        prev.filter((strategy) => strategy.id !== strategyId),
-      );
-      console.log("Strategy deleted successfully");
+      const response = await fetch(`/api/strategies/${strategyId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStrategies((prev) => prev.filter((s) => s.id !== strategyId));
+      } else {
+        console.error("Failed to delete strategy:", result.error);
+        alert(result.error || "Failed to delete strategy.");
+      }
     } catch (error) {
       console.error("Failed to delete strategy:", error);
     }
@@ -160,15 +189,29 @@ const StrategiesPage: React.FC = () => {
 
   const handleToggleActive = async (strategy: Strategy) => {
     try {
-      const updatedStrategy: Strategy = {
-        ...strategy,
-        isActive: !strategy.isActive,
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch(`/api/strategies/${strategy.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !strategy.isActive }),
+      });
 
-      setStrategies((prev) =>
-        prev.map((s) => (s.id === strategy.id ? updatedStrategy : s)),
-      );
+      const result = await response.json();
+
+      if (result.success) {
+        setStrategies((prev) =>
+          prev.map((s) =>
+            s.id === strategy.id
+              ? {
+                  ...s,
+                  isActive: !s.isActive,
+                  updatedAt: result.data.updatedAt,
+                }
+              : s,
+          ),
+        );
+      } else {
+        console.error("Failed to toggle strategy status:", result.error);
+      }
     } catch (error) {
       console.error("Failed to toggle strategy status:", error);
     }
@@ -210,6 +253,11 @@ const StrategiesPage: React.FC = () => {
     return (
       <Layout title={editingStrategy ? "Edit Strategy" : "Create New Strategy"}>
         <div className="max-w-4xl">
+          {errorMsg && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-md p-4 text-sm text-red-400">
+              {errorMsg}
+            </div>
+          )}
           <StrategyForm
             onSubmit={
               editingStrategy ? handleUpdateStrategy : handleCreateStrategy
@@ -217,6 +265,7 @@ const StrategiesPage: React.FC = () => {
             onCancel={() => {
               setShowForm(false);
               setEditingStrategy(null);
+              setErrorMsg(null);
             }}
             initialData={
               editingStrategy
