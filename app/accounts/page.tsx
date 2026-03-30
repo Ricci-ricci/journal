@@ -87,7 +87,7 @@ const AccountsPage: React.FC = () => {
           name: formData.name,
           broker: formData.broker || null,
           accountType: formData.accountType,
-          initialBalance: formData.initialBalance,
+          initialBalance: parseFloat(formData.initialBalance),
           currency: formData.currency,
         }),
       });
@@ -131,7 +131,7 @@ const AccountsPage: React.FC = () => {
           name: formData.name,
           broker: formData.broker || null,
           accountType: formData.accountType,
-          initialBalance: formData.initialBalance,
+          initialBalance: parseFloat(formData.initialBalance),
           currency: formData.currency,
         }),
       });
