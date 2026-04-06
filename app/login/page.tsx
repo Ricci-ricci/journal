@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refetchUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (data.success) {
+        await refetchUser();
         router.push("/dashboard");
       } else {
         setError(data.error ?? "Login failed. Please try again.");
@@ -193,6 +196,7 @@ export default function LoginPage() {
                   });
                   const data = await res.json();
                   if (data.success) {
+                    await refetchUser();
                     router.push("/dashboard");
                   } else {
                     setError("Demo account not available. Please register.");
