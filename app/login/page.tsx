@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -42,11 +43,18 @@ export default function LoginPage() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border">
         <Link href="/accueil" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">TJ</span>
-          </div>
-          <span className="text-base font-semibold text-foreground">
-            Trading Journal
+          <Image
+            src="/images/logo.jpg"
+            alt="Rally logo"
+            width={32}
+            height={32}
+            className="rounded-lg"
+          />
+          <span
+            className="text-base text-foreground"
+            style={{ fontFamily: "var(--font-rally)" }}
+          >
+            Rally
           </span>
         </Link>
         <Link
@@ -75,12 +83,16 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Logo mark */}
           <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-xl">TJ</span>
-            </div>
+            <Image
+              src="/images/logo.jpg"
+              alt="Rally logo"
+              width={56}
+              height={56}
+              className="rounded-2xl mx-auto mb-5 shadow-lg"
+            />
             <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
             <p className="text-muted-foreground text-sm mt-1.5">
-              Sign in to your Trading Journal
+              Sign in to Rally
             </p>
           </div>
 

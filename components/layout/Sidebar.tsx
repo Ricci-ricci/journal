@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAccounts } from "@/contexts/AccountsContext";
@@ -208,19 +209,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
         {!isCollapsed && (
           <Link href="/dashboard" className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">TJ</span>
-            </div>
-            <span className="ml-3 text-lg font-semibold text-foreground">
-              Trading Journal
+            <Image
+              src="/images/logo.jpg"
+              alt="Rally logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
+            <span
+              className="ml-3 text-lg text-foreground"
+              style={{ fontFamily: "var(--font-rally)" }}
+            >
+              Rally
             </span>
           </Link>
         )}
 
         {isCollapsed && (
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto">
-            <span className="text-white font-bold text-sm">TJ</span>
-          </div>
+          <Image
+            src="/images/logo.jpg"
+            alt="Rally logo"
+            width={32}
+            height={32}
+            className="rounded-lg mx-auto"
+          />
         )}
 
         <button

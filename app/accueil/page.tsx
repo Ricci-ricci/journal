@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 const features = [
   {
@@ -137,11 +138,18 @@ export default function AccueilPage() {
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">TJ</span>
-          </div>
-          <span className="text-lg font-semibold tracking-tight">
-            Trading Journal
+          <Image
+            src="/images/logo.jpg"
+            alt="Rally logo"
+            width={32}
+            height={32}
+            className="rounded-lg shrink-0"
+          />
+          <span
+            className="text-lg tracking-tight"
+            style={{ fontFamily: "var(--font-rally)" }}
+          >
+            Rally
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -182,9 +190,9 @@ export default function AccueilPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-10">
-            A professional trading journal built for serious traders. Log
-            trades, analyze performance patterns, and build the discipline that
-            separates consistent winners from the rest.
+            Rally is a professional trading journal built for serious traders.
+            Log trades, analyze performance patterns, and build the discipline
+            that separates consistent winners from the rest.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -259,7 +267,7 @@ export default function AccueilPage() {
           </h2>
           <p className="text-muted-foreground mb-8">
             Join traders who use their journal as their edge. Start tracking
-            today — it's free.
+            today — it&apos;s free.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -282,15 +290,22 @@ export default function AccueilPage() {
       <footer className="border-t border-border px-6 py-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-xs">TJ</span>
-            </div>
-            <span className="text-sm text-muted-foreground font-medium">
-              Trading Journal
+            <Image
+              src="/images/logo.jpg"
+              alt="Rally logo"
+              width={24}
+              height={24}
+              className="rounded shrink-0"
+            />
+            <span
+              className="text-sm text-muted-foreground font-medium"
+              style={{ fontFamily: "var(--font-rally)" }}
+            >
+              Rally
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Trading Journal. All rights reserved.
+            © {new Date().getFullYear()} Rally. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">

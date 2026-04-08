@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 interface NavItem {
   href: string;
@@ -126,11 +127,18 @@ export const Navigation: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/dashboard" className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TJ</span>
-              </div>
-              <span className="ml-3 text-xl font-semibold text-foreground">
-                Trading Journal
+              <Image
+                src="/images/logo.jpg"
+                alt="Rally logo"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
+              <span
+                className="ml-3 text-xl text-foreground"
+                style={{ fontFamily: "var(--font-rally)" }}
+              >
+                Rally
               </span>
             </Link>
           </div>
