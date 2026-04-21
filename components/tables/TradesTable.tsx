@@ -8,6 +8,7 @@ import {
   DeleteIconButton,
   ViewIconButton,
   CloseTradeIconButton,
+  IconButton,
 } from "../ui/IconButton";
 
 interface Trade {
@@ -44,6 +45,7 @@ interface TradesTableProps {
   onDeleteTrade?: (tradeId: string) => void;
   onViewTrade?: (trade: Trade) => void;
   onCloseTrade?: (trade: Trade) => void;
+  onShareTrade?: (trade: Trade) => void;
 }
 
 const formatDate = (dateString: string): string => {
@@ -97,6 +99,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
   onDeleteTrade,
   onViewTrade,
   onCloseTrade,
+  onShareTrade,
 }) => {
   if (loading) {
     return (
@@ -322,6 +325,29 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                           onClick={() => onCloseTrade(trade)}
                         />
                       )}
+                    {onShareTrade && (
+                      <IconButton
+                        variant="default"
+                        tooltip="Share"
+                        size="md"
+                        onClick={() => onShareTrade(trade)}
+                        icon={
+                          <svg
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            className="w-full h-full"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                            />
+                          </svg>
+                        }
+                      />
+                    )}
                     {onDeleteTrade && (
                       <DeleteIconButton
                         size="md"

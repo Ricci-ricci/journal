@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Layout } from "../../components/layout/Layout";
 import { TradesTable } from "../../components/tables/TradesTable";
 import { CloseTradeModal } from "../../components/modals/CloseTradeModal";
+import { ShareTradeModal } from "../../components/modals/ShareTradeModal";
 import { Button } from "../../components/ui/Button";
 import { AddIconButton } from "../../components/ui/IconButton";
 import { Input } from "../../components/ui/Input";
@@ -18,6 +19,33 @@ import {
 } from "../../components/ui/Card";
 import { useAccounts } from "../../contexts/AccountsContext";
 import { useAuth } from "../../contexts/AuthContext";
+
+interface PostUser {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
+interface PostWithRelations {
+  id: string;
+  userId: string;
+  user: PostUser;
+  tradeId: string | null;
+  caption: string | null;
+  showPnL: boolean;
+  showAccountSize: boolean;
+  symbol: string;
+  direction: "LONG" | "SHORT";
+  assetType: string | null;
+  entryPrice: number;
+  exitPrice: number | null;
+  profitLoss: number | null;
+  profitLossPct: number | null;
+  status: "OPEN" | "CLOSED" | "PARTIAL";
+  createdAt: string;
+  _count: { likes: number; comments: number };
+  likedByMe: boolean;
+}
 
 interface Trade {
   id: string;
@@ -95,6 +123,9 @@ const TradesPage: React.FC = () => {
   // Close trade modal state
   const [tradeToClose, setTradeToClose] = useState<Trade | null>(null);
   const [closeLoading, setCloseLoading] = useState(false);
+
+  // Share trade modal state
+  const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -276,6 +307,11 @@ const TradesPage: React.FC = () => {
     }
   };
 
+  const handleShareTrade = (trade: Trade) => setTradeToShare(trade);
+
+  const handleShared: (post: PostWithRelations) => void = () =>
+    setTradeToShare(null);
+
   const handleEditTrade = (trade: Trade) => {
     router.push(`/trades/${trade.id}/edit`);
   };
@@ -294,6 +330,12 @@ const TradesPage: React.FC = () => {
 
   return (
     <Layout title="My Trades">
+      {/* Share Trade Modal */}
+      <ShareTradeModal
+        trade={tradeToShare}
+        onClose={() => setTradeToShare(null)}
+        onShared={handleShared}
+      />
       {/* Close Trade Modal */}
       <CloseTradeModal
         trade={tradeToClose}
@@ -508,6 +550,7 @@ const TradesPage: React.FC = () => {
               onDeleteTrade={handleDeleteTrade}
               onViewTrade={handleViewTrade}
               onCloseTrade={handleCloseTrade}
+              onShareTrade={handleShareTrade}
             />
           </CardContent>
         </Card>
