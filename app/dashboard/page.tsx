@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardContent,
 } from "../../components/ui/Card";
+import { TradeActivityHeatmap } from "../../components/dashboard/TradeActivityHeatmap";
 import { useAccounts } from "../../contexts/AccountsContext";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -539,7 +540,13 @@ export default function DashboardPage() {
           </Card>
         )}
 
+        {/* ── Day heatmap + Recent Trades row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* ── Trades by day ── */}
+          <div className="lg:col-span-1">
+            <TradeActivityHeatmap />
+          </div>
+
           {/* ── Recent Trades ── */}
           <div className="lg:col-span-2">
             <Card>
@@ -624,8 +631,10 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* ── Right column ── */}
-          <div className="space-y-6">
+        </div>
+
+        {/* ── Quick Actions + Performance Summary row ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Quick Actions */}
             <Card>
               <CardHeader>
@@ -754,7 +763,6 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             )}
-          </div>
         </div>
       </div>
     </Layout>
