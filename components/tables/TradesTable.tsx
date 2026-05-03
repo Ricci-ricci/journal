@@ -41,6 +41,7 @@ interface Trade {
 interface TradesTableProps {
   trades: Trade[];
   loading?: boolean;
+  deletingId?: string | null;
   onEditTrade?: (trade: Trade) => void;
   onDeleteTrade?: (tradeId: string) => void;
   onViewTrade?: (trade: Trade) => void;
@@ -95,6 +96,7 @@ const getProfitLossColor = (profitLoss: number | null): string => {
 export const TradesTable: React.FC<TradesTableProps> = ({
   trades,
   loading = false,
+  deletingId = null,
   onEditTrade,
   onDeleteTrade,
   onViewTrade,
@@ -209,10 +211,16 @@ export const TradesTable: React.FC<TradesTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {trades.map((trade) => (
+            {trades.map((trade) => {
+              const isDeleting = deletingId === trade.id;
+              return (
               <tr
                 key={trade.id}
-                className="hover:bg-muted/30 transition-colors"
+                className={`transition-all duration-300 ease-out ${
+                  isDeleting
+                    ? "opacity-0 -translate-x-4 bg-red-500/10 pointer-events-none"
+                    : "hover:bg-muted/30"
+                }`}
               >
                 <td className="px-3 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
@@ -351,13 +359,15 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     {onDeleteTrade && (
                       <DeleteIconButton
                         size="md"
+                        disabled={isDeleting}
                         onClick={() => onDeleteTrade(trade.id)}
                       />
                     )}
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

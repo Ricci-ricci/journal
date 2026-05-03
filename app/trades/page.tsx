@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Layout } from "../../components/layout/Layout";
 import { TradesTable } from "../../components/tables/TradesTable";
 import { CloseTradeModal } from "../../components/modals/CloseTradeModal";
+import { DeleteTradeModal } from "../../components/modals/DeleteTradeModal";
 import { ShareTradeModal } from "../../components/modals/ShareTradeModal";
 import { Button } from "../../components/ui/Button";
 import { AddIconButton } from "../../components/ui/IconButton";
@@ -124,6 +125,11 @@ const TradesPage: React.FC = () => {
   const [tradeToClose, setTradeToClose] = useState<Trade | null>(null);
   const [closeLoading, setCloseLoading] = useState(false);
 
+  // Delete trade modal state
+  const [tradeToDelete, setTradeToDelete] = useState<Trade | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   // Share trade modal state
   const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
 
@@ -192,41 +198,55 @@ const TradesPage: React.FC = () => {
     return matchesSearch;
   });
 
-  const handleDeleteTrade = async (tradeId: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this trade? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
+  const handleDeleteTrade = (tradeId: string) => {
+    const trade = trades.find((t) => t.id === tradeId);
+    if (trade) setTradeToDelete(trade);
+  };
 
+  const handleDeleteTradeConfirm = async () => {
+    if (!tradeToDelete) return;
+    const tradeId = tradeToDelete.id;
+
+    setDeleteLoading(true);
     try {
       const response = await fetch(`/api/trades/${tradeId}`, {
         method: "DELETE",
       });
       const result = await response.json();
 
-      if (result.success) {
-        setTrades((prev) => prev.filter((t) => t.id !== tradeId));
-        setStats((prev) => {
-          if (!prev) return prev;
-          const remaining = trades.filter((t) => t.id !== tradeId);
+      if (!result.success) {
+        alert("Failed to delete trade: " + (result.error || result.details));
+        setDeleteLoading(false);
+        return;
+      }
+
+      // Close modal, then play the row animation before removing from state
+      setTradeToDelete(null);
+      setDeleteLoading(false);
+      setDeletingId(tradeId);
+
+      setTimeout(() => {
+        setTrades((prev) => {
+          const remaining = prev.filter((t) => t.id !== tradeId);
           const closed = remaining.filter((t) => t.status === "CLOSED");
           const winning = closed.filter((t) => (t.profitLoss || 0) > 0).length;
-          return {
+          setStats({
             totalTrades: remaining.length,
             openTrades: remaining.filter((t) => t.status === "OPEN").length,
             closedTrades: closed.length,
             totalPnL: closed.reduce((s, t) => s + (t.profitLoss || 0), 0),
             winRate: closed.length > 0 ? (winning / closed.length) * 100 : 0,
-          };
+          });
+          return remaining;
         });
-      } else {
-        alert("Failed to delete trade: " + result.error);
-      }
+        setDeletingId(null);
+        // Account balance depends on trades — refresh sidebar balances
+        refetchAccounts();
+      }, 320);
     } catch (error) {
       console.error("Failed to delete trade:", error);
+      alert("An unexpected error occurred. Please try again.");
+      setDeleteLoading(false);
     }
   };
 
@@ -342,6 +362,13 @@ const TradesPage: React.FC = () => {
         onConfirm={handleCloseTradeConfirm}
         onCancel={() => setTradeToClose(null)}
         loading={closeLoading}
+      />
+      {/* Delete Trade Modal */}
+      <DeleteTradeModal
+        trade={tradeToDelete}
+        onConfirm={handleDeleteTradeConfirm}
+        onCancel={() => setTradeToDelete(null)}
+        loading={deleteLoading}
       />
       <div className="space-y-6">
         {/* Period toggle + header row */}
@@ -546,6 +573,7 @@ const TradesPage: React.FC = () => {
             <TradesTable
               trades={filteredTrades}
               loading={loading}
+              deletingId={deletingId}
               onEditTrade={handleEditTrade}
               onDeleteTrade={handleDeleteTrade}
               onViewTrade={handleViewTrade}

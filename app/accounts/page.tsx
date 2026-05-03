@@ -19,6 +19,7 @@ import {
   DeleteIconButton,
 } from "../../components/ui/IconButton";
 import { useAuth } from "../../contexts/AuthContext";
+import { useAccounts } from "../../contexts/AccountsContext";
 
 interface Account {
   id: string;
@@ -40,6 +41,7 @@ const AccountsPage: React.FC = () => {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
+  const { refetch: refetchAccountsContext } = useAccounts();
 
   useEffect(() => {
     fetchAccounts();
@@ -95,7 +97,7 @@ const AccountsPage: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchAccounts();
+        await Promise.all([fetchAccounts(), refetchAccountsContext()]);
         setShowForm(false);
         alert("Account created successfully!");
       } else {
@@ -139,7 +141,7 @@ const AccountsPage: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchAccounts();
+        await Promise.all([fetchAccounts(), refetchAccountsContext()]);
         setShowForm(false);
         setEditingAccount(null);
         alert("Account updated successfully!");
@@ -174,6 +176,7 @@ const AccountsPage: React.FC = () => {
 
       if (result.success) {
         setAccounts((prev) => prev.filter((acc) => acc.id !== accountId));
+        await refetchAccountsContext();
         alert("Account deleted successfully!");
       } else {
         console.error("Failed to delete account:", result.error);
