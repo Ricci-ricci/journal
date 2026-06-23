@@ -26,6 +26,7 @@ model User {
   posts      Post[]
   likes      Like[]
   comments   Comment[]
+  backtests  Backtest[]
 }
 
 model TradingAccount {
@@ -148,6 +149,38 @@ model Strategy {
   trades Trade[]
 
   @@index([userId])
+}
+
+model Backtest {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  platform  String?
+  symbol    String?
+  timeFrame String?
+
+  // The month this backtest covers (stored as the first day of the month)
+  periodMonth DateTime
+
+  // Results — all optional so any subset can be recorded
+  totalPnL       Float?
+  winRate        Float?
+  totalTrades    Int    @default(0)
+  winningTrades  Int?
+  losingTrades   Int?
+  profitFactor   Float?
+  maxDrawdown    Float?
+  initialBalance Float?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([periodMonth])
 }
 
 model PerformanceMetric {
