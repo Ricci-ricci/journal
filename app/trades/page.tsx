@@ -10,7 +10,7 @@ import { DeleteTradeModal } from "../../components/modals/DeleteTradeModal";
 import { ShareTradeModal } from "../../components/modals/ShareTradeModal";
 import { Button } from "../../components/ui/Button";
 import { AddIconButton } from "../../components/ui/IconButton";
-import { Input } from "../../components/ui/Input";
+import { SearchInput } from "../../components/ui/SearchInput";
 import { Select } from "../../components/ui/Select";
 import {
   Card,
@@ -349,7 +349,16 @@ const TradesPage: React.FC = () => {
   const formatPercent = (percent: number): string => `${percent.toFixed(1)}%`;
 
   return (
-    <Layout title="My Trades">
+    <Layout
+      title="My Trades"
+      headerRight={
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by symbol..."
+        />
+      }
+    >
       {/* Share Trade Modal */}
       <ShareTradeModal
         trade={tradeToShare}
@@ -510,28 +519,7 @@ const TradesPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             {/* Filters */}
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Input
-                placeholder="Search by symbol..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                leftIcon={
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                }
-              />
-
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
               <Select
                 options={statusOptions}
                 value={statusFilter}

@@ -10,12 +10,15 @@ interface LayoutProps {
   children: React.ReactNode;
   showSidebar?: boolean;
   title?: string;
+  /* Optional content pinned to the top-right of the page header (e.g. a search box). */
+  headerRight?: React.ReactNode;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
   children,
   showSidebar = true,
   title,
+  headerRight,
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState<boolean>(
     () => {
@@ -49,10 +52,17 @@ export const Layout: React.FC<LayoutProps> = ({
         )}
 
         <div className="flex flex-col flex-1 overflow-hidden">
-          {title && (
-            <header className="flex-shrink-0 bg-card border-b border-border">
-              <div className="px-4 sm:px-6 lg:px-8 py-6">
-                <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          {(title || headerRight) && (
+            <header className="flex-shrink-0 bg-card">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {title && (
+                  <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+                )}
+                {headerRight && (
+                  <div className="w-full sm:w-72 sm:ml-auto flex-shrink-0">
+                    {headerRight}
+                  </div>
+                )}
               </div>
             </header>
           )}

@@ -26,7 +26,7 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
-import { Input } from "../../components/ui/Input";
+import { SearchInput } from "../../components/ui/SearchInput";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface Strategy {
@@ -288,7 +288,16 @@ const StrategiesPage: React.FC = () => {
   }
 
   return (
-    <Layout title="Trading Strategies">
+    <Layout
+      title="Trading Strategies"
+      headerRight={
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search strategies..."
+        />
+      }
+    >
       <div className="space-y-6">
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -312,29 +321,6 @@ const StrategiesPage: React.FC = () => {
         <Card>
           <CardContent>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Search strategies..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  leftIcon={
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  }
-                />
-              </div>
-
               <div className="flex space-x-2">
                 <Button
                   variant={filterActive === null ? "primary" : "outline"}

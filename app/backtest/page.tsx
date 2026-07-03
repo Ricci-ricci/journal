@@ -15,7 +15,7 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
-import { Input } from "../../components/ui/Input";
+import { SearchInput } from "../../components/ui/SearchInput";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface Backtest {
@@ -216,6 +216,18 @@ const BacktestPage: React.FC = () => {
         winRateValues.length
       : null;
 
+  // ─── Account returns ──────────────────────────────────────────────────────
+  // Every backtest that has a computable return on its account.
+  const accountReturns = backtests
+    .map((b) => ({ backtest: b, ret: returnOnAccount(b) }))
+    .filter((r): r is { backtest: Backtest; ret: number } => r.ret !== null);
+
+  // Combined return: the sum of every account's return percentage.
+  const combinedReturn = accountReturns.reduce((sum, r) => sum + r.ret, 0);
+
+  const formatSignedPercent = (value: number): string =>
+    `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+
   // ─── Form view ────────────────────────────────────────────────────────────
   if (showForm) {
     return (
@@ -263,7 +275,16 @@ const BacktestPage: React.FC = () => {
 
   // ─── List view ────────────────────────────────────────────────────────────
   return (
-    <Layout title="Backtests">
+    <Layout
+      title="Backtests"
+      headerRight={
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by name, platform or symbol..."
+        />
+      }
+    >
       <div className="space-y-6">
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -331,35 +352,60 @@ const BacktestPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Search */}
-        <Card>
-          <CardContent>
-            <Input
-              placeholder="Search by name, platform or symbol..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              leftIcon={
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              }
-            />
-            <p className="text-sm text-muted-foreground mt-4">
-              Showing {filtered.length} of {backtests.length} backtests
-              {searchTerm && <span className="ml-1">(filtered)</span>}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Account Returns */}
+        {accountReturns.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <CardTitle>Account Returns</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Return on account size for each backtest, combined.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">
+                    Combined Return
+                  </p>
+                  <p
+                    className={`text-2xl font-bold ${
+                      combinedReturn >= 0
+                        ? "text-emerald-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {formatSignedPercent(combinedReturn)}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {accountReturns.map(({ backtest: b, ret }) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-1.5"
+                  >
+                    <span className="text-sm text-foreground">{b.name}</span>
+                    <span
+                      className={`text-sm font-semibold ${
+                        ret >= 0 ? "text-emerald-400" : "text-red-400"
+                      }`}
+                    >
+                      {formatSignedPercent(ret)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Results count */}
+        <p className="text-sm text-muted-foreground">
+          Showing {filtered.length} of {backtests.length} backtests
+          {searchTerm && <span className="ml-1">(filtered)</span>}
+        </p>
 
         {/* List */}
         {loading ? (

@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     const inputClasses = [
-      "block w-full rounded-md border-0 py-1.5 bg-transparent text-foreground shadow-sm ring-1 ring-inset",
+      "block w-full rounded-md border-0 py-1.5 bg-background text-foreground shadow-sm ring-1 ring-inset",
       error
         ? "ring-destructive placeholder:text-destructive/50 focus:ring-2 focus:ring-inset focus:ring-destructive"
         : "ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring",
