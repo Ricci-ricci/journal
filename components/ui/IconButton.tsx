@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Eye,
   Pencil,
-  Plus,
   Power,
   Trash2,
 } from "lucide-react";
@@ -32,13 +31,13 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   tooltipPosition?: "top" | "bottom" | "left" | "right";
 }
 
-/* Row actions stay grey until hovered; only then does the meaning show. */
+/* Row actions stay quiet until hovered; only then does the meaning show. */
 const quiet = "text-muted-foreground hover:bg-accent hover:text-foreground";
 const variantClasses: Record<IconButtonVariant, string> = {
   default: quiet,
   edit: quiet,
   delete: "text-muted-foreground hover:bg-loss/10 hover:text-loss",
-  add: "bg-primary text-primary-foreground hover:bg-primary/85",
+  add: "bg-primary text-primary-foreground shadow-button hover:bg-primary/90",
   success: "text-muted-foreground hover:bg-profit/10 hover:text-profit",
   warning: "text-muted-foreground hover:bg-warn/10 hover:text-warn",
   close: "text-muted-foreground hover:bg-profit/10 hover:text-profit",
@@ -81,7 +80,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         aria-label={tooltip}
         disabled={disabled || loading}
         className={cn(
-          "inline-flex items-center justify-center rounded-md transition-colors",
+          "inline-flex items-center justify-center rounded-lg transition-colors",
           "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
           "disabled:opacity-40 disabled:cursor-not-allowed",
           variantClasses[variant],
@@ -106,7 +105,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         <span
           role="tooltip"
           className={cn(
-            "pointer-events-none absolute z-50 hidden whitespace-nowrap rounded bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background",
+            "pointer-events-none absolute z-50 hidden whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-[11px] font-medium text-foreground shadow-pop",
             "group-hover/tip:block group-focus-within/tip:block",
             tooltipPositionClasses[tooltipPosition],
           )}
@@ -137,15 +136,6 @@ export const DeleteIconButton: React.FC<Preset> = (props) => (
     variant="delete"
     tooltip="Delete"
     icon={<Trash2 className={full} />}
-    {...props}
-  />
-);
-
-export const AddIconButton: React.FC<Preset> = (props) => (
-  <IconButton
-    variant="add"
-    tooltip="Add"
-    icon={<Plus className={full} />}
     {...props}
   />
 );

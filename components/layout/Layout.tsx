@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Sidebar } from "./Sidebar";
 import { Wordmark } from "./Wordmark";
 
@@ -39,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="h-dvh overflow-hidden flex bg-background">
+    <div className="h-dvh overflow-hidden flex bg-sidebar">
       {showSidebar && (
         <div className="hidden lg:block flex-shrink-0 h-full">
           <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
@@ -50,7 +51,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {showSidebar && isDrawerOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
           <div
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsDrawerOpen(false)}
           />
           <div className="relative h-full animate-in slide-in-from-left duration-200">
@@ -62,7 +63,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
           <button
             onClick={() => setIsDrawerOpen(false)}
-            className="relative m-3 inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-accent"
+            className="relative m-3 inline-flex h-9 w-9 items-center justify-center rounded-lg text-foreground hover:bg-accent"
           >
             <span className="sr-only">Close menu</span>
             <X className="h-5 w-5" />
@@ -70,52 +71,49 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
       )}
 
-      <div className="flex flex-col flex-1 min-w-0">
-        {showSidebar && (
-          <div className="lg:hidden flex-shrink-0 flex items-center justify-between h-14 pl-4 pr-2 border-b border-border">
-            <Link href="/dashboard">
-              <Wordmark />
-            </Link>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <span className="sr-only">Open menu</span>
-              <Menu className="h-5 w-5" />
-            </button>
-          </div>
+      {/* The page sits on a raised sheet beside the sidebar. */}
+      <div
+        className={cn(
+          "flex flex-col flex-1 min-w-0 bg-background overflow-hidden",
+          showSidebar &&
+            "lg:my-2 lg:mr-2 lg:rounded-2xl lg:border lg:border-border lg:shadow-card",
+        )}
+      >
+        {(showSidebar || title || headerRight) && (
+          <header className="flex-shrink-0 flex items-center gap-3 h-14 px-4 sm:px-6 lg:px-8 border-b border-border bg-card/40">
+            {showSidebar && (
+              <Link href="/dashboard" className="lg:hidden flex-shrink-0">
+                <Wordmark markOnly />
+              </Link>
+            )}
+            {title && (
+              <h1 className="font-heading text-[15px] leading-none text-foreground truncate">
+                {title}
+              </h1>
+            )}
+            <div className="ml-auto flex items-center gap-2 min-w-0">
+              {headerRight && (
+                <div className="w-40 sm:w-72 min-w-0">{headerRight}</div>
+              )}
+              {showSidebar && (
+                <button
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="lg:hidden inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <span className="sr-only">Open menu</span>
+                  <Menu className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </header>
         )}
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-10 pt-6 lg:pt-9 pb-16">
-            {(title || headerRight) && (
-              <header className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-                {title && (
-                  <h1 className="font-heading text-[32px] leading-none tracking-tight text-foreground">
-                    {title}
-                  </h1>
-                )}
-                {headerRight && (
-                  <div className="w-full sm:w-64 sm:ml-auto flex-shrink-0">
-                    {headerRight}
-                  </div>
-                )}
-              </header>
-            )}
+        <main className="flex-1 overflow-y-auto glow">
+          <div className="mx-auto w-full max-w-[1360px] px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8 pb-16">
             {children}
           </div>
         </main>
       </div>
-    </div>
-  );
-};
-
-export const SimpleLayout: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  return (
-    <div className="min-h-dvh bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      {children}
     </div>
   );
 };

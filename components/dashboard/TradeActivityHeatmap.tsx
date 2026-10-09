@@ -148,12 +148,18 @@ export function TradeActivityHeatmap() {
     return 1;
   }
 
-  // One neutral ramp: activity is a count, not a gain or a loss.
+  // One accent ramp: activity is a count, not a gain or a loss.
   function cellStyle(count: number, buckets: number[]): React.CSSProperties {
-    const steps = [5, 18, 34, 54, 78];
-    const pct = steps[intensity(count, buckets)];
+    const level = intensity(count, buckets);
+    if (level === 0) {
+      return {
+        backgroundColor:
+          "color-mix(in oklab, var(--foreground) 5%, transparent)",
+      };
+    }
+    const pct = [0, 26, 48, 72, 100][level];
     return {
-      backgroundColor: `color-mix(in oklab, var(--foreground) ${pct}%, transparent)`,
+      backgroundColor: `color-mix(in oklab, var(--primary) ${pct}%, transparent)`,
     };
   }
 
@@ -199,7 +205,7 @@ export function TradeActivityHeatmap() {
                 onClick={() => shiftMonth(-1)}
                 disabled={!canGoPrev}
                 aria-label="Previous month"
-                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -210,7 +216,7 @@ export function TradeActivityHeatmap() {
                 onClick={() => shiftMonth(1)}
                 disabled={!canGoNext}
                 aria-label="Next month"
-                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
+                className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -235,7 +241,7 @@ export function TradeActivityHeatmap() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-1.5 mb-2">
           {DAY_HEADERS.map((d) => (
             <div
               key={d}
@@ -246,16 +252,16 @@ export function TradeActivityHeatmap() {
           ))}
         </div>
         {loading ? (
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1.5">
             {Array.from({ length: 35 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-square rounded-sm bg-muted/50"
+                className="aspect-square rounded-md bg-muted/50"
               />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1.5">
             {calendar.cells.map((cell, i) => {
               if (cell.day === null) {
                 return <div key={i} className="aspect-square" />;
@@ -265,15 +271,15 @@ export function TradeActivityHeatmap() {
                 <div
                   key={i}
                   title={`${dateLabel} — ${cell.count} trade${cell.count !== 1 ? "s" : ""}`}
-                  className={`num aspect-square rounded-sm flex items-center justify-center text-[10px] ${
-                    cell.isToday ? "ring-1 ring-inset ring-foreground" : ""
+                  className={`num aspect-square rounded-md flex items-center justify-center text-[11px] ${
+                    cell.isToday ? "ring-2 ring-inset ring-foreground/80" : ""
                   }`}
                   style={cellStyle(cell.count, calendar.buckets)}
                 >
                   <span
                     className={
                       intensity(cell.count, calendar.buckets) >= 3
-                        ? "text-background"
+                        ? "text-primary-foreground font-medium"
                         : cell.count > 0
                           ? "text-foreground"
                           : "text-muted-foreground/70"

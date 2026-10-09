@@ -30,18 +30,24 @@ interface SidebarItem {
   icon: LucideIcon;
 }
 
-const sidebarGroups: SidebarItem[][] = [
-  [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-    { href: "/trades", label: "Trades", icon: LineChart },
-    { href: "/journal", label: "Journal", icon: BookOpen },
-    { href: "/strategies", label: "Strategies", icon: Target },
-    { href: "/backtest", label: "Backtest", icon: FlaskConical },
-  ],
-  [
-    { href: "/accounts", label: "Accounts", icon: Wallet },
-    { href: "/feed", label: "Feed", icon: Users },
-  ],
+const sidebarGroups: { label: string; items: SidebarItem[] }[] = [
+  {
+    label: "Trading",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+      { href: "/trades", label: "Trades", icon: LineChart },
+      { href: "/journal", label: "Journal", icon: BookOpen },
+      { href: "/strategies", label: "Strategies", icon: Target },
+      { href: "/backtest", label: "Backtest", icon: FlaskConical },
+    ],
+  },
+  {
+    label: "Workspace",
+    items: [
+      { href: "/accounts", label: "Accounts", icon: Wallet },
+      { href: "/feed", label: "Feed", icon: Users },
+    ],
+  },
 ];
 
 const initialsOf = (name?: string | null, email?: string | null): string => {
@@ -92,26 +98,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const itemClasses = (active: boolean) =>
     cn(
-      "flex items-center gap-2.5 rounded-md text-sm transition-colors",
-      isCollapsed ? "justify-center h-9 w-9 mx-auto" : "h-8 px-2.5",
+      "group flex items-center gap-3 rounded-lg text-sm transition-colors",
+      isCollapsed ? "justify-center h-9 w-9 mx-auto" : "h-9 px-2.5",
       active
-        ? "bg-sidebar-accent text-foreground font-medium"
+        ? "bg-sidebar-accent text-foreground font-medium shadow-card"
         : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
     );
 
   return (
     <aside
       className={cn(
-        "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-[width] duration-200",
-        isCollapsed ? "w-14" : "w-60",
+        "flex flex-col h-full bg-sidebar transition-[width] duration-200",
+        isCollapsed ? "w-16" : "w-64",
         className,
       )}
     >
       {/* ── Wordmark + collapse ── */}
       <div
         className={cn(
-          "flex items-center h-14 flex-shrink-0",
-          isCollapsed ? "justify-center" : "justify-between pl-4 pr-2",
+          "flex items-center h-16 flex-shrink-0",
+          isCollapsed ? "justify-center" : "justify-between pl-5 pr-3",
         )}
       >
         {!isCollapsed && (
@@ -122,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onToggle}
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="hidden lg:inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+          className="hidden lg:inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
         >
           {isCollapsed ? (
             <PanelLeftOpen className="h-4 w-4" />
@@ -134,11 +140,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* ── Account switcher ── */}
       {!isCollapsed && (
-        <div className="relative flex-shrink-0 px-2 pb-2">
+        <div className="relative flex-shrink-0 px-3 pb-3">
           <button
             onClick={() => setDropdownOpen((v) => !v)}
             aria-expanded={dropdownOpen}
-            className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border px-2.5 py-2 text-left hover:bg-sidebar-accent/60 transition-colors"
+            className="w-full flex items-center justify-between gap-2 rounded-xl border border-sidebar-border bg-sidebar-accent/50 px-3 py-2.5 text-left shadow-card hover:bg-sidebar-accent transition-colors"
           >
             <span className="min-w-0">
               <span className="block text-[13px] font-medium text-foreground truncate">
@@ -169,14 +175,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="fixed inset-0 z-40"
                 onClick={() => setDropdownOpen(false)}
               />
-              <div className="absolute left-2 right-2 top-full z-50 -mt-1 max-h-80 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-lg shadow-black/30">
+              <div className="absolute left-3 right-3 top-full z-50 -mt-2 max-h-80 overflow-y-auto rounded-xl border border-border bg-popover p-1.5 shadow-pop">
                 <button
                   onClick={() => selectAccount(null)}
-                  className="w-full flex items-center justify-between gap-2 rounded px-2 py-1.5 text-[13px] text-left hover:bg-accent transition-colors"
+                  className="w-full flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-[13px] text-left hover:bg-accent transition-colors"
                 >
                   <span className="text-foreground">All accounts</span>
                   {!activeAccountId && (
-                    <Check className="h-3.5 w-3.5 text-foreground flex-shrink-0" />
+                    <Check className="h-3.5 w-3.5 text-brand flex-shrink-0" />
                   )}
                 </button>
 
@@ -184,7 +190,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={acc.id}
                     onClick={() => selectAccount(acc.id)}
-                    className="w-full flex items-center justify-between gap-2 rounded px-2 py-1.5 text-left hover:bg-accent transition-colors"
+                    className="w-full flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-accent transition-colors"
                   >
                     <span className="min-w-0">
                       <span className="block text-[13px] text-foreground truncate">
@@ -209,7 +215,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
                     </span>
                     {activeAccountId === acc.id && (
-                      <Check className="h-3.5 w-3.5 text-foreground flex-shrink-0" />
+                      <Check className="h-3.5 w-3.5 text-brand flex-shrink-0" />
                     )}
                   </button>
                 ))}
@@ -220,14 +226,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* ── Navigation ── */}
-      <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-2">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-1">
         <Link
           href="/trades/new"
           onClick={onNavigate}
           title={isCollapsed ? "New trade" : undefined}
           className={cn(
-            "flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/85 transition-colors mb-3",
-            isCollapsed ? "justify-center h-9 w-9 mx-auto" : "h-8 px-2.5",
+            "flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow-button hover:bg-primary/90 transition-colors mb-5",
+            isCollapsed ? "h-9 w-9 mx-auto" : "h-9 px-3",
           )}
         >
           <Plus className="h-4 w-4 flex-shrink-0" />
@@ -235,25 +241,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </Link>
 
         {sidebarGroups.map((group, i) => (
-          <div
-            key={i}
-            className={cn(
-              "space-y-0.5",
-              i > 0 && "mt-3 pt-3 border-t border-sidebar-border",
+          <div key={group.label} className={cn("space-y-0.5", i > 0 && "mt-5")}>
+            {isCollapsed ? (
+              i > 0 && <div className="mx-3 mb-3 border-t border-sidebar-border" />
+            ) : (
+              <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                {group.label}
+              </p>
             )}
-          >
-            {group.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={onNavigate}
-                title={isCollapsed ? label : undefined}
-                className={itemClasses(isActivePath(href))}
-              >
-                <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={1.75} />
-                {!isCollapsed && label}
-              </Link>
-            ))}
+            {group.items.map(({ href, label, icon: Icon }) => {
+              const active = isActivePath(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onNavigate}
+                  title={isCollapsed ? label : undefined}
+                  className={itemClasses(active)}
+                >
+                  <Icon
+                    className={cn(
+                      "h-4 w-4 flex-shrink-0 transition-colors",
+                      active
+                        ? "text-brand"
+                        : "text-muted-foreground group-hover:text-foreground",
+                    )}
+                    strokeWidth={1.75}
+                  />
+                  {!isCollapsed && label}
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
@@ -261,13 +279,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* ── User ── */}
       <div
         className={cn(
-          "flex-shrink-0 flex items-center gap-2.5 border-t border-sidebar-border",
-          isCollapsed ? "justify-center py-3" : "px-3 py-3",
+          "flex-shrink-0 flex items-center gap-3",
+          isCollapsed ? "justify-center py-4" : "px-4 py-4",
         )}
       >
         <span
           title={user?.email ?? undefined}
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-[11px] font-medium text-foreground"
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[oklch(0.6_0.2_320)] text-[11px] font-semibold text-primary-foreground shadow-button"
         >
           {initialsOf(user?.name, user?.email)}
         </span>
@@ -275,7 +293,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && (
           <>
             <span className="flex-1 min-w-0">
-              <span className="block text-[13px] text-foreground truncate">
+              <span className="block text-[13px] font-medium text-foreground truncate">
                 {user?.name ?? user?.email ?? "My account"}
               </span>
               {user?.name && (
@@ -287,7 +305,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={logout}
               title="Sign out"
-              className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
             >
               <span className="sr-only">Sign out</span>
               <LogOut className="h-4 w-4" />

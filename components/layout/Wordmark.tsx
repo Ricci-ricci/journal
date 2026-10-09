@@ -14,10 +14,10 @@ export const Wordmark: React.FC<WordmarkProps> = ({ markOnly, className }) => (
       alt={markOnly ? "Rally" : ""}
       width={26}
       height={26}
-      className="rounded-[5px] shrink-0"
+      className="rounded-lg shrink-0 ring-1 ring-white/10"
     />
     {!markOnly && (
-      <span className="font-heading text-[21px] leading-none tracking-tight text-foreground">
+      <span className="font-heading text-[17px] leading-none text-foreground">
         Rally
       </span>
     )}

@@ -6,7 +6,7 @@ import {
   AccountForm,
   AccountFormData,
 } from "../../components/forms/AccountForm";
-import { Plus } from "lucide-react";
+import { Plus, Wallet } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import {
@@ -202,7 +202,7 @@ const AccountsPage: React.FC = () => {
   if (showForm) {
     return (
       <Layout title={editingAccount ? "Edit account" : "New account"}>
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           <AccountForm
             onSubmit={
               editingAccount ? handleUpdateAccount : handleCreateAccount
@@ -231,7 +231,7 @@ const AccountsPage: React.FC = () => {
 
   return (
     <Layout title="Accounts">
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm text-muted-foreground max-w-xl">
             One per broker account. Live, demo and paper balances are tracked
@@ -248,7 +248,7 @@ const AccountsPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(19rem,1fr))] gap-4">
             {[...Array(3)].map((_, i) => (
               <Card key={i}>
                 <div className="h-3 w-1/2 rounded bg-muted" />
@@ -269,19 +269,25 @@ const AccountsPage: React.FC = () => {
             somewhere to live.
           </EmptyState>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(19rem,1fr))] gap-4">
             {accounts.map((account) => (
               <Card key={account.id}>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="text-sm font-medium text-foreground truncate">
-                      {account.name}
-                    </h2>
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                      {[account.broker, account.accountType.toLowerCase()]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      aria-hidden
+                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15 text-brand"
+                    >
+                      <Wallet className="h-[18px] w-[18px]" />
+                    </span>
+                    <div className="min-w-0">
+                      <h2 className="font-heading text-[15px] text-foreground truncate">
+                        {account.name}
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                        {account.broker || "No broker"}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center flex-shrink-0 -mt-1.5 -mr-2">
                     <EditIconButton
@@ -295,12 +301,17 @@ const AccountsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="num mt-5 text-2xl tracking-tight text-foreground">
-                  {formatCurrency(account.currentBalance, account.currency)}
+                <p className="mt-6 flex flex-wrap items-center gap-2.5">
+                  <span className="num text-3xl font-semibold tracking-tight text-foreground">
+                    {formatCurrency(account.currentBalance, account.currency)}
+                  </span>
+                  <span className="chip">
+                    {account.accountType.toLowerCase()}
+                  </span>
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground">
                   <span
-                    className={`num ${
+                    className={`num font-medium ${
                       account.totalPnL > 0
                         ? "text-profit"
                         : account.totalPnL < 0

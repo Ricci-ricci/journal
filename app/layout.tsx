@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AccountsProvider } from "@/contexts/AccountsContext";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  style: ["normal", "italic"],
-});
 
 export const metadata: Metadata = {
   title: "Rally",
@@ -30,7 +25,6 @@ export default function RootLayout({
         "dark font-sans",
         geist.variable,
         geistMono.variable,
-        newsreader.variable,
       )}
     >
       <body className="antialiased bg-background text-foreground">

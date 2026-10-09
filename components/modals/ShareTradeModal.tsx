@@ -96,7 +96,7 @@ const Toggle: React.FC<ToggleProps> = ({
           "inline-block h-3.5 w-3.5 transform rounded-full transition-transform",
           checked
             ? "translate-x-4.5 bg-primary-foreground"
-            : "translate-x-0.5 bg-muted-foreground",
+            : "translate-x-0.5 bg-foreground/70",
         ].join(" ")}
       />
     </button>
@@ -167,14 +167,14 @@ const ShareTradeForm: React.FC<ShareTradeFormProps> = ({
   };
 
   return (
-    <div className="relative z-10 w-full max-w-md rounded-lg bg-popover border border-border shadow-2xl shadow-black/50 overflow-hidden">
+    <div className="relative z-10 w-full max-w-md rounded-2xl bg-popover border border-border shadow-pop overflow-hidden">
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 px-5 pt-5">
         <div className="flex items-center gap-3">
           <div>
             <h2
               id="share-trade-title"
-              className="font-heading text-xl leading-tight text-foreground"
+              className="font-heading text-lg leading-tight text-foreground"
             >
               Share to the feed
             </h2>
@@ -190,7 +190,7 @@ const ShareTradeForm: React.FC<ShareTradeFormProps> = ({
           onClick={onClose}
           disabled={loading}
           aria-label="Close"
-          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
+          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
         >
           <X className="h-4 w-4" />
         </button>
@@ -199,7 +199,7 @@ const ShareTradeForm: React.FC<ShareTradeFormProps> = ({
       {/* ── Body ── */}
       <div className="px-5 py-5 space-y-4">
         {/* Trade preview */}
-        <div className="rounded-md border border-border px-4 py-3 space-y-1.5">
+        <div className="rounded-xl border border-border bg-background/50 px-4 py-3 space-y-1.5">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{trade.symbol}</span>{" "}
             {trade.direction.toLowerCase()} · {trade.status.toLowerCase()}
@@ -273,7 +273,7 @@ const ShareTradeForm: React.FC<ShareTradeFormProps> = ({
         {error && (
           <p
             role="alert"
-            className="rounded-md border border-loss/40 bg-loss/10 px-3 py-2.5 text-sm text-loss"
+            className="rounded-lg border border-loss/30 bg-loss/10 px-3 py-2.5 text-sm text-loss"
           >
             {error}
           </p>
@@ -323,7 +323,7 @@ export const ShareTradeModal: React.FC<ShareTradeModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       <ShareTradeForm

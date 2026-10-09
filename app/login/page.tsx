@@ -48,8 +48,8 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: "demo@journal.com",
-          password: "demo1234",
+          email: "demo@tradingjournal.com",
+          password: "password123",
         }),
       });
       const data = await res.json();

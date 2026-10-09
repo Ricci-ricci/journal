@@ -179,7 +179,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
             {onCancel && (
               <Button
                 type="button"

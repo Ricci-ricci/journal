@@ -89,10 +89,10 @@ export const TradesTable: React.FC<TradesTableProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="border-t border-border">
+      <div className="divide-y divide-border">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="border-b border-border py-4">
-            <div className="h-3 w-1/3 rounded bg-muted" />
+          <div key={i} className="px-5 py-5">
+            <div className="h-3 w-1/3 rounded bg-muted animate-pulse" />
           </div>
         ))}
       </div>
@@ -101,9 +101,11 @@ export const TradesTable: React.FC<TradesTableProps> = ({
 
   if (trades.length === 0) {
     return (
-      <EmptyState title="No trades to show">
-        Nothing matches yet. Log a trade, or loosen the filters.
-      </EmptyState>
+      <div className="p-4">
+        <EmptyState title="No trades to show">
+          Nothing matches yet. Log a trade, or loosen the filters.
+        </EmptyState>
+      </div>
     );
   }
 
@@ -111,51 +113,51 @@ export const TradesTable: React.FC<TradesTableProps> = ({
     <div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
-          <thead className="border-b border-border">
+          <thead className="border-b border-border bg-muted/40">
             <tr>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Symbol
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Direction
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Entry
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Exit
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 Quantity
               </th>
               <th
                 scope="col"
-                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
+                className="label px-4 first:pl-5 py-2.5 text-left"
               >
                 P&L
               </th>
-              <th scope="col" className="relative px-3 py-2.5">
+              <th scope="col" className="relative px-4 py-2.5">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
@@ -166,13 +168,13 @@ export const TradesTable: React.FC<TradesTableProps> = ({
               return (
               <tr
                 key={trade.id}
-                className={`border-b border-border transition-all duration-300 ease-out ${
+                className={`border-b border-border last:border-b-0 transition-all duration-300 ease-out ${
                   isDeleting
                     ? "opacity-0 -translate-x-4 bg-loss/10 pointer-events-none"
-                    : "hover:bg-muted/30"
+                    : "hover:bg-muted/40"
                 }`}
               >
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="font-medium text-foreground">
                       {trade.symbol}
@@ -189,23 +191,32 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
-                  <span className="text-muted-foreground">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
+                  <span
+                    className={`chip ${
+                      trade.direction === "LONG"
+                        ? "border-profit/25 bg-profit/10 text-profit"
+                        : "border-loss/25 bg-loss/10 text-loss"
+                    }`}
+                  >
                     {trade.direction === "LONG" ? "Long" : "Short"}
                   </span>
                 </td>
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
                   <span
-                    className={
+                    className={`chip ${
                       trade.status === "CLOSED"
-                        ? "text-muted-foreground"
-                        : "text-foreground"
-                    }
+                        ? ""
+                        : "border-brand/30 bg-primary/15 text-brand"
+                    }`}
                   >
+                    {trade.status !== "CLOSED" && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    )}
                     {trade.status.charAt(0) + trade.status.slice(1).toLowerCase()}
                   </span>
                 </td>
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="num text-foreground">
                       {formatCurrency(
@@ -218,7 +229,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.exitPrice ? (
                       <>
@@ -239,15 +250,15 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="num px-3 py-3 whitespace-nowrap text-foreground">
+                <td className="num px-4 py-3.5 whitespace-nowrap text-foreground">
                   {trade.quantity.toLocaleString()}
                 </td>
-                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                <td className="px-4 first:pl-5 py-3.5 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.profitLoss !== null ? (
                       <>
                         <div
-                          className={`num ${getProfitLossColor(trade.profitLoss)}`}
+                          className={`num font-medium ${getProfitLossColor(trade.profitLoss)}`}
                         >
                           {formatCurrency(
                             trade.profitLoss,
@@ -267,7 +278,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="pl-3 py-3 whitespace-nowrap text-right">
+                <td className="pl-3 pr-3 py-3.5 whitespace-nowrap text-right">
                   <div className="flex justify-end items-center">
                     {onViewTrade && (
                       <ViewIconButton

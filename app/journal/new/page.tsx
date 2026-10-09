@@ -83,7 +83,7 @@ const NewJournalEntryPage: React.FC = () => {
 
   return (
     <Layout title="New entry">
-      <div className="max-w-3xl">
+      <div className="mx-auto max-w-3xl">
         <Link
           href="/journal"
           className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
@@ -96,7 +96,7 @@ const NewJournalEntryPage: React.FC = () => {
         {errorMessage && (
           <p
             role="alert"
-            className="mb-5 rounded-md border border-loss/40 bg-loss/10 px-3 py-2.5 text-sm text-loss"
+            className="mb-5 rounded-xl border border-loss/30 bg-loss/10 px-3 py-2.5 text-sm text-loss"
           >
             {errorMessage}
           </p>

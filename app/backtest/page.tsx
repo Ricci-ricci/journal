@@ -227,9 +227,9 @@ const BacktestPage: React.FC = () => {
   if (showForm) {
     return (
       <Layout title={editing ? "Edit backtest" : "New backtest"}>
-        <div className="max-w-3xl">
+        <div className="mx-auto max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -269,8 +269,8 @@ const BacktestPage: React.FC = () => {
   }
 
   // ─── List view ────────────────────────────────────────────────────────────
-  const th = "label px-3 first:pl-0 py-2.5 font-normal whitespace-nowrap";
-  const td = "px-3 first:pl-0 py-3 align-top whitespace-nowrap";
+  const th = "label px-4 first:pl-5 py-2.5 whitespace-nowrap";
+  const td = "px-4 first:pl-5 py-3.5 align-top whitespace-nowrap";
 
   return (
     <Layout
@@ -283,7 +283,7 @@ const BacktestPage: React.FC = () => {
         />
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm text-muted-foreground max-w-xl">
             Results from backtests you ran elsewhere, kept by month.
@@ -318,10 +318,10 @@ const BacktestPage: React.FC = () => {
         </StatRow>
 
         {loading ? (
-          <div className="border-t border-border">
+          <div className="panel divide-y divide-border">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="border-b border-border py-4">
-                <div className="h-3 w-1/3 rounded bg-muted" />
+              <div key={i} className="px-5 py-5">
+                <div className="h-3 w-1/3 rounded bg-muted animate-pulse" />
               </div>
             ))}
           </div>
@@ -341,9 +341,9 @@ const BacktestPage: React.FC = () => {
               : "Add the monthly result of a backtest to compare it with live trading."}
           </EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="panel overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="border-b border-border">
+              <thead className="border-b border-border bg-muted/40">
                 <tr>
                   <th className={`${th} text-left`}>Backtest</th>
                   <th className={`${th} text-left`}>Month</th>
@@ -371,7 +371,10 @@ const BacktestPage: React.FC = () => {
                   ].filter(Boolean);
 
                   return (
-                    <tr key={b.id} className="border-b border-border">
+                    <tr
+                      key={b.id}
+                      className="border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors"
+                    >
                       <td className={`${td} !whitespace-normal min-w-[14rem]`}>
                         <p className="font-medium text-foreground">{b.name}</p>
                         {meta.length > 0 && (
@@ -389,7 +392,7 @@ const BacktestPage: React.FC = () => {
                         {formatMonth(b.periodMonth)}
                       </td>
                       <td
-                        className={`${td} num text-right ${
+                        className={`${td} num font-medium text-right ${
                           b.totalPnL === null
                             ? "text-muted-foreground"
                             : b.totalPnL >= 0
@@ -427,7 +430,7 @@ const BacktestPage: React.FC = () => {
                       <td className={`${td} num text-right`}>
                         {formatPercent(b.maxDrawdown)}
                       </td>
-                      <td className="pl-3 py-2 align-top whitespace-nowrap text-right">
+                      <td className="pl-3 pr-3 py-2.5 align-top whitespace-nowrap text-right">
                         <EditIconButton size="md" onClick={() => handleEdit(b)} />
                         <DeleteIconButton
                           size="md"

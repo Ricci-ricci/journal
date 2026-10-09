@@ -5,15 +5,13 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   padding?: "none" | "sm" | "md" | "lg";
-  /* Kept for call-site compatibility; cards are flat and no longer cast shadows. */
-  shadow?: "none" | "sm" | "md" | "lg";
 }
 
 const paddingClasses = {
   none: "",
-  sm: "p-3",
-  md: "p-5",
-  lg: "p-7",
+  sm: "p-4",
+  md: "p-5 sm:p-6",
+  lg: "p-6 sm:p-8",
 };
 
 export const Card: React.FC<CardProps> = ({
@@ -24,7 +22,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={cn(
-        "bg-card rounded-lg border border-border",
+        "panel",
         paddingClasses[padding],
         className,
       )}
@@ -56,7 +54,7 @@ export const CardTitle: React.FC<CardTitleProps> = ({
   className,
 }) => {
   return (
-    <h3 className={cn("text-sm font-medium text-foreground", className)}>
+    <h3 className={cn("font-heading text-[15px] text-foreground", className)}>
       {children}
     </h3>
   );

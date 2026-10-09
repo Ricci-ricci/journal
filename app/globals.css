@@ -9,8 +9,15 @@
     --color-foreground: var(--foreground);
     --font-sans: var(--font-sans);
     --font-mono: var(--font-mono);
-    --font-serif: var(--font-serif);
-    --font-heading: var(--font-serif);
+    --color-brand: var(--brand);
+    --shadow-card:
+        inset 0 1px 0 0 oklch(1 0 0 / 0.04), 0 1px 2px 0 oklch(0 0 0 / 0.3),
+        0 12px 24px -16px oklch(0 0 0 / 0.55);
+    --shadow-pop:
+        inset 0 1px 0 0 oklch(1 0 0 / 0.06), 0 4px 12px -2px oklch(0 0 0 / 0.4),
+        0 24px 48px -12px oklch(0 0 0 / 0.6);
+    --shadow-button:
+        inset 0 1px 0 0 oklch(1 0 0 / 0.18), 0 1px 2px 0 oklch(0 0 0 / 0.35);
     --color-profit: var(--profit);
     --color-loss: var(--loss);
     --color-warn: var(--warn);
@@ -52,84 +59,45 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Light theme — warm paper. Not switched on by default, but kept coherent. */
+/* Near-black with an emerald accent — the one theme of the app. */
 :root {
-    --background: oklch(0.975 0.006 85);
-    --foreground: oklch(0.22 0.008 75);
-    --card: oklch(0.99 0.004 85);
-    --card-foreground: oklch(0.22 0.008 75);
-    --popover: oklch(0.99 0.004 85);
-    --popover-foreground: oklch(0.22 0.008 75);
-    --primary: oklch(0.22 0.008 75);
-    --primary-foreground: oklch(0.975 0.006 85);
-    --secondary: oklch(0.94 0.006 85);
-    --secondary-foreground: oklch(0.22 0.008 75);
-    --muted: oklch(0.945 0.006 85);
-    --muted-foreground: oklch(0.47 0.01 75);
-    --accent: oklch(0.925 0.007 85);
-    --accent-foreground: oklch(0.22 0.008 75);
-    --destructive: oklch(0.52 0.17 27);
-    --border: oklch(0.22 0.008 75 / 0.12);
-    --input: oklch(0.22 0.008 75 / 0.2);
-    --ring: oklch(0.22 0.008 75 / 0.45);
-    /* Colour is reserved for money: gains, losses, and things to watch. */
-    --profit: oklch(0.5 0.12 155);
-    --loss: oklch(0.52 0.17 27);
-    --warn: oklch(0.56 0.11 75);
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.97 0 0);
+    --card: oklch(0.185 0 0);
+    --card-foreground: oklch(0.97 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.97 0 0);
+    --primary: oklch(0.72 0.16 159);
+    --primary-foreground: oklch(0.16 0.03 160);
+    /* Lighter emerald for links, icons and text on dark surfaces. */
+    --brand: oklch(0.82 0.15 160);
+    --secondary: oklch(0.235 0 0);
+    --secondary-foreground: oklch(0.97 0 0);
+    --muted: oklch(0.22 0 0);
+    --muted-foreground: oklch(0.68 0 0);
+    --accent: oklch(0.26 0 0);
+    --accent-foreground: oklch(0.97 0 0);
+    --destructive: oklch(0.7 0.19 25);
+    --border: oklch(1 0 0 / 0.08);
+    --input: oklch(1 0 0 / 0.14);
+    --ring: oklch(0.72 0.16 159);
+    --profit: oklch(0.8 0.16 160);
+    --loss: oklch(0.7 0.19 25);
+    --warn: oklch(0.82 0.13 85);
     --chart-1: var(--profit);
     --chart-2: var(--loss);
-    --chart-3: oklch(0.47 0.01 75);
+    --chart-3: var(--brand);
     --chart-4: var(--warn);
-    --chart-5: oklch(0.7 0.01 75);
-    --radius: 0.375rem;
-    --sidebar: oklch(0.96 0.006 85);
-    --sidebar-foreground: oklch(0.22 0.008 75);
-    --sidebar-primary: oklch(0.22 0.008 75);
-    --sidebar-primary-foreground: oklch(0.975 0.006 85);
-    --sidebar-accent: oklch(0.925 0.007 85);
-    --sidebar-accent-foreground: oklch(0.22 0.008 75);
-    --sidebar-border: oklch(0.22 0.008 75 / 0.12);
-    --sidebar-ring: oklch(0.22 0.008 75 / 0.45);
-}
-
-/* Dark theme — warm ink. This is the default look of the app. */
-.dark {
-    --background: oklch(0.165 0.005 75);
-    --foreground: oklch(0.925 0.012 85);
-    --card: oklch(0.195 0.005 75);
-    --card-foreground: oklch(0.925 0.012 85);
-    --popover: oklch(0.215 0.005 75);
-    --popover-foreground: oklch(0.925 0.012 85);
-    --primary: oklch(0.925 0.012 85);
-    --primary-foreground: oklch(0.18 0.005 75);
-    --secondary: oklch(0.235 0.005 75);
-    --secondary-foreground: oklch(0.925 0.012 85);
-    --muted: oklch(0.225 0.005 75);
-    --muted-foreground: oklch(0.68 0.012 80);
-    --accent: oklch(0.25 0.006 75);
-    --accent-foreground: oklch(0.925 0.012 85);
-    --destructive: oklch(0.71 0.15 27);
-    --border: oklch(0.925 0.012 85 / 0.1);
-    --input: oklch(0.925 0.012 85 / 0.16);
-    --ring: oklch(0.925 0.012 85 / 0.45);
-    /* Colour is reserved for money: gains, losses, and things to watch. */
-    --profit: oklch(0.78 0.12 155);
-    --loss: oklch(0.71 0.15 27);
-    --warn: oklch(0.8 0.1 85);
-    --chart-1: var(--profit);
-    --chart-2: var(--loss);
-    --chart-3: oklch(0.68 0.012 80);
-    --chart-4: var(--warn);
-    --chart-5: oklch(0.45 0.008 75);
-    --radius: 0.375rem;
-    --sidebar: oklch(0.15 0.005 75);
-    --sidebar-foreground: oklch(0.925 0.012 85);
-    --sidebar-primary: oklch(0.925 0.012 85);
-    --sidebar-primary-foreground: oklch(0.18 0.005 75);
-    --sidebar-accent: oklch(0.225 0.005 75);
-    --sidebar-accent-foreground: oklch(0.925 0.012 85);
-    --sidebar-border: oklch(0.925 0.012 85 / 0.1);
-    --sidebar-ring: oklch(0.925 0.012 85 / 0.45);
+    --chart-5: oklch(0.5 0 0);
+    --radius: 0.85rem;
+    --sidebar: oklch(0.125 0 0);
+    --sidebar-foreground: oklch(0.97 0 0);
+    --sidebar-primary: oklch(0.72 0.16 159);
+    --sidebar-primary-foreground: oklch(0.16 0.03 160);
+    --sidebar-accent: oklch(0.225 0 0);
+    --sidebar-accent-foreground: oklch(0.97 0 0);
+    --sidebar-border: oklch(1 0 0 / 0.07);
+    --sidebar-ring: oklch(0.72 0.16 159);
 }
 
 @layer base {
@@ -145,7 +113,7 @@
         font-feature-settings: "ss01", "cv11";
     }
     ::selection {
-        background: oklch(0.925 0.012 85 / 0.22);
+        background: oklch(0.72 0.16 159 / 0.35);
     }
     /* Native controls pick up the theme instead of the browser default. */
     input,
@@ -155,19 +123,81 @@
     }
 }
 
-@layer utilities {
-    /* Figures: monospaced digits so columns of prices line up. */
-    .num {
-        font-family: var(--font-mono), ui-monospace, monospace;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: -0.01em;
+/* Page and section titles: the same sans as the body, tighter and heavier. */
+@utility font-heading {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+}
+
+/* Figures: tabular digits so columns of prices line up. */
+@utility num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+/* Quiet caption used above figures and table columns. */
+@utility label {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+}
+
+/* Raised surface: the frame behind lists, tables and panels. */
+@utility panel {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+}
+
+/* Small pill for a status or a tag. Tone it with text/bg/border classes. */
+@utility chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.375rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Inline text link in the accent colour. */
+@utility link {
+    color: var(--brand);
+    font-weight: 500;
+    text-underline-offset: 4px;
+    transition: color 150ms;
+    &:hover {
+        color: var(--foreground);
+        text-decoration-line: underline;
     }
-    /* Small caps-style label used above figures and table columns. */
-    .label {
-        font-size: 0.6875rem;
-        line-height: 1rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--muted-foreground);
-    }
+}
+
+/* Soft emerald wash behind a section. */
+@utility glow {
+    background-image: radial-gradient(
+        60rem 22rem at 50% -8rem,
+        oklch(0.72 0.16 159 / 0.12),
+        transparent 70%
+    );
+    background-repeat: no-repeat;
+}
+
+/* Diagonal hatching used behind chart areas (matches the reference). */
+@utility hatch {
+    background-image: repeating-linear-gradient(
+        -45deg,
+        oklch(1 0 0 / 0.05) 0,
+        oklch(1 0 0 / 0.05) 1px,
+        transparent 1px,
+        transparent 6px
+    );
 }

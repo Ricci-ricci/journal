@@ -177,15 +177,15 @@ export const PostCard: React.FC<PostCardProps> = ({
   };
 
   const avatar =
-    "flex items-center justify-center rounded-full bg-muted font-medium text-foreground shrink-0";
+    "flex items-center justify-center rounded-full bg-primary/20 font-semibold text-brand shrink-0";
 
   return (
-    <article className="bg-card border border-border rounded-lg">
-      <div className="p-4 sm:p-5">
+    <article className="panel overflow-hidden">
+      <div className="p-5 sm:p-6">
         {/* ── Who and when ── */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className={`${avatar} h-7 w-7 text-xs`}>{avatarChar}</span>
+          <div className="flex items-center gap-3 min-w-0">
+            <span className={`${avatar} h-9 w-9 text-sm`}>{avatarChar}</span>
             <p className="text-sm text-foreground truncate">
               <span className="font-medium">{displayName}</span>{" "}
               <span className="text-muted-foreground">
@@ -205,19 +205,28 @@ export const PostCard: React.FC<PostCardProps> = ({
         </div>
 
         {/* ── The trade ── */}
-        <div className="mt-4 flex items-baseline justify-between gap-4 flex-wrap">
-          <p className="text-foreground">
-            <span className="font-heading text-2xl leading-none">
+        <div className="mt-4 rounded-xl border border-border bg-background/50 p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <p className="flex flex-wrap items-center gap-2 text-foreground">
+            <span className="font-heading text-xl leading-none mr-1">
               {post.symbol}
-            </span>{" "}
-            <span className="text-sm text-muted-foreground">
-              {post.direction.toLowerCase()}
-              {post.assetType && ` · ${post.assetType.toLowerCase()}`} ·{" "}
-              {post.status.toLowerCase()}
             </span>
+            <span
+              className={`chip ${
+                post.direction === "LONG"
+                  ? "border-profit/25 bg-profit/10 text-profit"
+                  : "border-loss/25 bg-loss/10 text-loss"
+              }`}
+            >
+              {post.direction.toLowerCase()}
+            </span>
+            {post.assetType && (
+              <span className="chip">{post.assetType.toLowerCase()}</span>
+            )}
+            <span className="chip">{post.status.toLowerCase()}</span>
           </p>
           {post.showPnL && post.profitLoss !== null && (
-            <p className={`num text-lg ${plColor}`}>
+            <p className={`num text-lg font-semibold ${plColor}`}>
               {plPositive ? "+" : ""}${post.profitLoss.toFixed(2)}
               {post.profitLossPct !== null && (
                 <span className="ml-1.5 text-xs">
@@ -229,7 +238,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
 
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        <p className="mt-2.5 text-sm text-muted-foreground">
           In at{" "}
           <span className="num text-foreground">
             ${post.entryPrice.toFixed(2)}
@@ -243,24 +252,25 @@ export const PostCard: React.FC<PostCardProps> = ({
             </>
           )}
         </p>
+        </div>
 
         {post.caption && (
-          <p className="mt-3 text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
+          <p className="mt-4 text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
             {post.caption}
           </p>
         )}
 
         {/* ── Actions ── */}
-        <div className="mt-4 flex items-center gap-4 text-[13px]">
+        <div className="mt-4 -ml-2 flex items-center gap-1 text-[13px]">
           <button
             type="button"
             onClick={handleLike}
             disabled={likeLoading}
             aria-pressed={liked}
-            className={`inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
+            className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2 transition-colors disabled:opacity-50 ${
               liked
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "text-loss hover:bg-loss/10"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
           >
             <Heart
@@ -275,10 +285,10 @@ export const PostCard: React.FC<PostCardProps> = ({
             type="button"
             onClick={handleToggleComments}
             aria-expanded={commentsOpen}
-            className={`inline-flex items-center gap-1.5 transition-colors ${
+            className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2 transition-colors ${
               commentsOpen
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-accent text-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
           >
             <MessageSquare className="h-4 w-4" strokeWidth={1.75} />
@@ -289,7 +299,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 
       {/* ── Comments ── */}
       {commentsOpen && (
-        <div className="border-t border-border p-4 sm:p-5 space-y-4">
+        <div className="border-t border-border bg-background/40 p-5 sm:p-6 space-y-4">
           {commentsLoading ? (
             <p className="text-xs text-muted-foreground">Loading comments…</p>
           ) : comments.length === 0 ? (

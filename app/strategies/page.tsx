@@ -246,9 +246,9 @@ const StrategiesPage: React.FC = () => {
   if (showForm) {
     return (
       <Layout title={editingStrategy ? "Edit strategy" : "New strategy"}>
-        <div className="max-w-3xl">
+        <div className="mx-auto max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -329,16 +329,16 @@ const StrategiesPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="mt-6 border-t border-border">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="border-b border-border py-6 space-y-3">
+          <div className="mt-5 grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="panel p-5 sm:p-6 space-y-3 animate-pulse">
                 <div className="h-5 w-1/3 rounded bg-muted" />
                 <div className="h-3 w-2/3 rounded bg-muted" />
               </div>
             ))}
           </div>
         ) : filteredStrategies.length === 0 ? (
-          <div className="mt-6">
+          <div className="mt-5">
             <EmptyState
               title={hasFilters ? "No strategies match" : "No strategies yet"}
               action={
@@ -355,7 +355,7 @@ const StrategiesPage: React.FC = () => {
             </EmptyState>
           </div>
         ) : (
-          <div className="mt-6 border-t border-border">
+          <div className="mt-5 grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
             {filteredStrategies.map((strategy) => {
               const rules = [
                 { label: "Entry", text: strategy.entryRules },
@@ -366,19 +366,26 @@ const StrategiesPage: React.FC = () => {
               return (
                 <article
                   key={strategy.id}
-                  className={`border-b border-border py-6 ${
+                  className={`panel p-5 sm:p-6 ${
                     strategy.isActive ? "" : "opacity-60"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <h2 className="font-heading text-2xl leading-tight text-foreground">
+                      <h2 className="flex flex-wrap items-center gap-2.5 font-heading text-lg leading-snug text-foreground">
                         {strategy.name}
-                        {!strategy.isActive && (
-                          <span className="ml-2 align-middle font-sans text-xs text-muted-foreground">
-                            inactive
-                          </span>
-                        )}
+                        <span
+                          className={`chip ${
+                            strategy.isActive
+                              ? "border-profit/25 bg-profit/10 text-profit"
+                              : ""
+                          }`}
+                        >
+                          {strategy.isActive && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                          )}
+                          {strategy.isActive ? "active" : "inactive"}
+                        </span>
                       </h2>
                       {strategy.description && (
                         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -403,7 +410,7 @@ const StrategiesPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                  <dl className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-px overflow-hidden rounded-lg border border-border bg-border">
                     {[
                       { l: "Trades", v: strategy.totalTrades, c: "" },
                       { l: "Win rate", v: formatPercent(strategy.winRate), c: "" },
@@ -418,21 +425,25 @@ const StrategiesPage: React.FC = () => {
                         c: strategy.averageLoss ? "text-loss" : "",
                       },
                     ].map((m) => (
-                      <div key={m.l} className="flex items-baseline gap-2">
+                      <div key={m.l} className="bg-card px-3.5 py-3">
                         <dt className="label">{m.l}</dt>
-                        <dd className={`num text-foreground ${m.c}`}>{m.v}</dd>
+                        <dd
+                          className={`num mt-1 text-base font-semibold text-foreground ${m.c}`}
+                        >
+                          {m.v}
+                        </dd>
                       </div>
                     ))}
                   </dl>
 
                   {rules.some((r) => r.text) && (
-                    <dl className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                    <dl className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
                       {rules.map(
                         (r) =>
                           r.text && (
                             <div key={r.label}>
                               <dt className="label">{r.label}</dt>
-                              <dd className="mt-1 text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                              <dd className="mt-1 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
                                 {r.text}
                               </dd>
                             </div>
@@ -441,7 +452,7 @@ const StrategiesPage: React.FC = () => {
                     </dl>
                   )}
 
-                  <p className="mt-4 text-xs text-muted-foreground">
+                  <p className="mt-5 border-t border-border pt-3.5 text-xs text-muted-foreground">
                     Updated {formatDate(strategy.updatedAt)}
                   </p>
                 </article>

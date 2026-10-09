@@ -209,7 +209,7 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
 
           {/* Return on account size */}
           {returnPct !== null && (
-            <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-3">
               <span className="text-sm text-muted-foreground">
                 {returnPct >= 0 ? "Profit" : "Loss"} on account size:
               </span>
@@ -304,13 +304,13 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
               rows={3}
               value={formData.notes}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder="Observations, conditions, parameters used..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
             {onCancel && (
               <Button
                 type="button"

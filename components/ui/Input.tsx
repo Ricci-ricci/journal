@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 /* Shared look for every text-like control (input, select, textarea). */
 export const fieldClasses =
-  "block w-full h-9 rounded-md border border-input bg-transparent text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25 disabled:opacity-50 disabled:cursor-not-allowed";
+  "block w-full h-9 rounded-lg border border-input bg-background/60 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25 disabled:opacity-50 disabled:cursor-not-allowed";
 export const fieldErrorClasses =
   "border-loss/70 focus:border-loss focus:ring-loss/25";
 export const fieldLabelClasses =

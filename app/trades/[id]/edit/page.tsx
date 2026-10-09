@@ -249,7 +249,7 @@ const EditTradePage: React.FC = () => {
 
   return (
     <Layout title="Edit trade">
-      <div className="max-w-3xl">
+      <div className="mx-auto max-w-3xl">
         <Link
           href="/trades"
           className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
@@ -261,7 +261,7 @@ const EditTradePage: React.FC = () => {
         {successMsg && (
           <p
             role="status"
-            className="mb-5 rounded-md border border-profit/40 bg-profit/10 px-3 py-2.5 text-sm text-profit"
+            className="mb-5 rounded-xl border border-profit/30 bg-profit/10 px-3 py-2.5 text-sm text-profit"
           >
             {successMsg}
           </p>
@@ -270,7 +270,7 @@ const EditTradePage: React.FC = () => {
         {errorMsg && (
           <p
             role="alert"
-            className="mb-5 rounded-md border border-loss/40 bg-loss/10 px-3 py-2.5 text-sm text-loss"
+            className="mb-5 rounded-xl border border-loss/30 bg-loss/10 px-3 py-2.5 text-sm text-loss"
           >
             {errorMsg}
           </p>
@@ -278,7 +278,7 @@ const EditTradePage: React.FC = () => {
 
         {/* Loading State */}
         {fetchingData ? (
-          <div className="rounded-lg border border-dashed border-border p-8 text-center">
+          <div className="rounded-xl border border-dashed border-input bg-card/40 p-8 text-center">
             
             <p className="text-sm text-muted-foreground">Loading trade data...</p>
           </div>
@@ -293,7 +293,7 @@ const EditTradePage: React.FC = () => {
           />
         ) : (
           !errorMsg && (
-            <div className="rounded-lg border border-dashed border-border p-8 text-center">
+            <div className="rounded-xl border border-dashed border-input bg-card/40 p-8 text-center">
               <p className="text-sm text-muted-foreground">Trade not found.</p>
             </div>
           )

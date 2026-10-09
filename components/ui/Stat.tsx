@@ -21,25 +21,30 @@ export const Stat: React.FC<StatProps> = ({
   hint,
   tone = "default",
 }) => (
-  <div className="min-w-0 bg-card px-4 py-3.5">
-    <p className="label">{label}</p>
-    <p className={cn("num mt-1.5 text-xl truncate", toneClasses[tone])}>
+  <div className="panel min-w-0 px-4 py-4">
+    <p className="label truncate">{label}</p>
+    <p
+      className={cn(
+        "num mt-2 text-2xl font-semibold tracking-tight truncate",
+        toneClasses[tone],
+      )}
+    >
       {value}
     </p>
     {hint && (
-      <p className="mt-0.5 text-xs text-muted-foreground truncate">{hint}</p>
+      <p className="mt-1 text-xs text-muted-foreground truncate">{hint}</p>
     )}
   </div>
 );
 
-/* A strip of figures sharing one frame, divided by hairlines. */
+/* A row of figure cards that wraps to fit the width. */
 export const StatRow: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
   <div
     className={cn(
-      "grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] gap-px overflow-hidden rounded-lg border border-border bg-border",
+      "grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-3",
       className,
     )}
   >
@@ -68,7 +73,7 @@ export function Segmented<T extends string>({
   return (
     <div
       className={cn(
-        "inline-flex flex-shrink-0 rounded-md border border-border p-0.5",
+        "inline-flex flex-shrink-0 rounded-lg border border-border bg-card p-0.5 shadow-xs",
         className,
       )}
     >
@@ -79,9 +84,9 @@ export function Segmented<T extends string>({
           onClick={() => onChange(o.value)}
           aria-pressed={value === o.value}
           className={cn(
-            "h-7 px-2.5 rounded text-[13px] transition-colors",
+            "h-7 px-3 rounded-md text-[13px] font-medium transition-colors",
             value === o.value
-              ? "bg-accent text-foreground font-medium"
+              ? "bg-accent text-foreground shadow-button"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -98,8 +103,8 @@ export const EmptyState: React.FC<{
   children?: React.ReactNode;
   action?: React.ReactNode;
 }> = ({ title, children, action }) => (
-  <div className="rounded-lg border border-dashed border-border px-6 py-14 text-center">
-    <p className="text-sm font-medium text-foreground">{title}</p>
+  <div className="rounded-xl border border-dashed border-input bg-card/40 px-6 py-14 text-center">
+    <p className="font-heading text-[15px] text-foreground">{title}</p>
     {children && (
       <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
         {children}

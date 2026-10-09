@@ -104,7 +104,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
                 name="isActive"
                 checked={formData.isActive}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-foreground focus:ring-ring border-border rounded"
+                className="h-4 w-4 accent-primary focus:ring-ring border-border rounded"
               />
               <label
                 htmlFor="isActive"
@@ -125,7 +125,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={3}
               value={formData.description}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder="Brief description of the strategy..."
             />
           </div>
@@ -140,10 +140,10 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={4}
               value={formData.entryRules}
               onChange={handleInputChange}
-              className={`block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ${
+              className={`block w-full rounded-lg border-0 px-3 py-2 text-foreground bg-background/60 shadow-xs ring-1 ring-inset ${
                 errors.entryRules
                   ? "ring-destructive focus:ring-destructive"
-                  : "ring-border focus:ring-ring"
+                  : "ring-input focus:ring-ring"
               } placeholder:text-muted-foreground focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
               placeholder="Define when to enter trades:
 • Technical indicators
@@ -166,10 +166,10 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={4}
               value={formData.exitRules}
               onChange={handleInputChange}
-              className={`block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ${
+              className={`block w-full rounded-lg border-0 px-3 py-2 text-foreground bg-background/60 shadow-xs ring-1 ring-inset ${
                 errors.exitRules
                   ? "ring-destructive focus:ring-destructive"
-                  : "ring-border focus:ring-ring"
+                  : "ring-input focus:ring-ring"
               } placeholder:text-muted-foreground focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
               placeholder="Define when to exit trades:
 • Profit targets
@@ -192,7 +192,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={4}
               value={formData.riskManagementRules}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder="Define risk management rules:
 • Position sizing
 • Maximum daily loss
@@ -202,11 +202,11 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
           </div>
 
           {/* Strategy Tips */}
-          <div className="bg-muted border border-foreground/30 rounded-md p-4">
+          <div className="bg-primary/10 border border-brand/25 rounded-xl p-4">
             <h4 className="text-sm font-medium text-foreground mb-2">
               Strategy Tips
             </h4>
-            <ul className="text-xs text-foreground space-y-1">
+            <ul className="text-xs text-muted-foreground space-y-1">
               <li>
                 • Be specific with your rules to avoid subjective decisions
               </li>
@@ -222,7 +222,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
             {onCancel && (
               <Button
                 type="button"

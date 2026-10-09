@@ -370,7 +370,7 @@ const TradesPage: React.FC = () => {
         onCancel={() => setTradeToDelete(null)}
         loading={deleteLoading}
       />
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Account line + period + new trade */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-sm text-muted-foreground">
@@ -411,9 +411,9 @@ const TradesPage: React.FC = () => {
           </StatRow>
         )}
 
-        <section>
+        <section className="panel overflow-hidden">
           {/* Filters */}
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 border-b border-border">
             <div className="w-36">
               <Select
                 aria-label="Status"

@@ -40,7 +40,7 @@ interface PostWithRelations {
 // ─── Skeleton card ────────────────────────────────────────────────────────────
 
 const SkeletonCard: React.FC = () => (
-  <div className="bg-card border border-border rounded-lg overflow-hidden">
+  <div className="panel overflow-hidden animate-pulse">
     <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
       <div className="w-9 h-9 rounded-full bg-muted shrink-0" />
       <div className="space-y-2 flex-1">
@@ -159,12 +159,12 @@ export default function FeedPage() {
 
   return (
     <Layout title="Feed">
-      <div className="max-w-2xl space-y-6">
+      <div className="mx-auto max-w-2xl space-y-5">
         <p className="text-sm text-muted-foreground">
           Trades other people chose to share. Share one of yours from the{" "}
           <Link
             href="/trades"
-            className="text-foreground underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
+            className="link"
           >
             Trades
           </Link>{" "}
@@ -182,7 +182,7 @@ export default function FeedPage() {
 
         {/* Error state */}
         {!loading && fetchError && (
-          <div className="rounded-md border border-loss/40 bg-loss/10 px-4 py-3 flex items-center justify-between gap-4">
+          <div className="rounded-xl border border-loss/30 bg-loss/10 px-4 py-3 flex items-center justify-between gap-4">
             <p className="text-sm text-loss">{fetchError}</p>
             <Button
               variant="outline"

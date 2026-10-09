@@ -234,9 +234,9 @@ const JournalPage: React.FC = () => {
   if (showForm) {
     return (
       <Layout title={editingEntry ? "Edit entry" : "New entry"}>
-        <div className="max-w-3xl">
+        <div className="mx-auto max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-xl px-4 py-3 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -282,8 +282,8 @@ const JournalPage: React.FC = () => {
         />
       }
     >
-      <div className="max-w-3xl">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="mx-auto max-w-4xl">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="w-40">
             <Select
               aria-label="Entry type"
@@ -310,9 +310,9 @@ const JournalPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="mt-6 border-t border-border">
+          <div className="mt-5 space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="border-b border-border py-6 space-y-3">
+              <div key={i} className="panel p-5 sm:p-6 space-y-3 animate-pulse">
                 <div className="h-3 w-24 rounded bg-muted" />
                 <div className="h-5 w-1/2 rounded bg-muted" />
                 <div className="h-3 w-5/6 rounded bg-muted" />
@@ -320,7 +320,7 @@ const JournalPage: React.FC = () => {
             ))}
           </div>
         ) : filteredEntries.length === 0 ? (
-          <div className="mt-6">
+          <div className="mt-5">
             <EmptyState
               title={hasFilters ? "No entries match" : "Nothing written yet"}
               action={
@@ -337,7 +337,7 @@ const JournalPage: React.FC = () => {
             </EmptyState>
           </div>
         ) : (
-          <div className="mt-6 border-t border-border">
+          <div className="mt-5 space-y-3">
             {filteredEntries.map((entry) => {
               const isExpanded = expandedEntry === entry.id;
               const sections = [
@@ -351,15 +351,17 @@ const JournalPage: React.FC = () => {
               return (
                 <article
                   key={entry.id}
-                  className="group border-b border-border py-6"
+                  className="group panel p-5 sm:p-6 transition-colors hover:border-input"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="label">
-                        {formatDate(entry.entryDate)} ·{" "}
-                        {entry.entryType.toLowerCase()}
+                      <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="chip border-brand/30 bg-primary/15 text-brand">
+                          {entry.entryType.toLowerCase()}
+                        </span>
+                        {formatDate(entry.entryDate)}
                       </p>
-                      <h2 className="mt-1.5 font-heading text-2xl leading-tight text-foreground">
+                      <h2 className="mt-2.5 font-heading text-lg leading-snug text-foreground">
                         {entry.title || "Untitled entry"}
                       </h2>
                     </div>
@@ -383,15 +385,18 @@ const JournalPage: React.FC = () => {
                   </div>
 
                   {entry.content && (
-                    <p className="mt-3 text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
+                    <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
                       {isExpanded ? entry.content : truncateText(entry.content)}
                     </p>
                   )}
 
                   {isExpanded && sections.length > 0 && (
-                    <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                    <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {sections.map((x) => (
-                        <div key={x.label}>
+                        <div
+                          key={x.label}
+                          className="rounded-lg border border-border bg-background/50 p-4"
+                        >
                           <dt className="label">{x.label}</dt>
                           <dd className="mt-1 text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
                             {x.text}
@@ -402,7 +407,7 @@ const JournalPage: React.FC = () => {
                   )}
 
                   {!isExpanded && entry.lessonsLearned && (
-                    <p className="mt-3 border-l border-foreground/30 pl-3 text-sm text-muted-foreground">
+                    <p className="mt-4 rounded-lg border-l-2 border-brand bg-primary/10 px-3 py-2 text-sm text-foreground/90">
                       {truncateText(entry.lessonsLearned, 100)}
                     </p>
                   )}

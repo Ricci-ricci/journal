@@ -360,7 +360,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Entry Details */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Entry Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -397,7 +397,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Exit Details */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Exit Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -423,7 +423,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Costs */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Costs
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -483,7 +483,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                   <button
                     type="button"
                     onClick={handleRecalculate}
-                    className="text-xs text-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+                    className="link text-xs"
                   >
                     Recalculate from prices
                   </button>
@@ -506,8 +506,8 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                     onChange={handleInputChange}
                     placeholder="0.00  (negative = loss)"
                     className={[
-                      "block w-full rounded-md border-0 py-1.5 pr-3 pl-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
-                      "bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring ring-border",
+                      "block w-full h-9 rounded-lg border-0 pr-3 pl-3 shadow-xs ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
+                      "bg-background/60 text-foreground placeholder:text-muted-foreground focus:ring-ring ring-input",
                       plIsPositive
                         ? "text-profit ring-profit/40 focus:ring-profit"
                         : plIsNegative
@@ -552,8 +552,8 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                     onChange={handleInputChange}
                     placeholder="0.00"
                     className={[
-                      "block w-full rounded-md border-0 py-1.5 pr-8 pl-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
-                      "bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring ring-border",
+                      "block w-full h-9 rounded-lg border-0 pr-8 pl-3 shadow-xs ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
+                      "bg-background/60 text-foreground placeholder:text-muted-foreground focus:ring-ring ring-input",
                       plIsPositive
                         ? "text-profit ring-profit/40 focus:ring-profit"
                         : plIsNegative
@@ -616,7 +616,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Risk Management */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Risk Management
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -652,7 +652,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Strategy Information */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Strategy & Setup
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -676,7 +676,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Psychology */}
           <div>
-            <h3 className="label mb-3 pb-2 border-b border-border">
+            <h3 className="font-heading text-sm text-foreground mb-3 pb-2.5 border-b border-border">
               Psychology
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -710,13 +710,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               rows={4}
               value={formData.notes}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder="Trade analysis, market conditions, lessons learned..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
             {onCancel && (
               <Button
                 type="button"

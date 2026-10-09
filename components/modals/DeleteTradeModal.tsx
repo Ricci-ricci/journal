@@ -45,19 +45,19 @@ export const DeleteTradeModal: React.FC<DeleteTradeModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 animate-in fade-in duration-150"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
         onClick={!loading ? onCancel : undefined}
       />
 
       {/* Dialog */}
-      <div className="relative z-10 w-full max-w-md rounded-lg bg-popover border border-border shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-popover border border-border shadow-pop overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-5 pt-5">
           <div className="flex items-center gap-3">
             <div>
               <h2
                 id="delete-trade-title"
-                className="font-heading text-xl leading-tight text-foreground"
+                className="font-heading text-lg leading-tight text-foreground"
               >
                 Delete this trade?
               </h2>
@@ -73,7 +73,7 @@ export const DeleteTradeModal: React.FC<DeleteTradeModalProps> = ({
             onClick={onCancel}
             disabled={loading}
             aria-label="Close"
-          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
+          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
           >
             <X className="h-4 w-4" />
           </button>

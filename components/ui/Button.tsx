@@ -9,17 +9,21 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-primary text-primary-foreground hover:bg-primary/85",
-  secondary: "bg-secondary text-secondary-foreground hover:bg-accent",
-  outline: "border border-input text-foreground hover:bg-accent",
+  primary:
+    "bg-primary text-primary-foreground shadow-button hover:bg-primary/90",
+  secondary:
+    "bg-secondary text-secondary-foreground shadow-button hover:bg-accent",
+  outline:
+    "border border-input bg-card text-foreground shadow-xs hover:bg-accent",
   ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
-  danger: "border border-loss/40 text-loss hover:bg-loss/10",
-  success: "border border-profit/40 text-profit hover:bg-profit/10",
+  danger: "border border-loss/30 bg-loss/10 text-loss hover:bg-loss/20",
+  success:
+    "border border-profit/30 bg-profit/10 text-profit hover:bg-profit/20",
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
   sm: "h-8 px-3 text-[13px]",
-  md: "h-9 px-3.5 text-sm",
+  md: "h-9 px-4 text-sm",
   lg: "h-11 px-5 text-[15px]",
 };
 
@@ -29,7 +33,7 @@ export const buttonClasses = (
   className?: string,
 ) =>
   cn(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-colors",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     "disabled:opacity-50 disabled:cursor-not-allowed",
     variantClasses[variant],

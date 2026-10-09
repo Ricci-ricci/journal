@@ -120,14 +120,14 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
     cn(fieldClasses, "px-3", hasError && fieldErrorClasses);
 
   return (
-    <div className="relative z-10 w-full max-w-md rounded-lg bg-popover border border-border shadow-2xl shadow-black/50 overflow-hidden">
+    <div className="relative z-10 w-full max-w-md rounded-2xl bg-popover border border-border shadow-pop overflow-hidden">
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 px-5 pt-5">
         <div className="flex items-center gap-3">
           <div>
             <h2
               id="close-trade-title"
-              className="font-heading text-xl leading-tight text-foreground"
+              className="font-heading text-lg leading-tight text-foreground"
             >
               Close trade
             </h2>
@@ -143,7 +143,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           onClick={onCancel}
           disabled={loading}
           aria-label="Close"
-          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
+          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
         >
           <X className="h-4 w-4" />
         </button>
@@ -240,7 +240,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
 
         {/* ── Live P&L preview ── */}
         <div
-          className={`rounded-md border px-4 py-3.5 transition-colors ${previewBorder}`}
+          className={`rounded-xl border px-4 py-3.5 transition-colors ${previewBorder}`}
         >
           <p className="label mb-2">
             Result
@@ -253,7 +253,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           ) : (
             <div className="flex items-baseline justify-between gap-4">
               {/* Big amount */}
-              <span className={`num text-3xl tracking-tight ${plColor}`}>
+              <span className={`num text-3xl font-semibold tracking-tight ${plColor}`}>
                 {isProfit ? "+" : ""}
                 {formatCurrency(plNum)}
               </span>
@@ -321,7 +321,7 @@ export const CloseTradeModal: React.FC<CloseTradeModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={!loading ? onCancel : undefined}
       />
       {/* key resets all form state when a different trade is selected */}

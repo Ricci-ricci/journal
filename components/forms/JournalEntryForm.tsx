@@ -196,7 +196,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
               rows={4}
               value={formData.content}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder={placeholders.content}
             />
             {errors.content && (
@@ -216,7 +216,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.whatWentWell}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+                className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
                 placeholder={placeholders.whatWentWell}
               />
             </div>
@@ -231,7 +231,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.whatWentWrong}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+                className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
                 placeholder={placeholders.whatWentWrong}
               />
             </div>
@@ -249,7 +249,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.lessonsLearned}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+                className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
                 placeholder={placeholders.lessonsLearned}
               />
             </div>
@@ -269,7 +269,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.goalsNextPeriod}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+                className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
                 placeholder={placeholders.goalsNextPeriod}
               />
             </div>
@@ -285,13 +285,13 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
               rows={3}
               value={formData.marketConditions}
               onChange={handleInputChange}
-              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
+              className="block w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70 transition-[color,border-color,box-shadow] hover:border-foreground/25 focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/25"
               placeholder={placeholders.marketConditions}
             />
           </div>
 
           {/* Journal Tips */}
-          <div className="bg-profit/10 border border-profit/30 rounded-md p-4">
+          <div className="bg-profit/10 border border-profit/25 rounded-xl p-4">
             <h4 className="text-sm font-medium text-profit mb-2">
               {formData.entryType === "DAILY"
                 ? "Daily"
@@ -331,7 +331,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
             {onCancel && (
               <Button
                 type="button"
