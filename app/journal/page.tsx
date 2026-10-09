@@ -20,15 +20,10 @@ import { useAuth } from "../../contexts/AuthContext";
 
 import { SearchInput } from "../../components/ui/SearchInput";
 import { Select } from "../../components/ui/Select";
+import { Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
+import { EmptyState } from "../../components/ui/Stat";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
-import {
-  AddIconButton,
   EditIconButton,
   DeleteIconButton,
   ExpandIconButton,
@@ -62,7 +57,7 @@ const JournalPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const entryTypeOptions = [
-    { value: "", label: "All Types" },
+    { value: "", label: "All types" },
     { value: "DAILY", label: "Daily" },
     { value: "WEEKLY", label: "Weekly" },
     { value: "MONTHLY", label: "Monthly" },
@@ -226,19 +221,6 @@ const JournalPage: React.FC = () => {
     });
   };
 
-  const getTypeBadgeVariant = (type: string) => {
-    switch (type) {
-      case "DAILY":
-        return "info";
-      case "WEEKLY":
-        return "warning";
-      case "MONTHLY":
-        return "success";
-      default:
-        return "default";
-    }
-  };
-
   const truncateText = (
     text: string | null,
     maxLength: number = 150,
@@ -251,10 +233,10 @@ const JournalPage: React.FC = () => {
 
   if (showForm) {
     return (
-      <Layout title={editingEntry ? "Edit Journal Entry" : "New Journal Entry"}>
-        <div className="max-w-4xl">
+      <Layout title={editingEntry ? "Edit entry" : "New entry"}>
+        <div className="max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-md p-4 text-sm text-red-400">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -287,9 +269,11 @@ const JournalPage: React.FC = () => {
     );
   }
 
+  const hasFilters = Boolean(searchTerm || filterType);
+
   return (
     <Layout
-      title="Trading Journal"
+      title="Journal"
       headerRight={
         <SearchInput
           value={searchTerm}
@@ -298,277 +282,135 @@ const JournalPage: React.FC = () => {
         />
       }
     >
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div>
-            <h2 className="text-lg font-medium text-foreground">
-              Your Trading Journal
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Reflect on your trading journey, document insights, and track your
-              progress.
-            </p>
+      <div className="max-w-3xl">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-40">
+            <Select
+              aria-label="Entry type"
+              options={entryTypeOptions}
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            />
           </div>
-          <AddIconButton
-            tooltip="New Entry"
-            size="lg"
+          <p className="text-[13px] text-muted-foreground">
+            {loading
+              ? "Loading…"
+              : hasFilters
+                ? `${filteredEntries.length} of ${entries.length} entries`
+                : `${entries.length} entr${entries.length !== 1 ? "ies" : "y"}`}
+          </p>
+          <Button
+            size="sm"
+            className="ml-auto"
             onClick={() => setShowForm(true)}
-          />
+          >
+            <Plus className="h-4 w-4" />
+            New entry
+          </Button>
         </div>
 
-        {/* Search and Filters */}
-        <Card>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="sm:w-48">
-                <Select
-                  options={entryTypeOptions}
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  placeholder="Filter by type"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground">
-                Showing {filteredEntries.length} of {entries.length} entries
-                {(searchTerm || filterType) && (
-                  <span className="ml-1">(filtered)</span>
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Journal Entries */}
         {loading ? (
-          <div className="space-y-4">
+          <div className="mt-6 border-t border-border">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-3/4 mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-muted rounded w-full"></div>
-                    <div className="h-3 bg-muted rounded w-5/6"></div>
-                    <div className="h-3 bg-muted rounded w-4/6"></div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={i} className="border-b border-border py-6 space-y-3">
+                <div className="h-3 w-24 rounded bg-muted" />
+                <div className="h-5 w-1/2 rounded bg-muted" />
+                <div className="h-3 w-5/6 rounded bg-muted" />
+              </div>
             ))}
           </div>
         ) : filteredEntries.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-muted-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-foreground">
-                {searchTerm || filterType
-                  ? "No entries match your filters"
-                  : "No journal entries"}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {searchTerm || filterType
-                  ? "Try adjusting your search or filter criteria."
-                  : "Start documenting your trading journey by creating your first entry."}
-              </p>
-              {!searchTerm && !filterType && (
-                <div className="mt-6">
-                  <AddIconButton
-                    tooltip="Write Your First Entry"
-                    size="lg"
-                    onClick={() => setShowForm(true)}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="mt-6">
+            <EmptyState
+              title={hasFilters ? "No entries match" : "Nothing written yet"}
+              action={
+                !hasFilters && (
+                  <Button size="sm" onClick={() => setShowForm(true)}>
+                    Write the first entry
+                  </Button>
+                )
+              }
+            >
+              {hasFilters
+                ? "Try a different search or entry type."
+                : "A few lines after each session is enough to start."}
+            </EmptyState>
+          </div>
         ) : (
-          <div className="space-y-6">
-            {filteredEntries.map((entry) => (
-              <Card
-                key={entry.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <Badge
-                            variant={getTypeBadgeVariant(entry.entryType)}
-                            size="sm"
-                          >
-                            {entry.entryType}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {formatDate(entry.entryDate)}
-                          </span>
-                        </div>
-                        <CardTitle className="text-lg">
-                          {entry.title || "Untitled Entry"}
-                        </CardTitle>
-                      </div>
-                    </div>
+          <div className="mt-6 border-t border-border">
+            {filteredEntries.map((entry) => {
+              const isExpanded = expandedEntry === entry.id;
+              const sections = [
+                { label: "What went well", text: entry.whatWentWell },
+                { label: "What went wrong", text: entry.whatWentWrong },
+                { label: "Lessons", text: entry.lessonsLearned },
+                { label: "Next period", text: entry.goalsNextPeriod },
+                { label: "Market conditions", text: entry.marketConditions },
+              ].filter((x) => x.text);
 
-                    <div className="flex items-center space-x-2">
+              return (
+                <article
+                  key={entry.id}
+                  className="group border-b border-border py-6"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="label">
+                        {formatDate(entry.entryDate)} ·{" "}
+                        {entry.entryType.toLowerCase()}
+                      </p>
+                      <h2 className="mt-1.5 font-heading text-2xl leading-tight text-foreground">
+                        {entry.title || "Untitled entry"}
+                      </h2>
+                    </div>
+                    <div className="flex items-center flex-shrink-0 -mr-1.5">
                       <ExpandIconButton
-                        isExpanded={expandedEntry === entry.id}
-                        size="sm"
+                        isExpanded={isExpanded}
+                        size="md"
                         onClick={() =>
-                          setExpandedEntry(
-                            expandedEntry === entry.id ? null : entry.id,
-                          )
+                          setExpandedEntry(isExpanded ? null : entry.id)
                         }
                       />
                       <EditIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => handleEditEntry(entry)}
                       />
                       <DeleteIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => handleDeleteEntry(entry.id)}
                       />
                     </div>
                   </div>
-                </CardHeader>
 
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Main Content */}
-                    {entry.content && (
-                      <div>
-                        <p className="text-foreground leading-relaxed">
-                          {expandedEntry === entry.id
-                            ? entry.content
-                            : truncateText(entry.content)}
-                        </p>
-                      </div>
-                    )}
+                  {entry.content && (
+                    <p className="mt-3 text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
+                      {isExpanded ? entry.content : truncateText(entry.content)}
+                    </p>
+                  )}
 
-                    {/* Expanded Content */}
-                    {expandedEntry === entry.id && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
-                        {entry.whatWentWell && (
-                          <div>
-                            <h4 className="text-sm font-medium text-emerald-400 mb-2">
-                              ✅ What Went Well
-                            </h4>
-                            <p className="text-sm text-foreground bg-emerald-500/10 p-3 rounded">
-                              {entry.whatWentWell}
-                            </p>
-                          </div>
-                        )}
+                  {isExpanded && sections.length > 0 && (
+                    <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                      {sections.map((x) => (
+                        <div key={x.label}>
+                          <dt className="label">{x.label}</dt>
+                          <dd className="mt-1 text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                            {x.text}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
 
-                        {entry.whatWentWrong && (
-                          <div>
-                            <h4 className="text-sm font-medium text-red-400 mb-2">
-                              ❌ What Went Wrong
-                            </h4>
-                            <p className="text-sm text-foreground bg-red-500/10 p-3 rounded">
-                              {entry.whatWentWrong}
-                            </p>
-                          </div>
-                        )}
-
-                        {entry.lessonsLearned && (
-                          <div>
-                            <h4 className="text-sm font-medium text-blue-400 mb-2">
-                              💡 Lessons Learned
-                            </h4>
-                            <p className="text-sm text-foreground bg-blue-500/10 p-3 rounded">
-                              {entry.lessonsLearned}
-                            </p>
-                          </div>
-                        )}
-
-                        {entry.goalsNextPeriod && (
-                          <div>
-                            <h4 className="text-sm font-medium text-purple-400 mb-2">
-                              🎯 Goals Next Period
-                            </h4>
-                            <p className="text-sm text-foreground bg-purple-500/10 p-3 rounded">
-                              {entry.goalsNextPeriod}
-                            </p>
-                          </div>
-                        )}
-
-                        {entry.marketConditions && (
-                          <div className="md:col-span-2">
-                            <h4 className="text-sm font-medium text-foreground mb-2">
-                              📈 Market Conditions
-                            </h4>
-                            <p className="text-sm text-foreground bg-muted/50 p-3 rounded">
-                              {entry.marketConditions}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Preview of lessons when collapsed */}
-                    {expandedEntry !== entry.id && entry.lessonsLearned && (
-                      <div className="border-l-4 border-blue-400 pl-4">
-                        <h4 className="text-sm font-medium text-blue-400 mb-1">
-                          Key Lesson
-                        </h4>
-                        <p className="text-sm text-muted-foreground italic">
-                          {truncateText(entry.lessonsLearned, 100)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  {!isExpanded && entry.lessonsLearned && (
+                    <p className="mt-3 border-l border-foreground/30 pl-3 text-sm text-muted-foreground">
+                      {truncateText(entry.lessonsLearned, 100)}
+                    </p>
+                  )}
+                </article>
+              );
+            })}
           </div>
         )}
-
-        {/* Journal Stats */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Journal Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {entries.filter((e) => e.entryType === "DAILY").length}
-                </div>
-                <p className="text-sm text-muted-foreground">Daily Entries</p>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-emerald-400">
-                  {entries.filter((e) => e.entryType === "WEEKLY").length}
-                </div>
-                <p className="text-sm text-muted-foreground">Weekly Reviews</p>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {entries.filter((e) => e.entryType === "MONTHLY").length}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Monthly Analyses
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </Layout>
   );

@@ -1,35 +1,37 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
   padding?: "none" | "sm" | "md" | "lg";
+  /* Kept for call-site compatibility; cards are flat and no longer cast shadows. */
   shadow?: "none" | "sm" | "md" | "lg";
 }
 
+const paddingClasses = {
+  none: "",
+  sm: "p-3",
+  md: "p-5",
+  lg: "p-7",
+};
+
 export const Card: React.FC<CardProps> = ({
   children,
-  className = "",
+  className,
   padding = "md",
-  shadow = "md",
 }) => {
-  const paddingClasses = {
-    none: "",
-    sm: "p-3",
-    md: "p-6",
-    lg: "p-8",
-  };
-
-  const shadowClasses = {
-    none: "",
-    sm: "shadow-sm",
-    md: "shadow-md",
-    lg: "shadow-lg",
-  };
-
-  const classes = `bg-card rounded-lg border border-border ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`;
-
-  return <div className={classes}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        "bg-card rounded-lg border border-border",
+        paddingClasses[padding],
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 };
 
 interface CardHeaderProps {
@@ -39,13 +41,9 @@ interface CardHeaderProps {
 
 export const CardHeader: React.FC<CardHeaderProps> = ({
   children,
-  className = "",
+  className,
 }) => {
-  return (
-    <div className={`border-b border-border pb-4 mb-4 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={cn("mb-4", className)}>{children}</div>;
 };
 
 interface CardTitleProps {
@@ -55,10 +53,10 @@ interface CardTitleProps {
 
 export const CardTitle: React.FC<CardTitleProps> = ({
   children,
-  className = "",
+  className,
 }) => {
   return (
-    <h3 className={`text-lg font-semibold text-foreground ${className}`}>
+    <h3 className={cn("text-sm font-medium text-foreground", className)}>
       {children}
     </h3>
   );
@@ -72,7 +70,7 @@ interface CardContentProps {
 
 export const CardContent: React.FC<CardContentProps> = ({
   children,
-  className = "",
+  className,
 }) => {
   return <div className={className}>{children}</div>;
 };

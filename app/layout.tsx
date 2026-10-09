@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist, Orbitron } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AccountsProvider } from "@/contexts/AccountsContext";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-const orbitron = Orbitron({
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const newsreader = Newsreader({
   subsets: ["latin"],
-  variable: "--font-rally",
-  weight: ["700", "800", "900"],
+  variable: "--font-serif",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
   title: "Rally",
-  description: "Track and analyze your trading performance",
+  description: "A trading journal: log trades, write up your sessions, and see what actually works.",
 };
 
 export default function RootLayout({
@@ -25,7 +26,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("dark font-sans", geist.variable, orbitron.variable)}
+      className={cn(
+        "dark font-sans",
+        geist.variable,
+        geistMono.variable,
+        newsreader.variable,
+      )}
     >
       <body className="antialiased bg-background text-foreground">
         <AuthProvider>

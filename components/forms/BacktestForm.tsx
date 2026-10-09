@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+import { Card, CardContent } from "../ui/Card";
 
 export interface BacktestFormData {
   name: string;
@@ -131,11 +131,6 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          {initialData ? "Edit Backtest" : "Add New Backtest"}
-        </CardTitle>
-      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* General info */}
@@ -220,7 +215,7 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
               </span>
               <span
                 className={`text-sm font-semibold ${
-                  returnPct >= 0 ? "text-emerald-400" : "text-red-400"
+                  returnPct >= 0 ? "text-profit" : "text-loss"
                 }`}
               >
                 {returnPct >= 0 ? "+" : ""}
@@ -301,7 +296,7 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Notes
             </label>
             <textarea
@@ -309,13 +304,13 @@ export const BacktestForm: React.FC<BacktestFormProps> = ({
               rows={3}
               value={formData.notes}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder="Observations, conditions, parameters used..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-2 pt-2">
             {onCancel && (
               <Button
                 type="button"

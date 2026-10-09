@@ -1,66 +1,62 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "success" | "outline";
+  variant?: "primary" | "secondary" | "danger" | "success" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   children: React.ReactNode;
 }
+
+const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
+  primary: "bg-primary text-primary-foreground hover:bg-primary/85",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-accent",
+  outline: "border border-input text-foreground hover:bg-accent",
+  ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
+  danger: "border border-loss/40 text-loss hover:bg-loss/10",
+  success: "border border-profit/40 text-profit hover:bg-profit/10",
+};
+
+const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
+  sm: "h-8 px-3 text-[13px]",
+  md: "h-9 px-3.5 text-sm",
+  lg: "h-11 px-5 text-[15px]",
+};
+
+export const buttonClasses = (
+  variant: ButtonProps["variant"] = "primary",
+  size: ButtonProps["size"] = "md",
+  className?: string,
+) =>
+  cn(
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+    "disabled:opacity-50 disabled:cursor-not-allowed",
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
+  );
 
 export const Button: React.FC<ButtonProps> = ({
   variant = "primary",
   size = "md",
   loading = false,
   children,
-  className = "",
+  className,
   disabled,
   ...props
 }) => {
-  const baseClasses =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed";
-
-  const variantClasses = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
-    secondary:
-      "bg-muted text-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-    success:
-      "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
-    outline:
-      "border border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring",
-  };
-
-  const sizeClasses = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm",
-    lg: "px-6 py-3 text-base",
-  };
-
-  const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
-
   return (
-    <button className={classes} disabled={disabled || loading} {...props}>
+    <button
+      className={buttonClasses(variant, size, className)}
+      disabled={disabled || loading}
+      {...props}
+    >
       {loading && (
-        <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
+        <span
+          aria-hidden
+          className="h-3.5 w-3.5 rounded-full border-2 border-current border-r-transparent animate-spin"
+        />
       )}
       {children}
     </button>

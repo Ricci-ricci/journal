@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+import { Card, CardContent } from "../ui/Card";
 
 interface JournalEntryFormData {
   entryDate: string;
@@ -154,11 +154,6 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          {initialData ? "Edit Journal Entry" : "New Journal Entry"}
-        </CardTitle>
-      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
@@ -193,7 +188,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
           {/* Main Content */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Main Content
             </label>
             <textarea
@@ -201,11 +196,11 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
               rows={4}
               value={formData.content}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder={placeholders.content}
             />
             {errors.content && (
-              <p className="mt-2 text-sm text-red-600">{errors.content}</p>
+              <p className="mt-1.5 text-xs text-loss">{errors.content}</p>
             )}
           </div>
 
@@ -213,7 +208,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* What Went Well */}
             <div>
-              <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+              <label className="block text-[13px] font-medium text-foreground mb-1.5">
                 What Went Well
               </label>
               <textarea
@@ -221,14 +216,14 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.whatWentWell}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
                 placeholder={placeholders.whatWentWell}
               />
             </div>
 
             {/* What Went Wrong */}
             <div>
-              <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+              <label className="block text-[13px] font-medium text-foreground mb-1.5">
                 What Went Wrong
               </label>
               <textarea
@@ -236,7 +231,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.whatWentWrong}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
                 placeholder={placeholders.whatWentWrong}
               />
             </div>
@@ -246,7 +241,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Lessons Learned */}
             <div>
-              <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+              <label className="block text-[13px] font-medium text-foreground mb-1.5">
                 Lessons Learned
               </label>
               <textarea
@@ -254,14 +249,14 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.lessonsLearned}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
                 placeholder={placeholders.lessonsLearned}
               />
             </div>
 
             {/* Goals Next Period */}
             <div>
-              <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+              <label className="block text-[13px] font-medium text-foreground mb-1.5">
                 Goals for Next{" "}
                 {formData.entryType === "DAILY"
                   ? "Day"
@@ -274,7 +269,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                 rows={3}
                 value={formData.goalsNextPeriod}
                 onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
                 placeholder={placeholders.goalsNextPeriod}
               />
             </div>
@@ -282,7 +277,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
           {/* Market Conditions */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Market Conditions & Analysis
             </label>
             <textarea
@@ -290,14 +285,14 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
               rows={3}
               value={formData.marketConditions}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder={placeholders.marketConditions}
             />
           </div>
 
           {/* Journal Tips */}
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md p-4">
-            <h4 className="text-sm font-medium text-emerald-400 mb-2">
+          <div className="bg-profit/10 border border-profit/30 rounded-md p-4">
+            <h4 className="text-sm font-medium text-profit mb-2">
               {formData.entryType === "DAILY"
                 ? "Daily"
                 : formData.entryType === "WEEKLY"
@@ -305,7 +300,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                   : "Monthly"}{" "}
               Journal Tips
             </h4>
-            <ul className="text-xs text-emerald-400 space-y-1">
+            <ul className="text-xs text-profit space-y-1">
               {formData.entryType === "DAILY" && (
                 <>
                   <li>• Record your emotional state during key trades</li>
@@ -336,7 +331,7 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-2 pt-2">
             {onCancel && (
               <Button
                 type="button"

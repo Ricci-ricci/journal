@@ -4,7 +4,9 @@ import React, { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PostCard } from "@/components/feed/PostCard";
 import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/Stat";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -38,7 +40,7 @@ interface PostWithRelations {
 // ─── Skeleton card ────────────────────────────────────────────────────────────
 
 const SkeletonCard: React.FC = () => (
-  <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
+  <div className="bg-card border border-border rounded-lg overflow-hidden">
     <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
       <div className="w-9 h-9 rounded-full bg-muted shrink-0" />
       <div className="space-y-2 flex-1">
@@ -156,15 +158,18 @@ export default function FeedPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <Layout title="Community Feed">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Page header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Community Feed</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            See what other traders are sharing
-          </p>
-        </div>
+    <Layout title="Feed">
+      <div className="max-w-2xl space-y-6">
+        <p className="text-sm text-muted-foreground">
+          Trades other people chose to share. Share one of yours from the{" "}
+          <Link
+            href="/trades"
+            className="text-foreground underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
+          >
+            Trades
+          </Link>{" "}
+          page.
+        </p>
 
         {/* Loading skeleton */}
         {loading && (
@@ -177,12 +182,11 @@ export default function FeedPage() {
 
         {/* Error state */}
         {!loading && fetchError && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-6 py-5 text-center">
-            <p className="text-sm text-red-400">{fetchError}</p>
+          <div className="rounded-md border border-loss/40 bg-loss/10 px-4 py-3 flex items-center justify-between gap-4">
+            <p className="text-sm text-loss">{fetchError}</p>
             <Button
               variant="outline"
               size="sm"
-              className="mt-3"
               onClick={() => window.location.reload()}
             >
               Retry
@@ -192,33 +196,9 @@ export default function FeedPage() {
 
         {/* Empty state */}
         {!loading && !fetchError && posts.length === 0 && (
-          <div className="text-center py-16">
-            <div className="mx-auto w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <svg
-                className="w-8 h-8 text-muted-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6m-6-4h.01M17 16h.01"
-                />
-              </svg>
-            </div>
-            <h3 className="text-base font-semibold text-foreground mb-2">
-              No trades shared yet
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              Be the first to share one from your{" "}
-              <a href="/trades" className="text-blue-400 hover:underline">
-                Trades page
-              </a>
-              .
-            </p>
-          </div>
+          <EmptyState title="Nothing shared yet">
+            Be the first — open a trade on the Trades page and share it.
+          </EmptyState>
         )}
 
         {/* Post list */}
@@ -246,7 +226,7 @@ export default function FeedPage() {
                   loading={loadingMore}
                   disabled={loadingMore}
                 >
-                  Load More
+                  Load more
                 </Button>
               </div>
             )}

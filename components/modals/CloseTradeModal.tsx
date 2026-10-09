@@ -1,6 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  fieldClasses,
+  fieldErrorClasses,
+  fieldLabelClasses,
+} from "../ui/Input";
 import { Button } from "../ui/Button";
 
 interface Trade {
@@ -68,17 +75,17 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
   const isLoss = hasValidPl && plNum < 0;
 
   const plColor = isProfit
-    ? "text-emerald-400"
+    ? "text-profit"
     : isLoss
-      ? "text-red-400"
+      ? "text-loss"
       : "text-muted-foreground";
 
   const previewBorder = !hasValidPl
     ? "border-border bg-muted/30"
     : isProfit
-      ? "border-emerald-500/30 bg-emerald-500/5"
+      ? "border-profit/30 bg-profit/5"
       : isLoss
-        ? "border-red-500/30 bg-red-500/5"
+        ? "border-loss/30 bg-loss/5"
         : "border-border bg-muted/20";
 
   const handleConfirm = async () => {
@@ -110,57 +117,23 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
   };
 
   const inputClass = (hasError?: boolean) =>
-    [
-      "block w-full rounded-md border-0 py-2 px-3 text-sm shadow-sm",
-      "ring-1 ring-inset transition-colors",
-      "bg-background text-foreground placeholder:text-muted-foreground",
-      "focus:outline-none focus:ring-2 focus:ring-inset",
-      hasError
-        ? "ring-red-500 focus:ring-red-500"
-        : "ring-border focus:ring-ring",
-      loading ? "opacity-50 cursor-not-allowed" : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
+    cn(fieldClasses, "px-3", hasError && fieldErrorClasses);
 
   return (
-    <div className="relative z-10 w-full max-w-md rounded-xl bg-card border border-border shadow-2xl overflow-hidden">
+    <div className="relative z-10 w-full max-w-md rounded-lg bg-popover border border-border shadow-2xl shadow-black/50 overflow-hidden">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+      <div className="flex items-start justify-between gap-4 px-5 pt-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30">
-            <svg
-              className="h-4 w-4 text-emerald-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
           <div>
             <h2
               id="close-trade-title"
-              className="text-sm font-semibold text-foreground"
+              className="font-heading text-xl leading-tight text-foreground"
             >
-              Close Trade
+              Close trade
             </h2>
             <p className="text-xs text-muted-foreground">
               {trade.symbol}&nbsp;·&nbsp;
-              <span
-                className={
-                  trade.direction === "LONG"
-                    ? "text-emerald-400"
-                    : "text-red-400"
-                }
-              >
-                {trade.direction}
-              </span>
+              {trade.direction.toLowerCase()}
               &nbsp;·&nbsp;Entry&nbsp;{formatCurrency(trade.entryPrice)}
             </p>
           </div>
@@ -169,31 +142,20 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+          aria-label="Close"
+          className="-mr-1.5 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors disabled:opacity-40"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <X className="h-4 w-4" />
         </button>
       </div>
 
       {/* ── Body ── */}
-      <div className="px-6 py-5 space-y-4">
+      <div className="px-5 py-5 space-y-4">
         {/* Row: Exit Price + Exit Date */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              Exit Price <span className="text-red-400">*</span>
+            <label className={fieldLabelClasses}>
+              Exit Price <span className="text-loss">*</span>
             </label>
             <input
               type="number"
@@ -210,12 +172,12 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
               className={inputClass(!!errors.exitPrice)}
             />
             {errors.exitPrice && (
-              <p className="mt-1 text-xs text-red-400">{errors.exitPrice}</p>
+              <p className="mt-1 text-xs text-loss">{errors.exitPrice}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className={fieldLabelClasses}>
               Exit Date &amp; Time
             </label>
             <input
@@ -231,8 +193,8 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
         {/* Row: P&L amount + P&L % */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              Profit / Loss <span className="text-red-400">*</span>
+            <label className={fieldLabelClasses}>
+              Profit / Loss <span className="text-loss">*</span>
             </label>
             <input
               type="number"
@@ -248,12 +210,12 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
               className={inputClass(!!errors.profitLoss)}
             />
             {errors.profitLoss && (
-              <p className="mt-1 text-xs text-red-400">{errors.profitLoss}</p>
+              <p className="mt-1 text-xs text-loss">{errors.profitLoss}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className={fieldLabelClasses}>
               P&amp;L&nbsp;%&nbsp;
               <span className="text-muted-foreground font-normal">
                 (optional)
@@ -278,9 +240,9 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
 
         {/* ── Live P&L preview ── */}
         <div
-          className={`rounded-lg border px-4 py-4 transition-colors ${previewBorder}`}
+          className={`rounded-md border px-4 py-3.5 transition-colors ${previewBorder}`}
         >
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+          <p className="label mb-2">
             Result
           </p>
 
@@ -291,51 +253,24 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           ) : (
             <div className="flex items-baseline justify-between gap-4">
               {/* Big amount */}
-              <span className={`text-3xl font-bold tabular-nums ${plColor}`}>
+              <span className={`num text-3xl tracking-tight ${plColor}`}>
                 {isProfit ? "+" : ""}
                 {formatCurrency(plNum)}
               </span>
 
               {/* Percentage pill */}
               {hasValidPct && (
-                <span
-                  className={[
-                    "text-sm font-semibold tabular-nums px-2.5 py-1 rounded-full border",
-                    isProfit
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                      : isLoss
-                        ? "bg-red-500/10 text-red-400 border-red-500/30"
-                        : "bg-muted text-muted-foreground border-border",
-                  ].join(" ")}
-                >
+                <span className={`num text-sm ${plColor}`}>
                   {plPctNum >= 0 ? "+" : ""}
                   {plPctNum.toFixed(2)}%
                 </span>
               )}
             </div>
           )}
-
-          {/* Label below */}
-          {hasValidPl && (
-            <p className={`mt-1.5 text-xs font-medium ${plColor}`}>
-              {isProfit ? "▲ Profit" : isLoss ? "▼ Loss" : "— Break-even"}
-            </p>
-          )}
         </div>
 
         {/* Info note */}
-        <p className="text-xs text-muted-foreground flex items-start gap-1.5">
-          <svg
-            className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            />
-          </svg>
+        <p className="text-xs text-muted-foreground">
           Status will be set to&nbsp;
           <span className="font-medium text-foreground">Closed</span>
           &nbsp;and the account balance will be updated immediately.
@@ -343,7 +278,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
       </div>
 
       {/* ── Footer ── */}
-      <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
+      <div className="flex items-center justify-end gap-2 px-5 pb-5">
         <Button
           type="button"
           variant="outline"
@@ -360,7 +295,7 @@ const CloseTradeForm: React.FC<CloseTradeFormProps> = ({
           loading={loading}
           disabled={loading}
         >
-          Confirm Close
+          Close trade
         </Button>
       </div>
     </div>
@@ -386,7 +321,7 @@ export const CloseTradeModal: React.FC<CloseTradeModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60"
         onClick={!loading ? onCancel : undefined}
       />
       {/* key resets all form state when a different trade is selected */}

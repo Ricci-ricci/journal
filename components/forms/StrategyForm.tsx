@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+import { Card, CardContent } from "../ui/Card";
 
 interface StrategyFormData {
   name: string;
@@ -84,13 +84,6 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          {initialData
-            ? "Edit Trading Strategy"
-            : "Create New Trading Strategy"}
-        </CardTitle>
-      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Strategy Information */}
@@ -111,7 +104,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
                 name="isActive"
                 checked={formData.isActive}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-border rounded"
+                className="h-4 w-4 text-foreground focus:ring-ring border-border rounded"
               />
               <label
                 htmlFor="isActive"
@@ -124,7 +117,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Description
             </label>
             <textarea
@@ -132,14 +125,14 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={3}
               value={formData.description}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder="Brief description of the strategy..."
             />
           </div>
 
           {/* Entry Rules */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Entry Rules *
             </label>
             <textarea
@@ -159,13 +152,13 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
 • Confirmation signals"
             />
             {errors.entryRules && (
-              <p className="mt-2 text-sm text-red-600">{errors.entryRules}</p>
+              <p className="mt-1.5 text-xs text-loss">{errors.entryRules}</p>
             )}
           </div>
 
           {/* Exit Rules */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Exit Rules *
             </label>
             <textarea
@@ -185,13 +178,13 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
 • Reversal signals"
             />
             {errors.exitRules && (
-              <p className="mt-2 text-sm text-red-600">{errors.exitRules}</p>
+              <p className="mt-1.5 text-xs text-loss">{errors.exitRules}</p>
             )}
           </div>
 
           {/* Risk Management Rules */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Risk Management Rules
             </label>
             <textarea
@@ -199,7 +192,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
               rows={4}
               value={formData.riskManagementRules}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder="Define risk management rules:
 • Position sizing
 • Maximum daily loss
@@ -209,11 +202,11 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
           </div>
 
           {/* Strategy Tips */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-md p-4">
-            <h4 className="text-sm font-medium text-blue-400 mb-2">
+          <div className="bg-muted border border-foreground/30 rounded-md p-4">
+            <h4 className="text-sm font-medium text-foreground mb-2">
               Strategy Tips
             </h4>
-            <ul className="text-xs text-blue-400 space-y-1">
+            <ul className="text-xs text-foreground space-y-1">
               <li>
                 • Be specific with your rules to avoid subjective decisions
               </li>
@@ -229,7 +222,7 @@ export const StrategyForm: React.FC<StrategyFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-2 pt-2">
             {onCancel && (
               <Button
                 type="button"

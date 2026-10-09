@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Badge } from "../ui/Badge";
+import { Share2 } from "lucide-react";
+import { EmptyState } from "../ui/Stat";
 
 import {
   EditIconButton,
@@ -71,26 +72,9 @@ const formatPercent = (percent: number): string => {
   return `${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`;
 };
 
-const getStatusBadgeVariant = (status: string) => {
-  switch (status) {
-    case "OPEN":
-      return "info";
-    case "CLOSED":
-      return "default";
-    case "PARTIAL":
-      return "warning";
-    default:
-      return "default";
-  }
-};
-
-const getDirectionBadgeVariant = (direction: string) => {
-  return direction === "LONG" ? "success" : "danger";
-};
-
 const getProfitLossColor = (profitLoss: number | null): string => {
   if (profitLoss === null) return "text-muted-foreground";
-  return profitLoss >= 0 ? "text-emerald-400" : "text-red-400";
+  return profitLoss >= 0 ? "text-profit" : "text-loss";
 };
 
 export const TradesTable: React.FC<TradesTableProps> = ({
@@ -105,126 +89,92 @@ export const TradesTable: React.FC<TradesTableProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="bg-card rounded-lg border border-border">
-        <div className="px-6 py-4">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-muted rounded w-1/4" />
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="grid grid-cols-8 gap-4">
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                  <div className="h-4 bg-muted rounded" />
-                </div>
-              ))}
-            </div>
+      <div className="border-t border-border">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="border-b border-border py-4">
+            <div className="h-3 w-1/3 rounded bg-muted" />
           </div>
-        </div>
+        ))}
       </div>
     );
   }
 
   if (trades.length === 0) {
     return (
-      <div className="bg-card rounded-lg border border-border">
-        <div className="text-center py-12">
-          <svg
-            className="mx-auto h-12 w-12 text-muted-foreground"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2V7a2 2 0 012-2h2a2 2 0 002 2v2a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 00-2 2h-2a2 2 0 00-2 2v6a2 2 0 01-2 2H9z"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-foreground">
-            No trades
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Get started by creating your first trade.
-          </p>
-        </div>
-      </div>
+      <EmptyState title="No trades to show">
+        Nothing matches yet. Log a trade, or loosen the filters.
+      </EmptyState>
     );
   }
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden">
+    <div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-border">
-          <thead className="bg-muted/50">
+        <table className="min-w-full text-sm">
+          <thead className="border-b border-border">
             <tr>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Symbol
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Direction
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Entry
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Exit
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 Quantity
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                className="label px-3 first:pl-0 py-2.5 text-left font-normal"
               >
                 P&L
               </th>
-              <th scope="col" className="relative px-3 py-3">
+              <th scope="col" className="relative px-3 py-2.5">
                 <span className="sr-only">Actions</span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody>
             {trades.map((trade) => {
               const isDeleting = deletingId === trade.id;
               return (
               <tr
                 key={trade.id}
-                className={`transition-all duration-300 ease-out ${
+                className={`border-b border-border transition-all duration-300 ease-out ${
                   isDeleting
-                    ? "opacity-0 -translate-x-4 bg-red-500/10 pointer-events-none"
+                    ? "opacity-0 -translate-x-4 bg-loss/10 pointer-events-none"
                     : "hover:bg-muted/30"
                 }`}
               >
-                <td className="px-3 py-3 whitespace-nowrap">
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
-                    <div className="text-sm font-medium text-foreground">
+                    <div className="font-medium text-foreground">
                       {trade.symbol}
                     </div>
                     {trade.assetType && (
@@ -239,19 +189,25 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap">
-                  <Badge variant={getDirectionBadgeVariant(trade.direction)}>
-                    {trade.direction}
-                  </Badge>
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                  <span className="text-muted-foreground">
+                    {trade.direction === "LONG" ? "Long" : "Short"}
+                  </span>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap">
-                  <Badge variant={getStatusBadgeVariant(trade.status)}>
-                    {trade.status}
-                  </Badge>
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
+                  <span
+                    className={
+                      trade.status === "CLOSED"
+                        ? "text-muted-foreground"
+                        : "text-foreground"
+                    }
+                  >
+                    {trade.status.charAt(0) + trade.status.slice(1).toLowerCase()}
+                  </span>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap">
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
-                    <div className="text-sm text-foreground">
+                    <div className="num text-foreground">
                       {formatCurrency(
                         trade.entryPrice,
                         trade.account?.currency,
@@ -262,11 +218,11 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap">
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.exitPrice ? (
                       <>
-                        <div className="text-sm text-foreground">
+                        <div className="num text-foreground">
                           {formatCurrency(
                             trade.exitPrice,
                             trade.account?.currency,
@@ -283,15 +239,15 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap text-sm text-foreground">
+                <td className="num px-3 py-3 whitespace-nowrap text-foreground">
                   {trade.quantity.toLocaleString()}
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap">
+                <td className="px-3 first:pl-0 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     {trade.profitLoss !== null ? (
                       <>
                         <div
-                          className={`text-sm font-medium ${getProfitLossColor(trade.profitLoss)}`}
+                          className={`num ${getProfitLossColor(trade.profitLoss)}`}
                         >
                           {formatCurrency(
                             trade.profitLoss,
@@ -300,7 +256,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                         </div>
                         {trade.profitLossPercent !== null && (
                           <div
-                            className={`text-xs ${getProfitLossColor(trade.profitLoss)}`}
+                            className={`num text-xs ${getProfitLossColor(trade.profitLoss)}`}
                           >
                             {formatPercent(trade.profitLossPercent)}
                           </div>
@@ -311,8 +267,8 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-3 py-3 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end items-center space-x-1">
+                <td className="pl-3 py-3 whitespace-nowrap text-right">
+                  <div className="flex justify-end items-center">
                     {onViewTrade && (
                       <ViewIconButton
                         size="md"
@@ -339,21 +295,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({
                         tooltip="Share"
                         size="md"
                         onClick={() => onShareTrade(trade)}
-                        icon={
-                          <svg
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            className="w-full h-full"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                            />
-                          </svg>
-                        }
+                        icon={<Share2 className="w-full h-full" />}
                       />
                     )}
                     {onDeleteTrade && (

@@ -2,218 +2,68 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import {
+  BookOpen,
+  Check,
+  ChevronsUpDown,
+  FlaskConical,
+  LayoutGrid,
+  LineChart,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Target,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccounts } from "@/contexts/AccountsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { Wordmark } from "./Wordmark";
 
 interface SidebarItem {
   href: string;
   label: string;
-  icon: React.ReactNode;
-  badge?: string;
+  icon: LucideIcon;
 }
 
-const sidebarItems: SidebarItem[] = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/trades",
-    label: "My Trades",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/journal",
-    label: "Trading Journal",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/strategies",
-    label: "Strategies",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/backtest",
-    label: "Backtest",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/accounts",
-    label: "Accounts",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/feed",
-    label: "Feed",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6m-6-4h.01M17 16h.01"
-        />
-      </svg>
-    ),
-  },
+const sidebarGroups: SidebarItem[][] = [
+  [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+    { href: "/trades", label: "Trades", icon: LineChart },
+    { href: "/journal", label: "Journal", icon: BookOpen },
+    { href: "/strategies", label: "Strategies", icon: Target },
+    { href: "/backtest", label: "Backtest", icon: FlaskConical },
+  ],
+  [
+    { href: "/accounts", label: "Accounts", icon: Wallet },
+    { href: "/feed", label: "Feed", icon: Users },
+  ],
 ];
 
-const quickActions: SidebarItem[] = [
-  {
-    href: "/trades/new",
-    label: "New Trade",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/journal/new",
-    label: "Add Journal Entry",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-        />
-      </svg>
-    ),
-  },
-];
-
-const accountTypeDot: Record<string, string> = {
-  LIVE: "bg-red-400",
-  DEMO: "bg-yellow-400",
-  PAPER: "bg-muted-foreground/60",
-};
-
-const accountTypeBadgeColor: Record<string, string> = {
-  LIVE: "text-red-400",
-  DEMO: "text-yellow-400",
-  PAPER: "text-muted-foreground",
+const initialsOf = (name?: string | null, email?: string | null): string => {
+  const source = (name ?? "").trim() || (email ?? "").split("@")[0];
+  const parts = source.split(/[\s._-]+/).filter(Boolean);
+  if (parts.length === 0) return "–";
+  return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
 };
 
 interface SidebarProps {
   className?: string;
   isCollapsed: boolean;
   onToggle: () => void;
+  /* Called after a link is followed — lets the mobile drawer close itself. */
+  onNavigate?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   className = "",
   isCollapsed,
   onToggle,
+  onNavigate,
 }) => {
   const pathname = usePathname();
   const { accounts, activeAccount, activeAccountId, setActiveAccountId } =
@@ -235,395 +85,216 @@ export const Sidebar: React.FC<SidebarProps> = ({
       maximumFractionDigits: 2,
     }).format(amount);
 
+  const selectAccount = (id: string | null) => {
+    setActiveAccountId(id);
+    setDropdownOpen(false);
+  };
+
+  const itemClasses = (active: boolean) =>
+    cn(
+      "flex items-center gap-2.5 rounded-md text-sm transition-colors",
+      isCollapsed ? "justify-center h-9 w-9 mx-auto" : "h-8 px-2.5",
+      active
+        ? "bg-sidebar-accent text-foreground font-medium"
+        : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+    );
+
   return (
-    <div
+    <aside
       className={cn(
-        "relative flex flex-col bg-sidebar border-r border-border transition-all duration-300 ease-in-out h-full",
-        isCollapsed ? "w-16" : "w-64",
+        "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-[width] duration-200",
+        isCollapsed ? "w-14" : "w-60",
         className,
       )}
     >
-      {/* ── Logo header ── */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
+      {/* ── Wordmark + collapse ── */}
+      <div
+        className={cn(
+          "flex items-center h-14 flex-shrink-0",
+          isCollapsed ? "justify-center" : "justify-between pl-4 pr-2",
+        )}
+      >
         {!isCollapsed && (
-          <Link href="/dashboard" className="flex items-center">
-            <Image
-              src="/images/logo.jpg"
-              alt="Rally logo"
-              width={32}
-              height={32}
-              className="rounded-lg"
-            />
-            <span
-              className="ml-3 text-lg text-foreground"
-              style={{ fontFamily: "var(--font-rally)" }}
-            >
-              Rally
-            </span>
+          <Link href="/dashboard" onClick={onNavigate}>
+            <Wordmark />
           </Link>
         )}
-
-        {isCollapsed && (
-          <Image
-            src="/images/logo.jpg"
-            alt="Rally logo"
-            width={32}
-            height={32}
-            className="rounded-lg mx-auto"
-          />
-        )}
-
         <button
           onClick={onToggle}
-          className={cn(
-            "p-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors",
-            isCollapsed && "hidden",
-          )}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="hidden lg:inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-            />
-          </svg>
+          {isCollapsed ? (
+            <PanelLeftOpen className="h-4 w-4" />
+          ) : (
+            <PanelLeftClose className="h-4 w-4" />
+          )}
         </button>
       </div>
 
-      {/* Floating expand button (collapsed state) */}
-      {isCollapsed && (
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-20 bg-card border border-border rounded-full p-1.5 shadow-md hover:shadow-lg transition-shadow z-10"
-        >
-          <svg
-            className="w-3 h-3 text-muted-foreground"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      )}
-
-      {/* ── Account Switcher ── */}
-      {!isCollapsed ? (
-        <div className="flex-shrink-0 px-2 pt-3 pb-2 border-b border-border relative">
+      {/* ── Account switcher ── */}
+      {!isCollapsed && (
+        <div className="relative flex-shrink-0 px-2 pb-2">
           <button
             onClick={() => setDropdownOpen((v) => !v)}
-            className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+            aria-expanded={dropdownOpen}
+            className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border px-2.5 py-2 text-left hover:bg-sidebar-accent/60 transition-colors"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span
-                className={cn(
-                  "w-2 h-2 rounded-full flex-shrink-0",
-                  activeAccount
-                    ? accountTypeDot[activeAccount.accountType]
-                    : "bg-muted-foreground/40",
+            <span className="min-w-0">
+              <span className="block text-[13px] font-medium text-foreground truncate">
+                {activeAccount ? activeAccount.name : "All accounts"}
+              </span>
+              <span className="block text-xs text-muted-foreground truncate">
+                {activeAccount ? (
+                  <>
+                    <span className="num">
+                      {formatCurrency(
+                        activeAccount.currentBalance,
+                        activeAccount.currency,
+                      )}
+                    </span>{" "}
+                    · {activeAccount.accountType.toLowerCase()}
+                  </>
+                ) : (
+                  `${accounts.length} account${accounts.length !== 1 ? "s" : ""}`
                 )}
-              />
-              <div className="min-w-0 text-left">
-                <p className="text-xs font-medium text-foreground truncate leading-tight">
-                  {activeAccount ? activeAccount.name : "All Accounts"}
-                </p>
-                {activeAccount && (
-                  <p className="text-xs text-muted-foreground leading-tight">
-                    {formatCurrency(
-                      activeAccount.currentBalance,
-                      activeAccount.currency,
-                    )}
-                  </p>
-                )}
-              </div>
-            </div>
-            <svg
-              className={cn(
-                "w-3.5 h-3.5 text-muted-foreground flex-shrink-0 transition-transform duration-150",
-                dropdownOpen && "rotate-180",
-              )}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+              </span>
+            </span>
+            <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
           </button>
 
-          {/* Dropdown */}
           {dropdownOpen && (
-            <div className="absolute left-2 right-2 top-full mt-1 z-50 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
-              {/* All Accounts */}
-              <button
-                onClick={() => {
-                  setActiveAccountId(null);
-                  setDropdownOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-accent transition-colors"
-              >
-                <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
-                <span
-                  className={cn(
-                    "flex-1 text-left",
-                    !activeAccountId
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  All Accounts
-                </span>
-                {!activeAccountId && (
-                  <svg
-                    className="w-3.5 h-3.5 text-blue-400 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                )}
-              </button>
-
-              {accounts.length > 0 && <div className="h-px bg-border" />}
-
-              {accounts.map((acc) => (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setDropdownOpen(false)}
+              />
+              <div className="absolute left-2 right-2 top-full z-50 -mt-1 max-h-80 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-lg shadow-black/30">
                 <button
-                  key={acc.id}
-                  onClick={() => {
-                    setActiveAccountId(acc.id);
-                    setDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-accent transition-colors"
+                  onClick={() => selectAccount(null)}
+                  className="w-full flex items-center justify-between gap-2 rounded px-2 py-1.5 text-[13px] text-left hover:bg-accent transition-colors"
                 >
-                  <span
-                    className={cn(
-                      "w-2 h-2 rounded-full flex-shrink-0",
-                      accountTypeDot[acc.accountType],
-                    )}
-                  />
-                  <div className="flex-1 min-w-0 text-left">
-                    <p
-                      className={cn(
-                        "truncate leading-tight",
-                        activeAccountId === acc.id
-                          ? "text-foreground font-medium"
-                          : "text-foreground",
-                      )}
-                    >
-                      {acc.name}
-                    </p>
-                    <p className="text-muted-foreground leading-tight flex items-center gap-1">
-                      <span
-                        className={cn(
-                          "text-xs",
-                          accountTypeBadgeColor[acc.accountType],
-                        )}
-                      >
-                        {acc.accountType}
-                      </span>
-                      <span>·</span>
-                      <span>
-                        {formatCurrency(acc.currentBalance, acc.currency)}
-                      </span>
-                      {acc.totalPnL !== 0 && (
-                        <span
-                          className={
-                            acc.totalPnL >= 0
-                              ? "text-emerald-400"
-                              : "text-red-400"
-                          }
-                        >
-                          ({acc.totalPnL >= 0 ? "+" : ""}
-                          {formatCurrency(acc.totalPnL, acc.currency)})
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  {activeAccountId === acc.id && (
-                    <svg
-                      className="w-3.5 h-3.5 text-blue-400 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                  <span className="text-foreground">All accounts</span>
+                  {!activeAccountId && (
+                    <Check className="h-3.5 w-3.5 text-foreground flex-shrink-0" />
                   )}
                 </button>
-              ))}
-            </div>
+
+                {accounts.map((acc) => (
+                  <button
+                    key={acc.id}
+                    onClick={() => selectAccount(acc.id)}
+                    className="w-full flex items-center justify-between gap-2 rounded px-2 py-1.5 text-left hover:bg-accent transition-colors"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-[13px] text-foreground truncate">
+                        {acc.name}
+                      </span>
+                      <span className="block text-xs text-muted-foreground truncate">
+                        <span className="num">
+                          {formatCurrency(acc.currentBalance, acc.currency)}
+                        </span>{" "}
+                        · {acc.accountType.toLowerCase()}
+                        {acc.totalPnL !== 0 && (
+                          <span
+                            className={cn(
+                              "num ml-1.5",
+                              acc.totalPnL >= 0 ? "text-profit" : "text-loss",
+                            )}
+                          >
+                            {acc.totalPnL >= 0 ? "+" : ""}
+                            {formatCurrency(acc.totalPnL, acc.currency)}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                    {activeAccountId === acc.id && (
+                      <Check className="h-3.5 w-3.5 text-foreground flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
-        </div>
-      ) : (
-        /* Collapsed: dot indicator */
-        <div className="flex justify-center pt-2 pb-2.5 border-b border-border flex-shrink-0">
-          <span
-            title={activeAccount ? activeAccount.name : "All Accounts"}
-            className={cn(
-              "w-2.5 h-2.5 rounded-full",
-              activeAccount
-                ? accountTypeDot[activeAccount.accountType]
-                : "bg-muted-foreground/40",
-            )}
-          />
         </div>
       )}
 
       {/* ── Navigation ── */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
-        <div className="space-y-1">
-          {sidebarItems.map((item) => {
-            const isActive = isActivePath(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "group flex items-center rounded-md text-sm font-medium transition-colors",
-                  isCollapsed ? "justify-center p-2" : "px-3 py-2",
-                  isActive
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                )}
-                title={isCollapsed ? item.label : undefined}
-              >
-                <span
-                  className={cn(
-                    "flex-shrink-0 transition-colors",
-                    isActive
-                      ? "text-accent-foreground"
-                      : "text-muted-foreground group-hover:text-accent-foreground",
-                  )}
-                >
-                  {item.icon}
-                </span>
-                {!isCollapsed && (
-                  <span className="ml-3 transition-opacity duration-200">
-                    {item.label}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Quick Actions */}
-        <div
+      <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-2">
+        <Link
+          href="/trades/new"
+          onClick={onNavigate}
+          title={isCollapsed ? "New trade" : undefined}
           className={cn(
-            "pt-6 mt-6 border-t border-border",
-            isCollapsed && "border-none pt-4 mt-4",
+            "flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/85 transition-colors mb-3",
+            isCollapsed ? "justify-center h-9 w-9 mx-auto" : "h-8 px-2.5",
           )}
         >
-          {!isCollapsed && (
-            <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Quick Actions
-            </h3>
-          )}
-          <div className="space-y-1">
-            {quickActions.map((item) => (
+          <Plus className="h-4 w-4 flex-shrink-0" />
+          {!isCollapsed && "New trade"}
+        </Link>
+
+        {sidebarGroups.map((group, i) => (
+          <div
+            key={i}
+            className={cn(
+              "space-y-0.5",
+              i > 0 && "mt-3 pt-3 border-t border-sidebar-border",
+            )}
+          >
+            {group.map(({ href, label, icon: Icon }) => (
               <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "group flex items-center rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
-                  isCollapsed ? "justify-center p-2" : "px-3 py-2",
-                )}
-                title={isCollapsed ? item.label : undefined}
+                key={href}
+                href={href}
+                onClick={onNavigate}
+                title={isCollapsed ? label : undefined}
+                className={itemClasses(isActivePath(href))}
               >
-                <span className="flex-shrink-0 text-muted-foreground group-hover:text-accent-foreground transition-colors">
-                  {item.icon}
-                </span>
-                {!isCollapsed && (
-                  <span className="ml-3 transition-opacity duration-200">
-                    {item.label}
-                  </span>
-                )}
+                <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={1.75} />
+                {!isCollapsed && label}
               </Link>
             ))}
           </div>
-        </div>
+        ))}
       </nav>
 
-      {/* ── User Profile ── */}
+      {/* ── User ── */}
       <div
         className={cn(
-          "flex-shrink-0 border-t border-border",
-          isCollapsed ? "p-2" : "p-4",
+          "flex-shrink-0 flex items-center gap-2.5 border-t border-sidebar-border",
+          isCollapsed ? "justify-center py-3" : "px-3 py-3",
         )}
       >
-        <div
-          className={cn(
-            "flex items-center",
-            isCollapsed ? "justify-center" : "space-x-3",
-          )}
+        <span
+          title={user?.email ?? undefined}
+          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-[11px] font-medium text-foreground"
         >
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-muted-foreground">
-                DU
-              </span>
-            </div>
-          </div>
+          {initialsOf(user?.name, user?.email)}
+        </span>
 
-          {!isCollapsed && (
-            <>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.name ?? user?.email ?? "My Account"}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.email ?? ""}
-                </p>
-              </div>
-              <button
-                onClick={logout}
-                className="inline-flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring rounded-full transition-colors"
-              >
-                <span className="sr-only">Sign out</span>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-              </button>
-            </>
-          )}
-        </div>
+        {!isCollapsed && (
+          <>
+            <span className="flex-1 min-w-0">
+              <span className="block text-[13px] text-foreground truncate">
+                {user?.name ?? user?.email ?? "My account"}
+              </span>
+              {user?.name && (
+                <span className="block text-xs text-muted-foreground truncate">
+                  {user.email}
+                </span>
+              )}
+            </span>
+            <button
+              onClick={logout}
+              title="Sign out"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+            >
+              <span className="sr-only">Sign out</span>
+              <LogOut className="h-4 w-4" />
+            </button>
+          </>
+        )}
       </div>
-    </div>
+    </aside>
   );
 };

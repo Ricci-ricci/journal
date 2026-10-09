@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Badge } from "@/components/ui/Badge";
+import { Heart, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { DeleteIconButton } from "@/components/ui/IconButton";
+import { Input } from "@/components/ui/Input";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,27 +51,6 @@ interface PostCardProps {
   onLikeToggled: (postId: string, liked: boolean, count: number) => void;
 }
 
-// ─── Avatar colour helper ─────────────────────────────────────────────────────
-
-const AVATAR_COLORS = ["blue", "purple", "emerald", "amber", "rose"] as const;
-type AvatarColor = (typeof AVATAR_COLORS)[number];
-
-function hashAvatarColor(str: string): AvatarColor {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-const avatarColorClasses: Record<AvatarColor, string> = {
-  blue: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  purple: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  emerald: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  amber: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  rose: "bg-rose-500/20 text-rose-400 border-rose-500/30",
-};
-
 // ─── Relative-time helper ─────────────────────────────────────────────────────
 
 function relativeTime(dateStr: string): string {
@@ -106,16 +88,14 @@ export const PostCard: React.FC<PostCardProps> = ({
   // ── Derived display values ──
   const displayName = post.user.name || post.user.email;
   const avatarChar = displayName[0].toUpperCase();
-  const avatarColor = hashAvatarColor(post.user.id);
-  const colorClass = avatarColorClasses[avatarColor];
 
   const plPositive = post.profitLoss !== null && post.profitLoss >= 0;
   const plColor =
     post.profitLoss === null
       ? "text-muted-foreground"
       : plPositive
-        ? "text-emerald-400"
-        : "text-red-400";
+        ? "text-profit"
+        : "text-loss";
 
   // ── Handlers ──
 
@@ -196,208 +176,141 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
+  const avatar =
+    "flex items-center justify-center rounded-full bg-muted font-medium text-foreground shrink-0";
+
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div
-            className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border ${colorClass}`}
-          >
-            {avatarChar}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-foreground leading-none">
-              {displayName}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {relativeTime(post.createdAt)}
-            </p>
-          </div>
-        </div>
-
-        {/* Delete button (own posts only) */}
-        {currentUserId === post.userId && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            title="Delete post"
-            className="text-muted-foreground hover:text-red-400 transition-colors disabled:opacity-40"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* ── Body ── */}
-      <div className="px-4 py-3 space-y-2.5">
-        {/* Trade info row */}
-        <div className="flex items-center flex-wrap gap-2">
-          <span className="text-sm font-bold text-foreground">
-            {post.symbol}
-          </span>
-          <Badge
-            variant={post.direction === "LONG" ? "success" : "danger"}
-            size="sm"
-          >
-            {post.direction}
-          </Badge>
-          {post.assetType && (
-            <span className="text-xs text-muted-foreground">
-              {post.assetType}
-            </span>
-          )}
-          <Badge
-            variant={post.status === "OPEN" ? "info" : "default"}
-            size="sm"
-          >
-            {post.status}
-          </Badge>
-        </div>
-
-        {/* Prices + P&L row */}
-        <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm">
-          <span className="text-muted-foreground">
-            Entry:{" "}
-            <span className="text-foreground font-medium">
-              ${post.entryPrice.toFixed(2)}
-            </span>
-          </span>
-          {post.exitPrice !== null && (
-            <span className="text-muted-foreground">
-              Exit:{" "}
-              <span className="text-foreground font-medium">
-                ${post.exitPrice.toFixed(2)}
+    <article className="bg-card border border-border rounded-lg">
+      <div className="p-4 sm:p-5">
+        {/* ── Who and when ── */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className={`${avatar} h-7 w-7 text-xs`}>{avatarChar}</span>
+            <p className="text-sm text-foreground truncate">
+              <span className="font-medium">{displayName}</span>{" "}
+              <span className="text-muted-foreground">
+                · {relativeTime(post.createdAt)}
               </span>
-            </span>
+            </p>
+          </div>
+
+          {currentUserId === post.userId && (
+            <DeleteIconButton
+              size="sm"
+              tooltip="Delete post"
+              onClick={handleDelete}
+              disabled={deleting}
+            />
           )}
+        </div>
+
+        {/* ── The trade ── */}
+        <div className="mt-4 flex items-baseline justify-between gap-4 flex-wrap">
+          <p className="text-foreground">
+            <span className="font-heading text-2xl leading-none">
+              {post.symbol}
+            </span>{" "}
+            <span className="text-sm text-muted-foreground">
+              {post.direction.toLowerCase()}
+              {post.assetType && ` · ${post.assetType.toLowerCase()}`} ·{" "}
+              {post.status.toLowerCase()}
+            </span>
+          </p>
           {post.showPnL && post.profitLoss !== null && (
-            <span className={`font-semibold ${plColor}`}>
+            <p className={`num text-lg ${plColor}`}>
               {plPositive ? "+" : ""}${post.profitLoss.toFixed(2)}
               {post.profitLossPct !== null && (
-                <span className="ml-1 text-xs opacity-80">
-                  ({post.profitLossPct >= 0 ? "+" : ""}
-                  {post.profitLossPct.toFixed(2)}%)
+                <span className="ml-1.5 text-xs">
+                  {post.profitLossPct >= 0 ? "+" : ""}
+                  {post.profitLossPct.toFixed(2)}%
                 </span>
               )}
-            </span>
+            </p>
           )}
         </div>
 
-        {/* Caption */}
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          In at{" "}
+          <span className="num text-foreground">
+            ${post.entryPrice.toFixed(2)}
+          </span>
+          {post.exitPrice !== null && (
+            <>
+              , out at{" "}
+              <span className="num text-foreground">
+                ${post.exitPrice.toFixed(2)}
+              </span>
+            </>
+          )}
+        </p>
+
         {post.caption && (
-          <p className="text-sm text-foreground leading-relaxed">
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
             {post.caption}
           </p>
         )}
+
+        {/* ── Actions ── */}
+        <div className="mt-4 flex items-center gap-4 text-[13px]">
+          <button
+            type="button"
+            onClick={handleLike}
+            disabled={likeLoading}
+            aria-pressed={liked}
+            className={`inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
+              liked
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Heart
+              className="h-4 w-4"
+              fill={liked ? "currentColor" : "none"}
+              strokeWidth={1.75}
+            />
+            <span className="num">{likeCount}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleToggleComments}
+            aria-expanded={commentsOpen}
+            className={`inline-flex items-center gap-1.5 transition-colors ${
+              commentsOpen
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <MessageSquare className="h-4 w-4" strokeWidth={1.75} />
+            <span className="num">{commentCount}</span>
+          </button>
+        </div>
       </div>
 
-      {/* ── Action row ── */}
-      <div className="flex items-center gap-5 px-4 py-2 border-t border-border">
-        {/* Like */}
-        <button
-          type="button"
-          onClick={handleLike}
-          disabled={likeLoading}
-          className={`flex items-center gap-1.5 text-sm transition-colors disabled:opacity-50 ${
-            liked
-              ? "text-rose-400"
-              : "text-muted-foreground hover:text-rose-400"
-          }`}
-        >
-          <svg
-            className="w-4 h-4"
-            fill={liked ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            />
-          </svg>
-          <span>{likeCount}</span>
-        </button>
-
-        {/* Comments */}
-        <button
-          type="button"
-          onClick={handleToggleComments}
-          className={`flex items-center gap-1.5 text-sm transition-colors ${
-            commentsOpen
-              ? "text-blue-400"
-              : "text-muted-foreground hover:text-blue-400"
-          }`}
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-          <span>{commentCount}</span>
-        </button>
-      </div>
-
-      {/* ── Comment section (collapsible) ── */}
+      {/* ── Comments ── */}
       {commentsOpen && (
-        <div className="border-t border-border bg-muted/10 px-4 py-3 space-y-3">
+        <div className="border-t border-border p-4 sm:p-5 space-y-4">
           {commentsLoading ? (
-            <div className="animate-pulse space-y-2">
-              {[1, 2].map((i) => (
-                <div key={i} className="h-3 bg-muted rounded w-3/4" />
-              ))}
-            </div>
+            <p className="text-xs text-muted-foreground">Loading comments…</p>
           ) : comments.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              No comments yet. Be the first!
-            </p>
+            <p className="text-xs text-muted-foreground">No comments yet.</p>
           ) : (
             <div className="space-y-3">
               {comments.map((comment) => {
                 const cName = comment.user.name || comment.user.email;
-                const cColor =
-                  avatarColorClasses[hashAvatarColor(comment.user.id)];
                 return (
-                  <div key={comment.id} className="flex items-start gap-2">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold border shrink-0 ${cColor}`}
-                    >
+                  <div key={comment.id} className="flex items-start gap-2.5">
+                    <span className={`${avatar} h-6 w-6 text-[11px]`}>
                       {cName[0].toUpperCase()}
-                    </div>
+                    </span>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-xs font-medium text-foreground">
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground">
                           {cName}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {relativeTime(comment.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-foreground mt-0.5 wrap-break-word">
+                        </span>{" "}
+                        · {relativeTime(comment.createdAt)}
+                      </p>
+                      <p className="text-sm text-foreground/90 mt-0.5 wrap-break-word">
                         {comment.content}
                       </p>
                     </div>
@@ -407,11 +320,10 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
           )}
 
-          {/* Comment input (logged-in users only) */}
           {currentUserId && (
-            <div className="flex gap-2 pt-1">
-              <input
-                type="text"
+            <div className="flex gap-2">
+              <Input
+                aria-label="Comment"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => {
@@ -422,20 +334,19 @@ export const PostCard: React.FC<PostCardProps> = ({
                 }}
                 placeholder="Write a comment..."
                 disabled={commentSubmitting}
-                className="flex-1 rounded-md border-0 py-1.5 px-3 text-sm bg-background text-foreground placeholder:text-muted-foreground ring-1 ring-inset ring-border focus:outline-none focus:ring-2 focus:ring-ring transition-colors disabled:opacity-50"
               />
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={handleAddComment}
                 disabled={commentSubmitting || !newComment.trim()}
-                className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {commentSubmitting ? "…" : "Post"}
-              </button>
+                Post
+              </Button>
             </div>
           )}
         </div>
       )}
-    </div>
+    </article>
   );
 };

@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/Card";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAccounts } from "../../contexts/AccountsContext";
 
@@ -147,21 +148,12 @@ export function TradeActivityHeatmap() {
     return 1;
   }
 
+  // One neutral ramp: activity is a count, not a gain or a loss.
   function cellStyle(count: number, buckets: number[]): React.CSSProperties {
-    const i = intensity(count, buckets);
-    const fills = [
-      "rgba(244, 63, 94, 0.06)",
-      "rgba(244, 63, 94, 0.30)",
-      "rgba(244, 63, 94, 0.55)",
-      "rgba(244, 63, 94, 0.78)",
-      "rgba(244, 63, 94, 1.00)",
-    ];
-    const base = fills[i];
-    if (i === 0) return { backgroundColor: base };
+    const steps = [5, 18, 34, 54, 78];
+    const pct = steps[intensity(count, buckets)];
     return {
-      backgroundColor: base,
-      backgroundImage:
-        "repeating-linear-gradient(45deg, rgba(255,255,255,0.10) 0, rgba(255,255,255,0.10) 1px, transparent 1px, transparent 5px)",
+      backgroundColor: `color-mix(in oklab, var(--foreground) ${pct}%, transparent)`,
     };
   }
 
@@ -209,21 +201,9 @@ export function TradeActivityHeatmap() {
                 aria-label="Previous month"
                 className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
               >
-                <svg
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 18l-6-6 6-6"
-                  />
-                </svg>
+                <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm font-medium text-foreground min-w-[120px] text-center tabular-nums">
+              <span className="text-[13px] text-muted-foreground min-w-[108px] text-center">
                 {MONTH_NAMES[view.month]} {view.year}
               </span>
               <button
@@ -232,19 +212,7 @@ export function TradeActivityHeatmap() {
                 aria-label="Next month"
                 className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:cursor-not-allowed transition-colors"
               >
-                <svg
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 18l6-6-6-6"
-                  />
-                </svg>
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -267,7 +235,7 @@ export function TradeActivityHeatmap() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1.5 mb-2">
+        <div className="grid grid-cols-7 gap-1 mb-2">
           {DAY_HEADERS.map((d) => (
             <div
               key={d}
@@ -278,16 +246,16 @@ export function TradeActivityHeatmap() {
           ))}
         </div>
         {loading ? (
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: 35 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-square rounded bg-muted/30 animate-pulse"
+                className="aspect-square rounded-sm bg-muted/50"
               />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1">
             {calendar.cells.map((cell, i) => {
               if (cell.day === null) {
                 return <div key={i} className="aspect-square" />;
@@ -297,14 +265,18 @@ export function TradeActivityHeatmap() {
                 <div
                   key={i}
                   title={`${dateLabel} — ${cell.count} trade${cell.count !== 1 ? "s" : ""}`}
-                  className={`aspect-square rounded ring-1 ring-inset flex items-center justify-center text-[10px] font-medium transition-transform hover:scale-110 hover:ring-white/20 ${
-                    cell.isToday ? "ring-blue-400/60" : "ring-white/[0.04]"
+                  className={`num aspect-square rounded-sm flex items-center justify-center text-[10px] ${
+                    cell.isToday ? "ring-1 ring-inset ring-foreground" : ""
                   }`}
                   style={cellStyle(cell.count, calendar.buckets)}
                 >
                   <span
                     className={
-                      cell.count > 0 ? "text-white" : "text-muted-foreground/60"
+                      intensity(cell.count, calendar.buckets) >= 3
+                        ? "text-background"
+                        : cell.count > 0
+                          ? "text-foreground"
+                          : "text-muted-foreground/70"
                     }
                   >
                     {cell.day}

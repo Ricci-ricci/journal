@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+import { Card, CardContent } from "../ui/Card";
 
 interface Account {
   id: string;
@@ -284,9 +284,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{initialData ? "Edit Trade" : "Add New Trade"}</CardTitle>
-      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Account and Strategy Selection */}
@@ -363,7 +360,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Entry Details */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Entry Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -400,7 +397,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Exit Details */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Exit Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -426,7 +423,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Costs */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Costs
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -463,7 +460,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                 {isClosed && formData.exitPrice && (
                   <span className="text-xs text-muted-foreground">
                     {plAutoCalc ? (
-                      <span className="text-emerald-400 flex items-center gap-1">
+                      <span className="text-profit flex items-center gap-1">
                         <svg
                           className="w-3 h-3"
                           fill="currentColor"
@@ -478,7 +475,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                         Auto-calculated
                       </span>
                     ) : (
-                      <span className="text-amber-400">Manual override</span>
+                      <span className="text-warn">Manual override</span>
                     )}
                   </span>
                 )}
@@ -486,7 +483,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                   <button
                     type="button"
                     onClick={handleRecalculate}
-                    className="text-xs text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+                    className="text-xs text-foreground hover:text-foreground underline underline-offset-2 transition-colors"
                   >
                     Recalculate from prices
                   </button>
@@ -497,7 +494,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* P&L amount */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-foreground mb-1.5">
+                <label className="block text-[13px] font-medium text-foreground mb-1.5">
                   Profit / Loss (amount)
                 </label>
                 <div className="relative">
@@ -512,9 +509,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                       "block w-full rounded-md border-0 py-1.5 pr-3 pl-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
                       "bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring ring-border",
                       plIsPositive
-                        ? "text-emerald-400 ring-emerald-500/40 focus:ring-emerald-500"
+                        ? "text-profit ring-profit/40 focus:ring-profit"
                         : plIsNegative
-                          ? "text-red-400 ring-red-500/40 focus:ring-red-500"
+                          ? "text-loss ring-loss/40 focus:ring-loss"
                           : "",
                     ]
                       .filter(Boolean)
@@ -524,9 +521,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                     <span
                       className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold pointer-events-none ${
                         plIsPositive
-                          ? "text-emerald-400"
+                          ? "text-profit"
                           : plIsNegative
-                            ? "text-red-400"
+                            ? "text-loss"
                             : "text-muted-foreground"
                       }`}
                     >
@@ -535,7 +532,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                   )}
                 </div>
                 {errors.profitLoss && (
-                  <p className="mt-1 text-xs text-red-400">
+                  <p className="mt-1 text-xs text-loss">
                     {errors.profitLoss}
                   </p>
                 )}
@@ -543,7 +540,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
               {/* P&L percent */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-foreground mb-1.5">
+                <label className="block text-[13px] font-medium text-foreground mb-1.5">
                   Profit / Loss (%)
                 </label>
                 <div className="relative">
@@ -558,9 +555,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                       "block w-full rounded-md border-0 py-1.5 pr-8 pl-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-colors",
                       "bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring ring-border",
                       plIsPositive
-                        ? "text-emerald-400 ring-emerald-500/40 focus:ring-emerald-500"
+                        ? "text-profit ring-profit/40 focus:ring-profit"
                         : plIsNegative
-                          ? "text-red-400 ring-red-500/40 focus:ring-red-500"
+                          ? "text-loss ring-loss/40 focus:ring-loss"
                           : "",
                     ]
                       .filter(Boolean)
@@ -571,7 +568,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                   </span>
                 </div>
                 {errors.profitLossPercent && (
-                  <p className="mt-1 text-xs text-red-400">
+                  <p className="mt-1 text-xs text-loss">
                     {errors.profitLossPercent}
                   </p>
                 )}
@@ -584,9 +581,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({
                 <div
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
                     plIsPositive
-                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                      ? "bg-profit/15 text-profit border border-profit/30"
                       : plIsNegative
-                        ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                        ? "bg-loss/15 text-loss border border-loss/30"
                         : "bg-muted text-muted-foreground border border-border"
                   }`}
                 >
@@ -619,7 +616,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Risk Management */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Risk Management
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -655,7 +652,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Strategy Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Strategy & Setup
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -679,7 +676,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Psychology */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-3 pb-1 border-b border-border">
+            <h3 className="label mb-3 pb-2 border-b border-border">
               Psychology
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -705,7 +702,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+            <label className="block text-[13px] font-medium text-foreground mb-1.5">
               Notes
             </label>
             <textarea
@@ -713,13 +710,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({
               rows={4}
               value={formData.notes}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 py-1.5 text-foreground bg-background shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25"
               placeholder="Trade analysis, market conditions, lessons learned..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-2 pt-2">
             {onCancel && (
               <Button
                 type="button"

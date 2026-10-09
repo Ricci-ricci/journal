@@ -3,18 +3,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Layout } from "../../components/layout/Layout";
 import { BacktestForm, BacktestFormData } from "../../components/forms/BacktestForm";
+import { Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 import {
-  AddIconButton,
   EditIconButton,
   DeleteIconButton,
 } from "../../components/ui/IconButton";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
+import { EmptyState, Stat, StatRow, pnlTone } from "../../components/ui/Stat";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -231,10 +226,10 @@ const BacktestPage: React.FC = () => {
   // ─── Form view ────────────────────────────────────────────────────────────
   if (showForm) {
     return (
-      <Layout title={editing ? "Edit Backtest" : "Add New Backtest"}>
-        <div className="max-w-4xl">
+      <Layout title={editing ? "Edit backtest" : "New backtest"}>
+        <div className="max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-md p-4 text-sm text-red-400">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -274,6 +269,9 @@ const BacktestPage: React.FC = () => {
   }
 
   // ─── List view ────────────────────────────────────────────────────────────
+  const th = "label px-3 first:pl-0 py-2.5 font-normal whitespace-nowrap";
+  const td = "px-3 first:pl-0 py-3 align-top whitespace-nowrap";
+
   return (
     <Layout
       title="Backtests"
@@ -281,310 +279,166 @@ const BacktestPage: React.FC = () => {
         <SearchInput
           value={searchTerm}
           onChange={setSearchTerm}
-          placeholder="Search by name, platform or symbol..."
+          placeholder="Name, platform or symbol..."
         />
       }
     >
       <div className="space-y-6">
-        {/* Header Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div>
-            <h2 className="text-lg font-medium text-foreground">
-              Your Backtests
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Store and track backtests you ran on other platforms — monthly
-              PnL, win rate and more.
-            </p>
-          </div>
-          <AddIconButton
-            tooltip="Add Backtest"
-            size="lg"
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted-foreground max-w-xl">
+            Results from backtests you ran elsewhere, kept by month.
+          </p>
+          <Button
+            size="sm"
+            className="ml-auto"
             onClick={() => setShowForm(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Add backtest
+          </Button>
+        </div>
+
+        <StatRow>
+          <Stat
+            label="Net P&L"
+            value={formatCurrency(totalPnL)}
+            tone={pnlTone(totalPnL)}
           />
-        </div>
+          {accountReturns.length > 0 && (
+            <Stat
+              label="Combined return"
+              value={formatSignedPercent(combinedReturn)}
+              tone={pnlTone(combinedReturn)}
+              hint={`across ${accountReturns.length} account${accountReturns.length !== 1 ? "s" : ""}`}
+            />
+          )}
+          <Stat label="Avg win rate" value={formatPercent(avgWinRate)} />
+          <Stat label="Trades" value={totalTrades} />
+          <Stat label="Backtests" value={backtests.length} />
+        </StatRow>
 
-        {/* Summary stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardContent>
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Backtests
-              </p>
-              <p className="text-2xl font-bold text-foreground mt-1">
-                {backtests.length}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <p className="text-sm font-medium text-muted-foreground">
-                Total PnL
-              </p>
-              <p
-                className={`text-2xl font-bold mt-1 ${
-                  totalPnL >= 0 ? "text-emerald-400" : "text-red-400"
-                }`}
-              >
-                {formatCurrency(totalPnL)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <p className="text-sm font-medium text-muted-foreground">
-                Avg Win Rate
-              </p>
-              <p className="text-2xl font-bold text-foreground mt-1">
-                {formatPercent(avgWinRate)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Trades
-              </p>
-              <p className="text-2xl font-bold text-foreground mt-1">
-                {totalTrades}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Account Returns */}
-        {accountReturns.length > 0 && (
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>
-                  <CardTitle>Account Returns</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Return on account size for each backtest, combined.
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted-foreground">
-                    Combined Return
-                  </p>
-                  <p
-                    className={`text-2xl font-bold ${
-                      combinedReturn >= 0
-                        ? "text-emerald-400"
-                        : "text-red-400"
-                    }`}
-                  >
-                    {formatSignedPercent(combinedReturn)}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {accountReturns.map(({ backtest: b, ret }) => (
-                  <div
-                    key={b.id}
-                    className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-1.5"
-                  >
-                    <span className="text-sm text-foreground">{b.name}</span>
-                    <span
-                      className={`text-sm font-semibold ${
-                        ret >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}
-                    >
-                      {formatSignedPercent(ret)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Results count */}
-        <p className="text-sm text-muted-foreground">
-          Showing {filtered.length} of {backtests.length} backtests
-          {searchTerm && <span className="ml-1">(filtered)</span>}
-        </p>
-
-        {/* List */}
         {loading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="border-t border-border">
             {[...Array(4)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-3/4 mb-4"></div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="h-8 bg-muted rounded"></div>
-                    <div className="h-8 bg-muted rounded"></div>
-                    <div className="h-8 bg-muted rounded"></div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={i} className="border-b border-border py-4">
+                <div className="h-3 w-1/3 rounded bg-muted" />
+              </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-muted-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-foreground">
-                {searchTerm ? "No backtests match your search" : "No backtests yet"}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {searchTerm
-                  ? "Try adjusting your search."
-                  : "Get started by adding your first backtest."}
-              </p>
-              {!searchTerm && (
-                <div className="mt-6 flex justify-center">
-                  <AddIconButton
-                    tooltip="Add Your First Backtest"
-                    size="lg"
-                    onClick={() => setShowForm(true)}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <EmptyState
+            title={searchTerm ? "No backtests match" : "No backtests yet"}
+            action={
+              !searchTerm && (
+                <Button size="sm" onClick={() => setShowForm(true)}>
+                  Add a backtest
+                </Button>
+              )
+            }
+          >
+            {searchTerm
+              ? "Try a different search."
+              : "Add the monthly result of a backtest to compare it with live trading."}
+          </EmptyState>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {filtered.map((b) => (
-              <Card
-                key={b.id}
-                className="flex flex-col hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3 flex-wrap gap-y-2">
-                      <CardTitle>{b.name}</CardTitle>
-                      <Badge variant="info">{formatMonth(b.periodMonth)}</Badge>
-                      {b.platform && (
-                        <Badge variant="secondary">{b.platform}</Badge>
-                      )}
-                      {b.symbol && <Badge variant="default">{b.symbol}</Badge>}
-                      {b.timeFrame && (
-                        <Badge variant="default">{b.timeFrame}</Badge>
-                      )}
-                      {b.accountSize !== null && (
-                        <Badge variant="secondary">
-                          {formatAccountSize(b.accountSize)} account
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2 flex-shrink-0">
-                      <EditIconButton size="sm" onClick={() => handleEdit(b)} />
-                      <DeleteIconButton
-                        size="sm"
-                        onClick={() => handleDelete(b.id)}
-                      />
-                    </div>
-                  </div>
-                </CardHeader>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="border-b border-border">
+                <tr>
+                  <th className={`${th} text-left`}>Backtest</th>
+                  <th className={`${th} text-left`}>Month</th>
+                  <th className={`${th} text-right`}>P&amp;L</th>
+                  <th className={`${th} text-right`}>Return</th>
+                  <th className={`${th} text-right`}>Win rate</th>
+                  <th className={`${th} text-right`}>Trades</th>
+                  <th className={`${th} text-right`}>W / L</th>
+                  <th className={`${th} text-right`}>PF</th>
+                  <th className={`${th} text-right`}>Max DD</th>
+                  <th className="py-2.5">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((b) => {
+                  const ret = returnOnAccount(b);
+                  const meta = [
+                    b.symbol,
+                    b.timeFrame,
+                    b.platform,
+                    b.accountSize !== null &&
+                      `${formatAccountSize(b.accountSize)} account`,
+                  ].filter(Boolean);
 
-                <CardContent className="flex-1">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Total PnL</p>
-                      <p
-                        className={`text-sm font-semibold mt-0.5 ${
-                          (b.totalPnL ?? 0) >= 0
-                            ? "text-emerald-400"
-                            : "text-red-400"
+                  return (
+                    <tr key={b.id} className="border-b border-border">
+                      <td className={`${td} !whitespace-normal min-w-[14rem]`}>
+                        <p className="font-medium text-foreground">{b.name}</p>
+                        {meta.length > 0 && (
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {meta.join(" · ")}
+                          </p>
+                        )}
+                        {b.notes && (
+                          <p className="mt-1.5 max-w-md text-xs leading-relaxed text-muted-foreground whitespace-pre-line line-clamp-3">
+                            {b.notes}
+                          </p>
+                        )}
+                      </td>
+                      <td className={`${td} text-muted-foreground`}>
+                        {formatMonth(b.periodMonth)}
+                      </td>
+                      <td
+                        className={`${td} num text-right ${
+                          b.totalPnL === null
+                            ? "text-muted-foreground"
+                            : b.totalPnL >= 0
+                              ? "text-profit"
+                              : "text-loss"
                         }`}
                       >
                         {formatCurrency(b.totalPnL)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Return (% acct)
-                      </p>
-                      {(() => {
-                        const ret = returnOnAccount(b);
-                        return (
-                          <p
-                            className={`text-sm font-semibold mt-0.5 ${
-                              ret === null
-                                ? "text-foreground"
-                                : ret >= 0
-                                  ? "text-emerald-400"
-                                  : "text-red-400"
-                            }`}
-                          >
-                            {ret === null
-                              ? "—"
-                              : `${ret >= 0 ? "+" : ""}${ret.toFixed(2)}%`}
-                          </p>
-                        );
-                      })()}
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Win Rate</p>
-                      <p
-                        className={`text-sm font-semibold mt-0.5 ${
-                          b.winRate !== null && b.winRate >= 50
-                            ? "text-emerald-400"
-                            : "text-foreground"
+                      </td>
+                      <td
+                        className={`${td} num text-right ${
+                          ret === null
+                            ? "text-muted-foreground"
+                            : ret >= 0
+                              ? "text-profit"
+                              : "text-loss"
                         }`}
                       >
+                        {ret === null ? "—" : formatSignedPercent(ret)}
+                      </td>
+                      <td className={`${td} num text-right`}>
                         {formatPercent(b.winRate)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Trades</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">
+                      </td>
+                      <td className={`${td} num text-right`}>
                         {b.totalTrades || "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">W / L</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">
+                      </td>
+                      <td className={`${td} num text-right`}>
                         {b.winningTrades ?? "—"} / {b.losingTrades ?? "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Profit Factor
-                      </p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">
+                      </td>
+                      <td className={`${td} num text-right`}>
                         {b.profitFactor !== null
                           ? b.profitFactor.toFixed(2)
                           : "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Max Drawdown
-                      </p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">
+                      </td>
+                      <td className={`${td} num text-right`}>
                         {formatPercent(b.maxDrawdown)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {b.notes && (
-                    <div className="mt-4 text-xs text-muted-foreground bg-muted/50 p-3 rounded">
-                      <pre className="whitespace-pre-wrap font-sans">
-                        {b.notes}
-                      </pre>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                      </td>
+                      <td className="pl-3 py-2 align-top whitespace-nowrap text-right">
+                        <EditIconButton size="md" onClick={() => handleEdit(b)} />
+                        <DeleteIconButton
+                          size="md"
+                          onClick={() => handleDelete(b.id)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -8,16 +8,11 @@ import { TradesTable } from "../../components/tables/TradesTable";
 import { CloseTradeModal } from "../../components/modals/CloseTradeModal";
 import { DeleteTradeModal } from "../../components/modals/DeleteTradeModal";
 import { ShareTradeModal } from "../../components/modals/ShareTradeModal";
-import { Button } from "../../components/ui/Button";
-import { AddIconButton } from "../../components/ui/IconButton";
+import { Plus } from "lucide-react";
+import { Button, buttonClasses } from "../../components/ui/Button";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { Select } from "../../components/ui/Select";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../components/ui/Card";
+import { Segmented, Stat, StatRow, pnlTone } from "../../components/ui/Stat";
 import { useAccounts } from "../../contexts/AccountsContext";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -93,14 +88,14 @@ const PERIODS: { label: string; value: Period }[] = [
 ];
 
 const statusOptions = [
-  { value: "", label: "All Status" },
+  { value: "", label: "Any status" },
   { value: "OPEN", label: "Open" },
   { value: "CLOSED", label: "Closed" },
   { value: "PARTIAL", label: "Partial" },
 ];
 
 const directionOptions = [
-  { value: "", label: "All Directions" },
+  { value: "", label: "Any direction" },
   { value: "LONG", label: "Long" },
   { value: "SHORT", label: "Short" },
 ];
@@ -336,10 +331,6 @@ const TradesPage: React.FC = () => {
     router.push(`/trades/${trade.id}/edit`);
   };
 
-  const handleViewTrade = (trade: Trade) => {
-    console.log("View trade:", trade.id);
-  };
-
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -350,7 +341,7 @@ const TradesPage: React.FC = () => {
 
   return (
     <Layout
-      title="My Trades"
+      title="Trades"
       headerRight={
         <SearchInput
           value={searchTerm}
@@ -380,160 +371,68 @@ const TradesPage: React.FC = () => {
         loading={deleteLoading}
       />
       <div className="space-y-6">
-        {/* Period toggle + header row */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              {activeAccount ? (
-                <>
-                  Account:{" "}
-                  <span className="font-medium text-foreground">
-                    {activeAccount.name}
-                  </span>
-                  <span className="ml-2 text-xs">
-                    Balance:{" "}
-                    <span className="font-medium text-foreground">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: activeAccount.currency,
-                      }).format(activeAccount.currentBalance)}
-                    </span>
-                    {activeAccount.totalPnL !== 0 && (
-                      <span
-                        className={`ml-1 ${activeAccount.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"}`}
-                      >
-                        ({activeAccount.totalPnL >= 0 ? "+" : ""}
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: activeAccount.currency,
-                        }).format(activeAccount.totalPnL)}
-                        )
-                      </span>
-                    )}
-                  </span>
-                </>
-              ) : (
-                "Showing all accounts"
-              )}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Period toggle */}
-            <div className="inline-flex rounded-lg border border-border overflow-hidden">
-              {PERIODS.map((p) => (
-                <button
-                  key={p.value}
-                  onClick={() => setPeriod(p.value)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                    period === p.value
-                      ? "bg-blue-600 text-white"
-                      : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <Link href="/trades/new">
-              <AddIconButton tooltip="New Trade" size="md" />
+        {/* Account line + period + new trade */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            {activeAccount ? (
+              <>
+                {activeAccount.name} ·{" "}
+                <span className="num text-foreground">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: activeAccount.currency,
+                  }).format(activeAccount.currentBalance)}
+                </span>
+              </>
+            ) : (
+              "All accounts"
+            )}
+          </p>
+          <div className="flex items-center gap-2">
+            <Segmented options={PERIODS} value={period} onChange={setPeriod} />
+            <Link href="/trades/new" className={buttonClasses("primary", "sm")}>
+              <Plus className="h-4 w-4" />
+              New trade
             </Link>
           </div>
         </div>
 
-        {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardContent padding="sm">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Total Trades
-                  </p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.totalTrades}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent padding="sm">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Open</p>
-                  <p className="text-2xl font-bold text-blue-400">
-                    {stats.openTrades}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent padding="sm">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Closed</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.closedTrades}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent padding="sm">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Total P&L
-                  </p>
-                  <p
-                    className={`text-2xl font-bold ${
-                      stats.totalPnL >= 0 ? "text-emerald-400" : "text-red-400"
-                    }`}
-                  >
-                    {formatCurrency(stats.totalPnL)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent padding="sm">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Win Rate</p>
-                  <p
-                    className={`text-2xl font-bold ${
-                      stats.winRate >= 50 ? "text-emerald-400" : "text-red-400"
-                    }`}
-                  >
-                    {formatPercent(stats.winRate)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <StatRow>
+            <Stat
+              label="Net P&L"
+              value={formatCurrency(stats.totalPnL)}
+              tone={pnlTone(stats.totalPnL)}
+            />
+            <Stat label="Win rate" value={formatPercent(stats.winRate)} />
+            <Stat label="Trades" value={stats.totalTrades} />
+            <Stat label="Open" value={stats.openTrades} />
+            <Stat label="Closed" value={stats.closedTrades} />
+          </StatRow>
         )}
 
-        {/* Filters + Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Trade History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Filters */}
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section>
+          {/* Filters */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="w-36">
               <Select
+                aria-label="Status"
                 options={statusOptions}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               />
-
+            </div>
+            <div className="w-36">
               <Select
+                aria-label="Direction"
                 options={directionOptions}
                 value={directionFilter}
                 onChange={(e) => setDirectionFilter(e.target.value)}
               />
-
+            </div>
+            {(searchTerm || statusFilter || directionFilter) && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => {
                   setSearchTerm("");
@@ -541,22 +440,19 @@ const TradesPage: React.FC = () => {
                   setDirectionFilter("");
                 }}
               >
-                Clear Filters
+                Clear
               </Button>
-            </div>
-
-            {/* Results count */}
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground">
-                {loading
-                  ? "Loading…"
-                  : `${filteredTrades.length} trade${filteredTrades.length !== 1 ? "s" : ""}${
-                      filteredTrades.length !== trades.length
-                        ? ` (filtered from ${trades.length})`
-                        : ""
-                    }`}
-              </p>
-            </div>
+            )}
+            <p className="ml-auto text-[13px] text-muted-foreground">
+              {loading
+                ? "Loading…"
+                : `${filteredTrades.length} trade${filteredTrades.length !== 1 ? "s" : ""}${
+                    filteredTrades.length !== trades.length
+                      ? ` of ${trades.length}`
+                      : ""
+                  }`}
+            </p>
+          </div>
 
             <TradesTable
               trades={filteredTrades}
@@ -564,12 +460,10 @@ const TradesPage: React.FC = () => {
               deletingId={deletingId}
               onEditTrade={handleEditTrade}
               onDeleteTrade={handleDeleteTrade}
-              onViewTrade={handleViewTrade}
               onCloseTrade={handleCloseTrade}
               onShareTrade={handleShareTrade}
             />
-          </CardContent>
-        </Card>
+        </section>
       </div>
     </Layout>
   );

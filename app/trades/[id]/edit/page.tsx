@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Layout } from "../../../../components/layout/Layout";
@@ -246,87 +248,38 @@ const EditTradePage: React.FC = () => {
   };
 
   return (
-    <Layout title="Edit Trade">
-      <div className="max-w-4xl">
-        {/* Breadcrumb */}
-        <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="inline-flex items-center space-x-1 md:space-x-3">
-            <li className="inline-flex items-center">
-              <a
-                href="/trades"
-                className="inline-flex items-center text-sm font-medium text-foreground hover:text-blue-600"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                </svg>
-                Trades
-              </a>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="w-6 h-6 text-muted-foreground"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="ml-1 text-sm font-medium text-muted-foreground md:ml-2">
-                  Edit Trade
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+    <Layout title="Edit trade">
+      <div className="max-w-3xl">
+        <Link
+          href="/trades"
+          className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Trades
+        </Link>
 
-        {/* Success Message */}
         {successMsg && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md p-4 mb-6 flex items-center space-x-3">
-            <svg
-              className="h-5 w-5 text-emerald-400 shrink-0"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="text-sm font-medium text-emerald-400">{successMsg}</p>
-          </div>
+          <p
+            role="status"
+            className="mb-5 rounded-md border border-profit/40 bg-profit/10 px-3 py-2.5 text-sm text-profit"
+          >
+            {successMsg}
+          </p>
         )}
 
-        {/* Error Message */}
         {errorMsg && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-md p-4 mb-6 flex items-center space-x-3">
-            <svg
-              className="h-5 w-5 text-red-400 shrink-0"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="text-sm font-medium text-red-400">{errorMsg}</p>
-          </div>
+          <p
+            role="alert"
+            className="mb-5 rounded-md border border-loss/40 bg-loss/10 px-3 py-2.5 text-sm text-loss"
+          >
+            {errorMsg}
+          </p>
         )}
 
         {/* Loading State */}
         {fetchingData ? (
-          <div className="bg-card rounded-lg border border-border p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+          <div className="rounded-lg border border-dashed border-border p-8 text-center">
+            
             <p className="text-sm text-muted-foreground">Loading trade data...</p>
           </div>
         ) : trade ? (
@@ -340,7 +293,7 @@ const EditTradePage: React.FC = () => {
           />
         ) : (
           !errorMsg && (
-            <div className="bg-card rounded-lg border border-border p-8 text-center">
+            <div className="rounded-lg border border-dashed border-border p-8 text-center">
               <p className="text-sm text-muted-foreground">Trade not found.</p>
             </div>
           )

@@ -6,18 +6,14 @@ import {
   AccountForm,
   AccountFormData,
 } from "../../components/forms/AccountForm";
+import { Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
-import {
-  AddIconButton,
   EditIconButton,
   DeleteIconButton,
 } from "../../components/ui/IconButton";
+import { EmptyState } from "../../components/ui/Stat";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAccounts } from "../../contexts/AccountsContext";
 
@@ -203,22 +199,9 @@ const AccountsPage: React.FC = () => {
     });
   };
 
-  const getAccountTypeBadgeVariant = (type: string) => {
-    switch (type) {
-      case "LIVE":
-        return "danger";
-      case "DEMO":
-        return "warning";
-      case "PAPER":
-        return "secondary";
-      default:
-        return "default";
-    }
-  };
-
   if (showForm) {
     return (
-      <Layout title={editingAccount ? "Edit Account" : "Add New Account"}>
+      <Layout title={editingAccount ? "Edit account" : "New account"}>
         <div className="max-w-2xl">
           <AccountForm
             onSubmit={
@@ -247,223 +230,97 @@ const AccountsPage: React.FC = () => {
   }
 
   return (
-    <Layout title="Trading Accounts">
+    <Layout title="Accounts">
       <div className="space-y-6">
-        {/* Header Actions */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-lg font-medium text-foreground">
-              Manage your trading accounts
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Add and manage your trading accounts across different brokers and
-              account types.
-            </p>
-          </div>
-          <AddIconButton
-            tooltip="Add Account"
-            size="md"
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted-foreground max-w-xl">
+            One per broker account. Live, demo and paper balances are tracked
+            separately.
+          </p>
+          <Button
+            size="sm"
+            className="ml-auto"
             onClick={() => setShowForm(true)}
-          />
+          >
+            <Plus className="h-4 w-4" />
+            Add account
+          </Button>
         </div>
 
-        {/* Accounts Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
+            {[...Array(3)].map((_, i) => (
               <Card key={i}>
-                <CardContent className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-1/2 mb-4"></div>
-                  <div className="h-8 bg-muted rounded w-full mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-2/3"></div>
-                </CardContent>
+                <div className="h-3 w-1/2 rounded bg-muted" />
+                <div className="mt-5 h-7 w-2/3 rounded bg-muted" />
               </Card>
             ))}
           </div>
         ) : accounts.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-muted-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-foreground">
-                No accounts
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Get started by creating your first trading account.
-              </p>
-              <div className="mt-6">
-                <AddIconButton
-                  tooltip="Add Your First Account"
-                  size="lg"
-                  onClick={() => setShowForm(true)}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No accounts yet"
+            action={
+              <Button size="sm" onClick={() => setShowForm(true)}>
+                Add an account
+              </Button>
+            }
+          >
+            Add the account you trade from so balances and P&amp;L have
+            somewhere to live.
+          </EmptyState>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
             {accounts.map((account) => (
-              <Card
-                key={account.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="truncate">{account.name}</CardTitle>
-                      {account.broker && (
-                        <p className="text-sm text-muted-foreground mt-1 truncate">
-                          {account.broker}
-                        </p>
-                      )}
-                    </div>
-                    <Badge
-                      variant={getAccountTypeBadgeVariant(account.accountType)}
-                    >
-                      {account.accountType}
-                    </Badge>
+              <Card key={account.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-medium text-foreground truncate">
+                      {account.name}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                      {[account.broker, account.accountType.toLowerCase()]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
                   </div>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="space-y-3">
-                    {/* Current Balance */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Current Balance
-                      </span>
-                      <span className="text-lg font-semibold text-foreground">
-                        {formatCurrency(
-                          account.currentBalance,
-                          account.currency,
-                        )}
-                      </span>
-                    </div>
-
-                    {/* P&L */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        All-time P&L
-                      </span>
-                      <span
-                        className={`font-medium ${
-                          account.totalPnL >= 0
-                            ? "text-emerald-400"
-                            : "text-red-400"
-                        }`}
-                      >
-                        {account.totalPnL >= 0 ? "+" : ""}
-                        {formatCurrency(account.totalPnL, account.currency)}
-                      </span>
-                    </div>
-
-                    {/* Initial Balance */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Initial Balance
-                      </span>
-                      <span className="text-muted-foreground">
-                        {formatCurrency(
-                          account.initialBalance,
-                          account.currency,
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Currency</span>
-                      <span className="font-medium">{account.currency}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Created</span>
-                      <span>{formatDate(account.createdAt)}</span>
-                    </div>
-
-                    <div className="pt-3 border-t border-border">
-                      <div className="flex justify-end space-x-2">
-                        <EditIconButton
-                          size="sm"
-                          onClick={() => handleEditAccount(account)}
-                        />
-                        <DeleteIconButton
-                          size="sm"
-                          onClick={() => handleDeleteAccount(account.id)}
-                        />
-                      </div>
-                    </div>
+                  <div className="flex items-center flex-shrink-0 -mt-1.5 -mr-2">
+                    <EditIconButton
+                      size="md"
+                      onClick={() => handleEditAccount(account)}
+                    />
+                    <DeleteIconButton
+                      size="md"
+                      onClick={() => handleDeleteAccount(account.id)}
+                    />
                   </div>
-                </CardContent>
+                </div>
+
+                <p className="num mt-5 text-2xl tracking-tight text-foreground">
+                  {formatCurrency(account.currentBalance, account.currency)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  <span
+                    className={`num ${
+                      account.totalPnL > 0
+                        ? "text-profit"
+                        : account.totalPnL < 0
+                          ? "text-loss"
+                          : ""
+                    }`}
+                  >
+                    {account.totalPnL >= 0 ? "+" : ""}
+                    {formatCurrency(account.totalPnL, account.currency)}
+                  </span>{" "}
+                  from{" "}
+                  <span className="num">
+                    {formatCurrency(account.initialBalance, account.currency)}
+                  </span>{" "}
+                  · opened {formatDate(account.createdAt)}
+                </p>
               </Card>
             ))}
           </div>
         )}
-
-        {/* Account Types Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Types</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-start space-x-3">
-                <Badge variant="secondary" size="sm">
-                  PAPER
-                </Badge>
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Paper Trading
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Virtual trading with simulated money for practice and
-                    strategy testing.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <Badge variant="warning" size="sm">
-                  DEMO
-                </Badge>
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Demo Account
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Broker-provided demo account with virtual funds and real
-                    market data.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <Badge variant="danger" size="sm">
-                  LIVE
-                </Badge>
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">
-                    Live Account
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Real money trading account with actual market execution.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </Layout>
   );

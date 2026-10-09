@@ -1,4 +1,13 @@
 import React, { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+
+/* Shared look for every text-like control (input, select, textarea). */
+export const fieldClasses =
+  "block w-full h-9 rounded-md border border-input bg-transparent text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors hover:border-foreground/30 focus:outline-none focus:border-foreground/60 focus:ring-2 focus:ring-ring/25 disabled:opacity-50 disabled:cursor-not-allowed";
+export const fieldErrorClasses =
+  "border-loss/70 focus:border-loss focus:ring-loss/25";
+export const fieldLabelClasses =
+  "block text-[13px] font-medium text-foreground mb-1.5";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -22,26 +31,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const inputClasses = [
-      "block w-full rounded-md border-0 py-1.5 bg-background text-foreground shadow-sm ring-1 ring-inset",
-      error
-        ? "ring-destructive placeholder:text-destructive/50 focus:ring-2 focus:ring-inset focus:ring-destructive"
-        : "ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-ring",
-      leftIcon ? "pl-10" : "px-3",
-      rightIcon ? "pr-10" : "",
-      "sm:text-sm sm:leading-6",
-      "disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed",
+    const inputClasses = cn(
+      fieldClasses,
+      error && fieldErrorClasses,
+      leftIcon ? "pl-9" : "px-3",
+      rightIcon && "pr-9",
       className,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+    );
 
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+          <label className={fieldLabelClasses}>
             {label}
           </label>
         )}
@@ -49,7 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="relative">
           {leftIcon && (
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <span className="text-muted-foreground sm:text-sm">
+              <span className="text-muted-foreground">
                 {leftIcon}
               </span>
             </div>
@@ -59,7 +60,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
           {rightIcon && (
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-muted-foreground sm:text-sm">
+              <span className="text-muted-foreground">
                 {rightIcon}
               </span>
             </div>
@@ -67,13 +68,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && (
-          <p className="mt-2 text-sm text-destructive" role="alert">
+          <p className="mt-1.5 text-xs text-loss" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p className="mt-2 text-sm text-muted-foreground">{helperText}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{helperText}</p>
         )}
       </div>
     );

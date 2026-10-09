@@ -1,4 +1,7 @@
 import React, { forwardRef } from "react";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { fieldClasses, fieldErrorClasses, fieldLabelClasses } from "./Input";
 
 interface SelectOption {
   value: string;
@@ -29,24 +32,17 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref,
   ) => {
-    const selectClasses = [
-      "block w-full rounded-md border py-1.5 pl-3 pr-10",
-      "bg-background text-foreground",
-      "shadow-sm sm:text-sm sm:leading-6",
-      "transition-colors",
-      error
-        ? "border-destructive focus:ring-2 focus:ring-inset focus:ring-destructive"
-        : "border-border focus:ring-2 focus:ring-inset focus:ring-ring",
-      "disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed",
+    const selectClasses = cn(
+      fieldClasses,
+      "appearance-none pl-3 pr-9",
+      error && fieldErrorClasses,
       className,
-    ]
-      .filter(Boolean)
-      .join(" ");
+    );
 
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium leading-6 text-foreground mb-2">
+          <label className={fieldLabelClasses}>
             {label}
           </label>
         )}
@@ -62,32 +58,27 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               <option
                 key={option.value}
                 value={option.value}
-                className="bg-background text-foreground"
+                className="bg-popover text-foreground"
               >
                 {option.label}
               </option>
             ))}
           </select>
 
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
+          <ChevronDown
+            aria-hidden
+            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          />
         </div>
 
         {error && (
-          <p className="mt-2 text-sm text-destructive" role="alert">
+          <p className="mt-1.5 text-xs text-loss" role="alert">
             {error}
           </p>
         )}
 
         {helperText && !error && (
-          <p className="mt-2 text-sm text-muted-foreground">{helperText}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{helperText}</p>
         )}
       </div>
     );

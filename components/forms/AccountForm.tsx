@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/Card";
+import { Card, CardContent } from "../ui/Card";
 
 export interface AccountFormData {
   name: string;
@@ -103,11 +103,6 @@ export const AccountForm: React.FC<AccountFormProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          {initialData ? "Edit Trading Account" : "Add New Trading Account"}
-        </CardTitle>
-      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Account Information */}
@@ -184,7 +179,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-2 pt-2">
             {onCancel && (
               <Button
                 type="button"

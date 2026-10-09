@@ -13,19 +13,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Layout } from "../../components/layout/Layout";
 import { StrategyForm } from "../../components/forms/StrategyForm";
 import { Button } from "../../components/ui/Button";
+import { Plus } from "lucide-react";
 import {
-  AddIconButton,
   EditIconButton,
   DeleteIconButton,
   ActivateIconButton,
 } from "../../components/ui/IconButton";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
+import { EmptyState, Segmented } from "../../components/ui/Stat";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -229,12 +223,12 @@ const StrategiesPage: React.FC = () => {
   });
 
   const formatPercent = (percent: number | null): string => {
-    if (percent === null) return "N/A";
+    if (percent === null) return "—";
     return `${percent.toFixed(1)}%`;
   };
 
   const formatCurrency = (amount: number | null): string => {
-    if (amount === null) return "N/A";
+    if (amount === null) return "—";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -251,10 +245,10 @@ const StrategiesPage: React.FC = () => {
 
   if (showForm) {
     return (
-      <Layout title={editingStrategy ? "Edit Strategy" : "Create New Strategy"}>
-        <div className="max-w-4xl">
+      <Layout title={editingStrategy ? "Edit strategy" : "New strategy"}>
+        <div className="max-w-3xl">
           {errorMsg && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-md p-4 text-sm text-red-400">
+            <div className="mb-4 bg-loss/10 border border-loss/30 rounded-md p-4 text-sm text-loss">
               {errorMsg}
             </div>
           )}
@@ -287,9 +281,11 @@ const StrategiesPage: React.FC = () => {
     );
   }
 
+  const hasFilters = Boolean(searchTerm) || filterActive !== null;
+
   return (
     <Layout
-      title="Trading Strategies"
+      title="Strategies"
       headerRight={
         <SearchInput
           value={searchTerm}
@@ -298,268 +294,159 @@ const StrategiesPage: React.FC = () => {
         />
       }
     >
-      <div className="space-y-6">
-        {/* Header Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div>
-            <h2 className="text-lg font-medium text-foreground">
-              Your Trading Strategies
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Create, manage and track the performance of your trading
-              strategies.
-            </p>
-          </div>
-          <AddIconButton
-            tooltip="Create Strategy"
-            size="lg"
-            onClick={() => setShowForm(true)}
+      <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Segmented
+            options={[
+              { label: "All", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Inactive", value: "inactive" },
+            ]}
+            value={
+              filterActive === null
+                ? "all"
+                : filterActive
+                  ? "active"
+                  : "inactive"
+            }
+            onChange={(v) => setFilterActive(v === "all" ? null : v === "active")}
           />
+          <p className="text-[13px] text-muted-foreground">
+            {loading
+              ? "Loading…"
+              : hasFilters
+                ? `${filteredStrategies.length} of ${strategies.length}`
+                : `${strategies.length} strateg${strategies.length !== 1 ? "ies" : "y"}`}
+          </p>
+          <Button
+            size="sm"
+            className="ml-auto"
+            onClick={() => setShowForm(true)}
+          >
+            <Plus className="h-4 w-4" />
+            New strategy
+          </Button>
         </div>
 
-        {/* Filters */}
-        <Card>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="flex space-x-2">
-                <Button
-                  variant={filterActive === null ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterActive(null)}
-                >
-                  All
-                </Button>
-                <Button
-                  variant={filterActive === true ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterActive(true)}
-                >
-                  Active
-                </Button>
-                <Button
-                  variant={filterActive === false ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterActive(false)}
-                >
-                  Inactive
-                </Button>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground">
-                Showing {filteredStrategies.length} of {strategies.length}{" "}
-                strategies
-                {(searchTerm || filterActive !== null) && (
-                  <span className="ml-1">(filtered)</span>
-                )}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Strategies List */}
         {loading ? (
-          <div className="space-y-4">
+          <div className="mt-6 border-t border-border">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-3/4 mb-4"></div>
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="h-8 bg-muted rounded"></div>
-                    <div className="h-8 bg-muted rounded"></div>
-                    <div className="h-8 bg-muted rounded"></div>
-                    <div className="h-8 bg-muted rounded"></div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={i} className="border-b border-border py-6 space-y-3">
+                <div className="h-5 w-1/3 rounded bg-muted" />
+                <div className="h-3 w-2/3 rounded bg-muted" />
+              </div>
             ))}
           </div>
         ) : filteredStrategies.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-muted-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-foreground">
-                {searchTerm || filterActive !== null
-                  ? "No strategies match your filters"
-                  : "No strategies"}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {searchTerm || filterActive !== null
-                  ? "Try adjusting your search or filter criteria."
-                  : "Get started by creating your first trading strategy."}
-              </p>
-              {!searchTerm && filterActive === null && (
-                <div className="mt-6 flex justify-center">
-                  <AddIconButton
-                    tooltip="Create Your First Strategy"
-                    size="lg"
-                    onClick={() => setShowForm(true)}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="mt-6">
+            <EmptyState
+              title={hasFilters ? "No strategies match" : "No strategies yet"}
+              action={
+                !hasFilters && (
+                  <Button size="sm" onClick={() => setShowForm(true)}>
+                    Write down a setup
+                  </Button>
+                )
+              }
+            >
+              {hasFilters
+                ? "Try a different search or filter."
+                : "Describe a setup once, then tag trades with it to see how it does."}
+            </EmptyState>
+          </div>
         ) : (
-          <div className="space-y-6">
-            {filteredStrategies.map((strategy) => (
-              <Card
-                key={strategy.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <CardTitle>{strategy.name}</CardTitle>
-                      <Badge
-                        variant={strategy.isActive ? "success" : "secondary"}
-                      >
-                        {strategy.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </div>
+          <div className="mt-6 border-t border-border">
+            {filteredStrategies.map((strategy) => {
+              const rules = [
+                { label: "Entry", text: strategy.entryRules },
+                { label: "Exit", text: strategy.exitRules },
+                { label: "Risk", text: strategy.riskManagementRules },
+              ];
 
-                    <div className="flex items-center space-x-2">
+              return (
+                <article
+                  key={strategy.id}
+                  className={`border-b border-border py-6 ${
+                    strategy.isActive ? "" : "opacity-60"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <h2 className="font-heading text-2xl leading-tight text-foreground">
+                        {strategy.name}
+                        {!strategy.isActive && (
+                          <span className="ml-2 align-middle font-sans text-xs text-muted-foreground">
+                            inactive
+                          </span>
+                        )}
+                      </h2>
+                      {strategy.description && (
+                        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                          {strategy.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center flex-shrink-0 -mr-1.5">
                       <ActivateIconButton
                         isActive={strategy.isActive}
-                        size="sm"
+                        size="md"
                         onClick={() => handleToggleActive(strategy)}
                       />
                       <EditIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => handleEditStrategy(strategy)}
                       />
                       <DeleteIconButton
-                        size="sm"
+                        size="md"
                         onClick={() => handleDeleteStrategy(strategy.id)}
                       />
                     </div>
                   </div>
-                  {strategy.description && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {strategy.description}
-                    </p>
+
+                  <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                    {[
+                      { l: "Trades", v: strategy.totalTrades, c: "" },
+                      { l: "Win rate", v: formatPercent(strategy.winRate), c: "" },
+                      {
+                        l: "Avg win",
+                        v: formatCurrency(strategy.averageProfit),
+                        c: strategy.averageProfit ? "text-profit" : "",
+                      },
+                      {
+                        l: "Avg loss",
+                        v: formatCurrency(strategy.averageLoss),
+                        c: strategy.averageLoss ? "text-loss" : "",
+                      },
+                    ].map((m) => (
+                      <div key={m.l} className="flex items-baseline gap-2">
+                        <dt className="label">{m.l}</dt>
+                        <dd className={`num text-foreground ${m.c}`}>{m.v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+
+                  {rules.some((r) => r.text) && (
+                    <dl className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                      {rules.map(
+                        (r) =>
+                          r.text && (
+                            <div key={r.label}>
+                              <dt className="label">{r.label}</dt>
+                              <dd className="mt-1 text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                                {r.text}
+                              </dd>
+                            </div>
+                          ),
+                      )}
+                    </dl>
                   )}
-                </CardHeader>
 
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* Performance Metrics */}
-                    <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-foreground">
-                        Performance
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            Total Trades
-                          </span>
-                          <span className="text-sm font-medium">
-                            {strategy.totalTrades}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            Win Rate
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${strategy.winRate && strategy.winRate >= 50 ? "text-emerald-400" : "text-red-400"}`}
-                          >
-                            {formatPercent(strategy.winRate)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            Avg Profit
-                          </span>
-                          <span className="text-sm font-medium text-emerald-400">
-                            {formatCurrency(strategy.averageProfit)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">
-                            Avg Loss
-                          </span>
-                          <span className="text-sm font-medium text-red-400">
-                            {formatCurrency(strategy.averageLoss)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Entry Rules */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">
-                        Entry Rules
-                      </h4>
-                      {strategy.entryRules ? (
-                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">
-                            {strategy.entryRules}
-                          </pre>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                          No entry rules defined
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Exit Rules */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">
-                        Exit Rules
-                      </h4>
-                      {strategy.exitRules ? (
-                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">
-                            {strategy.exitRules}
-                          </pre>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                          No exit rules defined
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Risk Management */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-foreground">
-                        Risk Management
-                      </h4>
-                      {strategy.riskManagementRules ? (
-                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded max-h-24 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap font-sans">
-                            {strategy.riskManagementRules}
-                          </pre>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                          No risk rules defined
-                        </p>
-                      )}
-                      <div className="pt-2 text-xs text-muted-foreground">
-                        <p>Created: {formatDate(strategy.createdAt)}</p>
-                        <p>Updated: {formatDate(strategy.updatedAt)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Updated {formatDate(strategy.updatedAt)}
+                  </p>
+                </article>
+              );
+            })}
           </div>
         )}
       </div>
